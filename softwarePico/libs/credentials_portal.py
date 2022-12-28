@@ -61,12 +61,19 @@ def serve_credentials_portal():
                         print('newpassword = ' + newpassword)
                         newssid = subparts[0].split('=')[1]
                         print('newssid = ' + newssid)
-                        # validate ssid and password
+                    if 'text-latitude' in subparts[2]:
+                        latitude = subparts[2].split('=')[1]
+                    if 'text-longitude' in subparts[3]:
+                        longitude = subparts[3].split('=')[1]
+                        # validate field input
                         #TODO
                         # write to conf/wifi.conf
                         wificonf_file = open('./conf/wifi.conf','w')
                         wificonf_file.write(newssid + ',' + newpassword)
                         wificonf_file.close()
+                        geolocation_file = open('./conf/geolocation.conf','w')
+                        geolocation_file.write(latitude + ',' + longitude)
+                        geolocation_file.close()
                         # now send a confirmation page, wait ten seconds and reboot
                         #TODO
                         waiting_credentials = False

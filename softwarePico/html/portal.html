@@ -24,10 +24,52 @@ body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#333}#control
         <input type="password" class="form-control" name="text-password" access="false" maxlength="16" id="text-password" required="required" aria-required="true">
     </div>
     <div class="form-group">
+        <label for="text-latitude" id="mess_geolocation">Configure the location of where the device will be installed.</label>
+        <button onclick="getLocation()">fill geolocation fields</button>
+    </div>
+    <div class="form-group">
+        <label for="text-latitude">Latitude<span class="formbuilder-required">*</span></label>
+        <input type="latitude" class="form-control" name="text-latitude" access="false" maxlength="16" id="text-latitude" required="required" aria-required="true">
+    </div>
+    <div class="form-group">
+        <label for="text-longitude">Longitude<span class="formbuilder-required">*</span></label>
+        <input type="longitude" class="form-control" name="text-longitude" access="false" maxlength="16" id="text-longitude" required="required" aria-required="true">
+    </div>
+
+    <div class="form-group">
         <button type="submit" "class="btn" name="button-submit" value="submit" id="button-submit">Submit</button>
     </div>
 </form>
 </div>
+
+<p id="text-longitude"></p>
+
+<script>
+var lat = document.getElementById("text-latitude");
+var lon = document.getElementById("text-longitude");
+var message_geolocation = document.getElementById("mess_geolocation");
+
+const geoloc_options = {
+  enableHighAccuracy: true,
+  timeout: 5000,
+  maximumAge: 0
+};
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition,showErrorPosition,geoloc_options);
+  }
+}
+
+function showErrorPosition() {
+  message_geolocation.innerHTML = "Allow geolocation. Geolocation is not supported by this browser.";
+}
+
+function showPosition(position) {
+  lat.value = position.coords.latitude;
+  lon.value = position.coords.longitude;
+}
+</script>
 </body>
 </html>
 
