@@ -57,12 +57,27 @@ const geoloc_options = {
 
 function getLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition,showErrorPosition,geoloc_options);
+    navigator.geolocation.getCurrentPosition(showPosition,handleError,geoloc_options);
   }
 }
 
-function showErrorPosition() {
-  message_geolocation.innerHTML = "Allow geolocation. Geolocation is not supported by this browser.";
+function handleError(error) {
+  // Display error based on the error code.
+  const { code } = error;
+  switch (code) {
+    case GeolocationPositionError.TIMEOUT:
+      // Handle timeout.
+      message_geolocation.innerHTML = "Timeout. Geolocation is not supported by this browser.";
+      break;
+    case GeolocationPositionError.PERMISSION_DENIED:
+      // User denied the request.
+      message_geolocation.innerHTML = "Allow geolocation. Geolocation is not enabled by this browser.";
+      break;
+    case GeolocationPositionError.POSITION_UNAVAILABLE:
+      // Position not available.
+      message_geolocation.innerHTML = "Geolocation error. Geolocation is currently not available.";
+      break;
+  }
 }
 
 function showPosition(position) {

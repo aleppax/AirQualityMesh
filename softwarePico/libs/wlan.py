@@ -2,35 +2,82 @@ import machine
 import network
 import socket
 import binascii
+import time
+from libs import logger, config
 
-iam = machine.unique_id()
-ssid = 'eigen'
-ap = False
+wlan = ''
+trying = False
 
-def connect_accesspoint():
-    creds_file = open('./conf/wifi.conf')
-    rawcreds = creds_file.read()
-    ssid, password = rawcreds.split(',')
-    ap = network.WLAN(network.STA_IF)
-    ap.active(True)
-    ap.connect(ssid, password)
-    print(ap.isconnected())
-    #wifi.conf found, trying to connect to the access point.
-    # try to connect for a while, if can't connect, switch to credentials portal.
+def initialize():
+    connected = False
+    if not hasattr(config,'wifi'):
+        serve_captive_portal()
+    connected = connect_from_list()
+    if not connected:
+        logger.warning("No way to connect. Rebooting in 20 seconds")
+        machine.lightsleep(20000) # ms
+        machine.soft_reset()
 
-def serve_credentials_portal():
-    print('running credentials portal')
-    #last 8 digits of the System control CPUID register of the RP2040 chip
+def connect_from_list():
+    global trying
+    trying = True
+    wifiNumber = 0
+    connected = False
+    while trying:
+        connected = connect(wifiNumber)
+        wifiNumber += 1
+        if connected:
+            return True
+
+def connect(wifiNumber):
+    global wlan, trying
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    ssid = "SSID_" + str(wifiNumber)
+    password = "PASSW_" + str(wifiNumber)
+    if ssid in config.wifi:
+        ssid, password = config.wifi[ssid], config.wifi[password]
+        wlan.connect(ssid, password)
+        timeout = 10
+        while timeout > 0:
+            status = wlan.status()
+            if status == -3:
+                logger.warning('authentication failure')
+                return False
+            elif status == -2:
+                logger.warning('No matching SSID found (could be out of range, or down)')
+                return False
+            elif status == -1:
+                logger.warning('Connection failed')
+                return False
+            elif status == 0:
+                logger.warning('Link is down')
+                return False 
+            elif status == 1:
+                logger.info('Connected to wifi')
+            elif status == 2:
+                logger.info('Connected to wifi, but no IP address')
+            elif status == 3:
+                logger.info('Connected to wifi with an IP address')
+                return True
+            timeout -= 1
+            time.sleep(1)
+    else:
+        logger.warning('There is no valid SSID/password pair.')
+        trying = False
+        return False
+
+def serve_captive_portal():
+    global wlan
+    iam = machine.unique_id()
     passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
     global ap
-    ap = network.WLAN(network.AP_IF)
-    ap.config(essid=ssid, password=passwd)
-    ap.active(True)
+    wlan = network.WLAN(network.AP_IF)
+    wlan.config(essid=ssid, password=passwd)
+    wlan.active(True)
     while ap.active() == False:
         pass
     ipaddress = ap.ifconfig()[0]
-    print('password is: ' + passwd)
-    print('IP is: ' + ipaddress)
     # now wait for a connection
     while ap.isconnected() == False:
         pass
@@ -41,7 +88,6 @@ def serve_credentials_portal():
     s = socket.socket()
     s.bind(addrinfo)
     s.listen(1)
-    print('listening on ', addrinfo)
     # Listen for connections
     waiting_credentials = True
     while waiting_credentials:
@@ -49,7 +95,7 @@ def serve_credentials_portal():
             cl, addr = s.accept()
             cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
             cl.send(html_form)
-            print('client connected from', addr)
+            logger.debug('client connected from', addr)
             request = cl.recv(1024)
             request = str(request.decode('utf-8'))
             reqstrings = request.split("\r\n")
@@ -58,9 +104,7 @@ def serve_credentials_portal():
                     subparts = part.split("&")
                     if 'text-password=' in subparts[1]:
                         newpassword = subparts[1].split('=')[1]
-                        print('newpassword = ' + newpassword)
                         newssid = subparts[0].split('=')[1]
-                        print('newssid = ' + newssid)
                     if 'text-latitude' in subparts[2]:
                         latitude = subparts[2].split('=')[1]
                     if 'text-longitude' in subparts[3]:
@@ -78,7 +122,7 @@ def serve_credentials_portal():
                         #TODO
                         waiting_credentials = False
                         cl.close()
-                        ap.disconnect()
+                        wlan.disconnect()
                         machine.soft_reset()
 
         except OSError as e:
