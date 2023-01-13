@@ -10,7 +10,7 @@ trying = False
 
 def initialize():
     connected = False
-    if not hasattr(config,'wifi'):
+    if not hasattr(config,'wlan'):
         serve_captive_portal()
     connected = connect_from_list()
     if not connected:
@@ -35,9 +35,12 @@ def connect(wifiNumber):
     wlan.active(True)
     ssid = "SSID_" + str(wifiNumber)
     password = "PASSW_" + str(wifiNumber)
-    if ssid in config.wifi:
-        ssid, password = config.wifi[ssid], config.wifi[password]
-        wlan.connect(ssid, password)
+    if ssid in config.wlan:
+        ssid, password = config.wlan[ssid], config.wlan[password]
+        try:
+            wlan.connect(ssid, password)
+        except:
+            logger.error('Wrong wifi credentials')
         timeout = 10
         while timeout > 0:
             status = wlan.status()
@@ -111,13 +114,16 @@ def serve_captive_portal():
                         longitude = subparts[3].split('=')[1]
                         # validate field input
                         #TODO
-                        # write to conf/wifi.conf
-                        wificonf_file = open('./conf/wifi.conf','w')
-                        wificonf_file.write(newssid + ',' + newpassword)
-                        wificonf_file.close()
-                        geolocation_file = open('./conf/geolocation.conf','w')
-                        geolocation_file.write(latitude + ',' + longitude)
-                        geolocation_file.close()
+                        exist_wifi = True
+                        wifiNumber = 0
+                        while exist_wifi:
+                            wifiNumber += 1
+                            ssid = "SSID_" + str(wifiNumber)
+                            exist_wifi = ssid in config.wlan
+                        config = config.add('wlan',"SSID_" + str(wifiNumber),newssid)
+                        config = config.add('wlan',"PASSW_" + str(wifiNumber),newpassword)
+                        config = config.add('station',"latitude",latitude)
+                        config = config.add('station',"longitude",longitude)
                         # now send a confirmation page, wait ten seconds and reboot
                         #TODO
                         waiting_credentials = False

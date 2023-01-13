@@ -1,5 +1,6 @@
 import time
 import os
+from libs import config
 # stores tuples of records: timestamp = <1609459286>, NTP_synced = 0 / 1, event_index;
 # 1000 log records use 16 Kb, 2 KB. RP2040 has 2MB of memory
 # indexes are deduced from this list, you can add other log events:
@@ -11,13 +12,14 @@ events = [
     'unknown',   #2
     'Connected to wifi with an IP address',
     'No way to connect. Trying again in 20 seconds',
+    'Wrong wifi credentials',
 ]
 
-logfile = 'system.log'
-filesize_limit_byte = 4000
+logfile = config.logger['logfile']
+filesize_limit_byte = config.logger['filesize_limit_byte']
 rtc = ''
 NTP_synced = 0
-print_log = True # False will disable printing log messages
+print_log = config.logger['print_log'] # False will disable printing log messages
 # log levels: critical, error, warning, info, debug, notset
 
 def use_NTP(ntp):

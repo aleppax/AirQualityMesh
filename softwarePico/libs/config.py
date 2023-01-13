@@ -1,6 +1,24 @@
-wifi = {
-    'SSID_0' : '',
-    'PASSW_0' : '',
+cron = {
+    'NTP_server_1' : 'it.pool.ntp.org',
+    'NTP_server_2' : 'pool.ntp.org',
+    'epoch' : 1,
+}
+logger = {
+    'logfile' : 'system.log',
+    'filesize_limit_byte' : 4000,
+    'print_log' : True,
+}
+leadacid = {
+    'ADC_factor' : 0.1122,
+    'ADC_port' : 2,
+}
+station = {
+    'latitude' : 0.0,
+    'longitude' : 0.0,
+}
+wlan = {
+    'SSID_0' : 'xxx',
+    'PASSW_0' : 'xxx',
 }
 mftsc = {
     'I' : 'exist',
