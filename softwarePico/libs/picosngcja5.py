@@ -60,8 +60,6 @@ class SNGCJA5:
 
         self.status_addresses = {"Sensor status": 6, "PD Status": 4, "LD Status": 2, "Fan status": 0}
         self.__data = []
-        
-        self.get_status_data()
 
     def power_on_sensor(self):
         pm_sensor_power_supply = Pin(config.picosngcja5['sensor_power_on_pin'], Pin.OUT)
