@@ -12,6 +12,9 @@ leadacid = {
     'ADC_factor' : 0.1122,
     'ADC_port' : 2,
 }
+picosngcja5 = {
+    'sensor_power_on_pin' : 15,
+}
 station = {
     'latitude' : 0.0,
     'longitude' : 0.0,
