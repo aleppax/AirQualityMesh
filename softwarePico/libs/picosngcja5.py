@@ -1,4 +1,5 @@
 from time import sleep
+import sys
 
 MASS_DENSITY_PM_TYPES = ["pm1.0", "pm2.5", "pm10"]
 MASS_DENSITY_BLOCK_SIZE = 4
@@ -9,7 +10,6 @@ ADDRESS_MASS_DENSITY_LENGTH = (ADDRESS_MASS_DENSITY_TAIL - ADDRESS_MASS_DENSITY_
 Address register of mass density values is started from 0 (0x00) to 11 (0x0B).
 Size of each value block is 4 bytes (32 bits) 
 Total data length is 12 bytes
-
 Value allocation
 ------------------------
 PM1.0: byte 0 - byte 3 
@@ -26,7 +26,6 @@ ADDRESS_PARTICLE_COUNT_LENGTH = (ADDRESS_PARTICLE_COUNT_TAIL - ADDRESS_PARTICLE_
 Address register of particle count values is started from 12 (0x0C) to 25 (0x19)
 Size of each value block is 2 bytes (16 bits)
 Total data length is 14 bytes (or 12 bytes excluding byte 18 and 19)
-
 Value allocation
 ------------------------
 PM0.5: byte 12 - byte 13
@@ -37,6 +36,7 @@ PM5.0: byte 20 - byte 21
 PM7.5: byte 22 - byte 23
 PM10: byte 24 - byte 25
 '''
+STATUS_ADDRESS = 0x26
 
 # Total raw data length stored in sensor register, i.e. 26 bytes
 DATA_LENGTH_HEAD = ADDRESS_MASS_DENSITY_HEAD
@@ -55,10 +55,11 @@ class SNGCJA5:
         self.__particle_count_addresses = {pm_type: PARTICLE_COUNT_BLOCK_SIZE*order
                                             for order, pm_type in enumerate(PARTICLE_COUNT_PM_TYPES)}
 
+        self.status_addresses = {"Sensor status": 6, "PD Status": 4, "LD Status": 2, "Fan status": 0}
         self.__data = []
-        self.__read_sensor_data()
+        self.get_status_data()
 
-    def get_mass_density_data(self, data:list) -> dict:
+    def get_mass_density_data(self, data:list):
 
         return {pm_type: 
             float((data[address+3] << 24 | 
@@ -67,12 +68,22 @@ class SNGCJA5:
                 data[address]) / 1000) 
                 for pm_type, address in self.__mass_density_addresses.items()}
 
-    def get_particle_count_data(self, data:list) -> dict:
+    def get_particle_count_data(self, data:list):
 
         return {pm_type: 
             float((data[address+1] << 8 | data[address])) 
                 for pm_type, address in self.__particle_count_addresses.items()
                 if pm_type != "N/A"}
+
+    def zfl(self, s, width):
+        # Pads the provided string with leading 0's to suit the specified 'chrs' length
+        # Force # characters, fill with leading 0's
+        return '{:0>{w}}'.format(s, w=width)
+
+    def get_status_data(self):
+        status_register = self.i2c.readfrom_mem(self.address,STATUS_ADDRESS,1)
+        bit_status_register = bin(int.from_bytes(status_register, sys.byteorder))[2:]
+        return {'status_register': self.zfl(bit_status_register,8)}
 
     def __read_sensor_data(self) -> None:
         try:
@@ -100,14 +111,18 @@ class SNGCJA5:
             self.__read_sensor_data()
             sleep(1)
         results = self.__data
-        self.empty_measurements_cache()
+        self.empty_measurements_queue()
         return results
 
-    def get_measurement(self) -> dict:
+    def get_measurement(self):
         if self.__data == []:
             return {}
         return self.__data.pop(0)
     
+    def measure(self):
+        self.empty_measurements_queue()
+        self.__read_sensor_data()
+        return self.__data.pop(0)
+    
     def empty_measurements_queue(self):
         self.__data = []
-
