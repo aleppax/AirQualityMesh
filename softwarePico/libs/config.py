@@ -1,7 +1,17 @@
+board = {
+    'GPIO_out' : ["LED",2,3,4,5,6,7],
+    'GPIO_in' : [0,1],
+    'I2C_BUS' : 0,
+    'I2C_SDA' : 8,
+    'I2C_SCL' : 9,
+}
+
 cron = {
-    'NTP_server_1' : 'it.pool.ntp.org',
-    'NTP_server_2' : 'pool.ntp.org',
-    'epoch' : 1,
+    'NTP_server_1' : '192.168.0.88', #local NTP server otherwise use something like 'it.pool.ntp.org',
+    'NTP_server_2' : '192.168.0.210',
+    'epoch' : 1970,
+    'NTPsync_interval' : 14400, # every 12 hours
+    'last_NTPsync' : 0,
 }
 logger = {
     'logfile' : 'system.log',
@@ -9,6 +19,7 @@ logger = {
     'print_log' : True,
 }
 leadacid = {
+    'battery_voltage' : 4.0,
     'ADC_factor' : 0.1122,
     'ADC_port' : 2,
 }
@@ -23,6 +34,7 @@ wlan = {
     'SSID_0' : 'xxx',
     'PASSW_0' : 'xxx',
 }
+
 mftsc = {
     'I' : 'exist',
 }
@@ -40,6 +52,8 @@ mftsc = {
 #################################################
 import gc
 import sys
+import machine
+from machine import Pin, I2C
 
 def add(dictname, key, value):
     newrow = _key_value_dict(key,value)
@@ -121,3 +135,14 @@ def _open_file_to_lines():
     except:
         print("Could not read file: ", __file__)
     return conf_lines
+
+def initialize_board():
+    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']))
+    gpio = {}
+    for pin in board['GPIO_out']:
+        gpio['GP'+str(pin)] = machine.Pin(pin, machine.Pin.OUT)
+        gpio['GP'+str(pin)].off()
+    for pin in board['GPIO_in']:
+        gpio['GP'+str(pin)] = machine.Pin(pin, machine.Pin.IN, machine.Pin.PULL_DOWN)
+    
+    return i2c, gpio

@@ -49,6 +49,8 @@ TOTAL_DATA_LENGTH = ADDRESS_MASS_DENSITY_LENGTH + ADDRESS_PARTICLE_COUNT_LENGTH
 class SNGCJA5:
 
     def __init__(self, i2c, addr=0x33):
+        # KSP13 connect base to sensor_power_on_pin with a resistor of 4k7 ohm
+        self.pm_sensor_power_supply = Pin(config.picosngcja5['sensor_power_on_pin'], Pin.OUT)
         self.power_on_sensor()
         self.address = addr
         self.i2c = i2c
@@ -62,8 +64,7 @@ class SNGCJA5:
         self.__data = []
 
     def power_on_sensor(self):
-        pm_sensor_power_supply = Pin(config.picosngcja5['sensor_power_on_pin'], Pin.OUT)
-        pm_sensor_power_supply.on()
+        self.pm_sensor_power_supply.on()
     
     def get_mass_density_data(self, data:list):
 

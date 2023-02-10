@@ -1,13 +1,16 @@
 # system scheduler
-
+import ntptime
 from machine import RTC
-from libs.ntp import Ntp
 from libs import logger, config
+from time import mktime
+rtc = RTC()
+logger.use_NTP(rtc)
 
 def initialize():
-    _rtc = RTC()
-    Ntp.set_datetime_callback(_rtc.datetime)
-    Ntp.set_hosts((config.cron['NTP_server_1'],config.cron['NTP_server_2']))
-    Ntp.rtc_sync(epoch = config.cron['epoch'])
-    logger.use_NTP(Ntp)
-    
+    global config
+    rtc_now = mktime(rtc.datetime())
+    if (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
+        ntptime.settime()
+        ntp_nowness = rtc.datetime()
+        config = config.add('cron','last_NTPsync',mktime(ntp_nowness))
+

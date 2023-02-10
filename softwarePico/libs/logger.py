@@ -1,6 +1,8 @@
 import time
 import os
+from time import gmtime, mktime
 from libs import config
+
 # stores tuples of records: timestamp = <1609459286>, NTP_synced = 0 / 1, event_index;
 # 1000 log records use 16 Kb, 2 KB. RP2040 has 2MB of memory
 # indexes are deduced from this list, you can add other log events:
@@ -44,13 +46,11 @@ def critical(message):
 def log(message, level = 0):
     #timestamp
     if rtc == '':
-        timestamp = time.time()
-        now = time.localtime()
         NTP_synced = 0
     else:
-        timestamp = rtc.time_s()
-        now = rtc.time()
         NTP_synced = 1
+    timestamp = time.time()
+    now = time.localtime()
     # parse message
     if message in events:
         index = events.index(message)
@@ -64,7 +64,7 @@ def log(message, level = 0):
     logrecord = logformat.format(str(timestamp),str(level),str(NTP_synced),str(index))
     # check file size
     if os.stat(logfile)[6] > filesize_limit_byte:
-        print('logfile reached size of ' + os.stat(logfile)[6] + 'bytes. Limit is ' + filesize_limit_byte + ' bytes')
+        print('logfile reached size of ' + str(os.stat(logfile)[6]) + 'bytes. Limit is ' + str(filesize_limit_byte) + ' bytes')
         return
         # TODO: purge older records
     # write to file

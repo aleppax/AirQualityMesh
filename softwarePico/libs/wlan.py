@@ -66,7 +66,7 @@ def connect(wifiNumber):
             timeout -= 1
             time.sleep(1)
     else:
-        logger.warning('There is no valid SSID/password pair.')
+        logger.warning('connection failed.')
         trying = False
         return False
 
