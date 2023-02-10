@@ -7,9 +7,7 @@ board = {
 }
 
 cron = {
-    'NTP_server_1' : '192.168.0.88', #local NTP server otherwise use something like 'it.pool.ntp.org',
-    'NTP_server_2' : '192.168.0.210',
-    'epoch' : 1970,
+    'NTP_server' : 'it.pool.ntp.org',
     'NTPsync_interval' : 14400, # every 12 hours
     'last_NTPsync' : 0,
 }
