@@ -11,18 +11,3 @@ wlan.initialize()
 # init RTC
 cron.initialize()
 
-
-# logger.info('start measurements')
-# seconds = 120
-# datafile = 'data.txt'
-# import time
-# while seconds > 0:
-#     m = pm_sensor.measure()
-#     time.sleep(1)
-#     seconds -= 1
-#     try:
-#         with open(datafile, 'a') as f:
-#             f.write(str(m["mass_density"]))
-#     except:
-#         print("Could not write file: ", datafile)
-# logger.info('end measurements')

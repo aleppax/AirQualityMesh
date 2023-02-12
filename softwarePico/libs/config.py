@@ -8,8 +8,14 @@ board = {
 
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
-    'NTPsync_interval' : 14400, # every 12 hours
+    'NTPsync_interval' : 14400, # every 4 hours
+    'update_interval' : 86400, # every 24 hours
     'last_NTPsync' : 0,
+    'last_update' : 0,
+    'current_version' : 0,
+    'version_file' : 'version.py',
+    'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
+    'branch' : 'data_collection_api_server',
 }
 logger = {
     'logfile' : 'system.log',
@@ -29,8 +35,8 @@ station = {
     'longitude' : 0.0,
 }
 wlan = {
-    'SSID_0' : 'xxx',
-    'PASSW_0' : 'xxx',
+    'SSID_0' : 'Vodafone-58205218',
+    'PASSW_0' : 'eiLeiSh&ie3rub8',
 }
 
 mftsc = {
