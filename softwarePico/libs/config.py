@@ -34,8 +34,8 @@ station = {
     'longitude' : 0.0,
 }
 wlan = {
-    'SSID_0' : 'Vodafone-58205218',
-    'PASSW_0' : 'eiLeiSh&ie3rub8',
+    'SSID_0' : 'xxx',
+    'PASSW_0' : 'xxx',
 }
 
 mftsc = {
