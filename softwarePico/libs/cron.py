@@ -32,10 +32,10 @@ def check_software_updates():
     rtc_now = mktime(rtc.datetime())
     if rtc_now - config.cron['last_update'] > config.cron['update_interval']:
         global update_available
-        if config.cron['version_file'] in os.listdir():
-            os.remove(config.cron['version_file'])
-        mip.install(config.cron['repository'] + config.cron['version_file'], target="/", version=config.cron['branch'])
-        if config.cron['version_file'] in os.listdir():
+        if 'version.py' in os.listdir():
+            os.remove('version.py')
+        mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
+        if 'version.py' in os.listdir():
             if 'version' in sys.modules:
                 del sys.modules['version']
             import version

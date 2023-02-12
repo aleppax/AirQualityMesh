@@ -13,7 +13,6 @@ cron = {
     'last_NTPsync' : 0,
     'last_update' : 0,
     'current_version' : 0,
-    'version_file' : 'version.py',
     'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
     'branch' : 'data_collection_api_server',
 }
