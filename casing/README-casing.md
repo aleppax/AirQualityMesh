@@ -30,8 +30,9 @@ A sturdy joint plate with screws and nuts for fixing to a post or railing or fen
 
 ## Sensor holder
 
+The only customized component is the sensor fixing structure which allows to house two particulate sensors and possibly a humidity and temperature sensor. Subsequent redesigns could accommodate a small fan in case it is necessary to force a greater air exchange.
+
 ![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/sensor_tunnel.jpg "sensor tunnel")
 ![interior](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/pictures/case_interior.jpeg "case interior view")
+![assembly](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/pictures/case_2.jpeg "3D printing the sensor holder")
 
-
-The only customized component is the sensor fixing structure which allows to house two particulate sensors and possibly a humidity and temperature sensor. Subsequent redesigns could accommodate a small fan in case it is necessary to force a greater air exchange.
