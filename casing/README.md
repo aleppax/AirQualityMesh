@@ -1,4 +1,4 @@
-## single side PCB mainly used to connect everything
+## PCB
  
 ![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/fatherboard_oPMs.jpg "mainboard")
 
