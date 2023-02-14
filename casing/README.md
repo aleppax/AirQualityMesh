@@ -16,7 +16,7 @@ The connection PCB has been designed so that half of the Raspberry Pico, the par
 ![front view](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/pictures/case_1.jpeg "case front view")
 ![battery view](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/pictures/case_3.jpeg "4V battery inside")
 
-the casing is designed to be composed mainly of cheap parts available from electrical component suppliers, for which a compact junction box was chosen (150 X 110 X 70 mm, IP 56), commercially available air vents (to which a double layer of mosquito netting was added for greater protection from small insects).
+the casing is designed to be composed mainly of cheap parts available from electrical component suppliers, for which a compact junction box was chosen (150 X 110 X 70 mm, IP 56), commercially available air vents (to which a double layer of mosquito netting was added for greater protection from small insects). Each air vent has an overall opening of 8 cm^2.
 
 ## Solar panel
 
