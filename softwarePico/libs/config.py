@@ -36,6 +36,7 @@ station = {
 wlan = {
     'SSID_0' : 'xxx',
     'PASSW_0' : 'xxx',
+    'connection_timeout' : 16,
 }
 
 mftsc = {

@@ -7,16 +7,34 @@ from libs import logger, config
 
 wlan = ''
 trying = False
+wlanSw = machine.Pin(23, machine.Pin.OUT)
+statuses = {
+    -3 : 'authentication failure',
+    -2 : 'No matching SSID found (could be out of range, or down)',
+    -1 : 'Connection failed',
+    0  : 'Link is down',
+    1  : 'Connected to wifi',
+    2  : 'Connected to wifi, but no IP address',
+    3  : 'Connected. Got an IP address',
+}
 
 def initialize():
-    connected = False
+    global wlanSw
+    wlanSw.high()
+    time.sleep_ms(80)
     if not hasattr(config,'wlan'):
         serve_captive_portal()
-    connected = connect_from_list()
-    if not connected:
-        logger.warning("No way to connect. Rebooting in 20 seconds")
-        machine.lightsleep(20000) # ms
-        machine.soft_reset()
+    return connect(0)
+
+def turn_off():
+    global wlan, wlanSw
+    wlanSw.low()
+    time.sleep_ms(100)
+    wlan.disconnect()
+    wlan.active(False)
+    wlan.deinit()
+    wlan = None
+    time.sleep_ms(100)
 
 def connect_from_list():
     global trying
@@ -28,6 +46,7 @@ def connect_from_list():
         wifiNumber += 1
         if connected:
             return True
+    return False
 
 def connect(wifiNumber):
     global wlan, trying
@@ -41,28 +60,17 @@ def connect(wifiNumber):
             wlan.connect(ssid, password)
         except:
             logger.error('Wrong wifi credentials')
-        timeout = 10
+        timeout = config.wlan['connection_timeout']
+        prev_status = -4
         while timeout > 0:
             status = wlan.status()
-            if status == -3:
-                logger.warning('authentication failure')
-                return False
-            elif status == -2:
-                logger.warning('No matching SSID found (could be out of range, or down)')
-                return False
-            elif status == -1:
-                logger.warning('Connection failed')
-                return False
-            elif status == 0:
-                logger.warning('Link is down')
-                return False 
-            elif status == 1:
-                logger.info('Connected to wifi')
-            elif status == 2:
-                logger.info('Connected to wifi, but no IP address')
-            elif status == 3:
-                logger.info('Connected to wifi with an IP address')
+            if prev_status != status:
+                logger.info(statuses[status])
+                prev_status = status
+            if status == 3:
                 return True
+            if status in [-3,-2,-1,0]:
+                return False 
             timeout -= 1
             time.sleep(1)
     else:

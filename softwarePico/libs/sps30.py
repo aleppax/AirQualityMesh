@@ -12,7 +12,7 @@
 
 import sys
 # import threading
-import logging
+from libs import logger
 import utime
 from time import sleep
 # from queue import Queue
@@ -59,7 +59,7 @@ class SPS30:
     def __init__(self,  i2c, address: int = 0x69, sampling_period: int = 1, logger: str = None):
         self.logger = None
         if logger:
-            self.logger = logging.getLogger(logger)
+            self.logger = logger
         self.addr = address
         self.sampling_period = sampling_period
         self.i2c = i2c

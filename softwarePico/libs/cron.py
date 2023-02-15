@@ -1,8 +1,8 @@
 # system scheduler
 import ntptime, os, mip, sys
-from machine import RTC
+from machine import RTC, lightsleep
 from libs import logger, config
-from time import mktime
+from time import mktime, sleep_ms
 import urequests as requests
 
 rtc = RTC()
@@ -70,3 +70,8 @@ def software_update():
             logger.info("Version upgrade done! Upgraded to version " + version.version)
         else:
             logger.error("Version upgrade incomplete! This can lead to instability.")
+
+def doLightSleep(sleepSeconds):
+    sleep_ms(100)
+    lightsleep(sleepSeconds * 1000)
+    sleep_ms(100)
