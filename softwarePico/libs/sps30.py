@@ -56,14 +56,15 @@ SIZE_INTEGER = 3  # unsigned 16 bit integer
 
 class SPS30:
 
-    def __init__(self,  i2c, address: int = 0x69, sampling_period: int = 1, logger: str = None):
+    def __init__(self,  i2c, pwrpin, address: int = 0x69, sampling_period: int = 1, logger: str = None):
         self.logger = None
         if logger:
             self.logger = logger
         self.addr = address
         self.sampling_period = sampling_period
         self.i2c = i2c
-
+        self.pwr_pin = pwrpin
+        self.on()
         self.__data = {}
         self.__valid = {
             "mass_density": False,
@@ -417,3 +418,8 @@ class SPS30:
         self.i2c.write(CMD_STOP_MEASUREMENT)
         self.i2c.close()
 
+    def on(self):
+        self.pwr_pin.on()
+    
+    def off(self):
+        self.pwr_pin.off()

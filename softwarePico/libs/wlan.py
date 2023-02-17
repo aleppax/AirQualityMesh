@@ -13,7 +13,7 @@ statuses = {
     -2 : 'No matching SSID found (could be out of range, or down)',
     -1 : 'Connection failed',
     0  : 'Link is down',
-    1  : 'Connected to wifi',
+    1  : 'link established',
     2  : 'Connected to wifi, but no IP address',
     3  : 'Connected. Got an IP address',
 }
@@ -47,6 +47,12 @@ def connect_from_list():
         if connected:
             return True
     return False
+
+def online():
+    if wlan.status() == 3:
+        return True
+    else:
+        return False
 
 def connect(wifiNumber):
     global wlan, trying

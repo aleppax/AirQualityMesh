@@ -42,5 +42,6 @@ def level():
     temperature = average_n_measurements(10,measure_RP2040_temp)
     #ADC measure
     voltage = average_n_measurements(100,ADC_voltage)
-    print('temperature ' + str(temperature))
-    print('voltage ' + str(voltage))
+    #print('temperature ' + str(temperature))
+    #print('voltage ' + str(voltage))
+    return temperature, voltage

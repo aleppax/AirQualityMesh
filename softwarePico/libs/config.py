@@ -8,13 +8,21 @@ board = {
 
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
-    'NTPsync_interval' : 14400, # every 4 hours
-    'update_interval' : 86400, # every 24 hours
+    'NTPsync_interval' : 3600 * 4,
+    # 'NTPsync_interval' every x hours
+    'update_interval' : 3600 * 24,
+    # 'update_interval' every x hours
+    'measuremens_per_day' : 288,
+    # 'measuremens_per_day' interval starting at 0:00. do not set too high (1440 is already very battery expensive). better using divisors of 86400
+    'minimum_sleep_s' : 4,
+    # 'minimum_sleep_s' avoid too short sleep periods leading to malfunction
+    'sensor_preheating_s' : 30,
+    # 'sensor_preheating_s' do not change, suggested by the manufacturers' datasheets
     'last_NTPsync' : 0,
     'last_update' : 0,
-    'current_version' : 0,
+    'current_version' : 1,
     'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
-    'branch' : 'data_collection_api_server',
+    'branch' : 'aleppax_project_structure',
 }
 logger = {
     'logfile' : 'system.log',
@@ -27,16 +35,31 @@ leadacid = {
     'ADC_port' : 2,
 }
 picosngcja5 = {
-    'sensor_power_on_pin' : 15,
+    'sensor_power_pin' : 2,
+#    '30s_pre_heating' : True,
 }
+sensors = {
+    'uln2003_1' : 'GP7', # hardware connections between Pico GPIOs and ULN2003 channels
+    'uln2003_2' : 'GP6',
+    'uln2003_3' : 'GP5',
+    'uln2003_4' : 'GP4',
+    'uln2003_5' : 'GP3',
+    'uln2003_6' : 'GP2',
+}
+sps30 = {
+    'sensor_power_pin' : 1,
+#    '30s_pre_heating' : True,
+}
+
 station = {
     'latitude' : 0.0,
     'longitude' : 0.0,
 }
 wlan = {
-    'SSID_0' : 'xxx',
-    'PASSW_0' : 'xxx',
-    'connection_timeout' : 16,
+    'SSID_0' : 'VodafonenofadoV',
+    'PASSW_0' : 'sushi@HOME10',
+    'connection_timeout' : 15, 
+    # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
 }
 
 mftsc = {

@@ -66,7 +66,8 @@ def log(message, level = 0):
     if os.stat(logfile)[6] > filesize_limit_byte:
         print('logfile reached size of ' + str(os.stat(logfile)[6]) + 'bytes. Limit is ' + str(filesize_limit_byte) + ' bytes')
         return
-        # TODO: purge older records
+        # purge older records
+        
     # write to file
     try:
         with open(logfile, 'a') as f:
@@ -77,7 +78,7 @@ def log(message, level = 0):
 def timetuple_to_DTF(timet,timezone='UTC'):
     # W3C-DTF, a subset of ISO8601 used also for HTTP headers
     # arguments:
-    # timet = (year, month, day, weekday, hour, min, sec, unused)
+    # timet = time.localtime() (year, month, day, hour, min, sec, weekday, yearday)
     # timezone, except for UTC, must be expressed in the format: '+02:00'
     if timezone == 'UTC':
         timezone = 'Z'
@@ -86,8 +87,8 @@ def timetuple_to_DTF(timet,timezone='UTC'):
         timet = timet + (0,)
     if len(timet) != 9:
         print('tuple length is not 9')
-    Tyear, Tmonth, Tday, Tweekday, Thour, Tmin, Tsec, Tyearday, Tms = (timet)
-    Tdateandtime = "{}/{}/{}T{}:{}:{}{}"
+    Tyear, Tmonth, Tday, Thour, Tmin, Tsec, Tweekday, Tyearday, Tms = (timet)
+    Tdateandtime = "{:02d}:{:02d}:{:02d}T{:02d}/{:02d}/{:02d}{}"
     return Tdateandtime.format(Tyear, Tmonth, Tday, Thour, Tmin, Tsec, timezone)
 
         
