@@ -26,7 +26,7 @@ while True:
         if still_to_wait > 0:
             sleep_ms(still_to_wait)
         #sensors measurements, they have been pre-heated for 30s
-        sensors.measure()
+        sensors.measure(logger.now_DTF())
         sensors.shutdown()
         # if online, save data online, otherwise to file
         if wlan.online():

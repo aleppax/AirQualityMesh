@@ -33,6 +33,7 @@ leadacid = {
     'battery_voltage' : 4.0,
     'ADC_factor' : 0.1122,
     'ADC_port' : 2,
+    'filter_length' : 10, # consider 'measuremens_per_day' (how frequently we take a measurement) if its span is too much reduce this number
 }
 picosngcja5 = {
     'sensor_power_pin' : 2,
@@ -52,12 +53,13 @@ sps30 = {
 }
 
 station = {
+    'station' : 'prototipo 1',
     'latitude' : 0.0,
     'longitude' : 0.0,
 }
 wlan = {
     'SSID_0' : 'VodafonenofadoV',
-    'PASSW_0' : 'sushi@HOME10',
+    'PASSW_0' : 'tacos@HOME01',
     'connection_timeout' : 15, 
     # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
 }

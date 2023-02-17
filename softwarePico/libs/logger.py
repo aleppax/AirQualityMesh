@@ -91,4 +91,6 @@ def timetuple_to_DTF(timet,timezone='UTC'):
     Tdateandtime = "{:02d}:{:02d}:{:02d}T{:02d}/{:02d}/{:02d}{}"
     return Tdateandtime.format(Tyear, Tmonth, Tday, Thour, Tmin, Tsec, timezone)
 
-        
+def now_DTF():
+    now = time.localtime()
+    return timetuple_to_DTF(now)
