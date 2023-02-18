@@ -21,6 +21,7 @@ logfile_name = config.logger['logfile']
 filesize_limit_byte = config.logger['filesize_limit_byte']
 logfileCount = config.logger['logfileCount']
 lastlog = config.logger['lastlog']
+logfile = logfile_name + '.' + str(lastlog)
 logNvalues = list(range(logfileCount))
 rtc = ''
 NTP_synced = 0
@@ -40,6 +41,8 @@ def updateLastlogConfig(n):
     config = config.add('logger','lastlog',n)
     logfile = logfile_name + '.' + str(n)
     lastlog = n
+    os.remove(logfile)
+
 
 def use_NTP(ntp):
     global rtc
@@ -80,14 +83,15 @@ def log(message, level = 0):
     logformat = "{},{},{},{}\n"
     logrecord = logformat.format(str(timestamp),str(level),str(NTP_synced),str(index))
     # check file size
-    if os.stat(logfile)[6] > filesize_limit_byte:
-        nextLogFile()
+    if logfile in os.listdir():
+        if os.stat(logfile)[6] > filesize_limit_byte:
+            nextLogFile()
     # write to file
     try:
-        with open(logfile, 'a') as f:
+        with open('/logs/' + logfile, 'a+') as f:
             f.write(logrecord)
     except:
-        print("Could not write file: ", logfile) # there's no way to log this one!
+        print("Could not write file: /logs/" + logfile) # there's no way to log this one!
 
 def timetuple_to_DTF(timet,timezone='UTC'):
     # W3C-DTF, a subset of ISO8601 used also for HTTP headers
