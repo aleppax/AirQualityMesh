@@ -17,12 +17,29 @@ events = [
     'Wrong wifi credentials',
 ]
 
-logfile = config.logger['logfile']
+logfile_name = config.logger['logfile']
 filesize_limit_byte = config.logger['filesize_limit_byte']
+logfileCount = config.logger['logfileCount']
+lastlog = config.logger['lastlog']
+logNvalues = list(range(logfileCount))
 rtc = ''
 NTP_synced = 0
 print_log = config.logger['print_log'] # False will disable printing log messages
 # log levels: critical, error, warning, info, debug, notset
+
+def nextLogFile():
+    if lastlog == logfileCount -1:
+        n = 0
+    else:
+        n = logNvalues[lastlog+1]
+    updateLastlogConfig(n)
+    return value
+
+def updateLastlogConfig(n):
+    global config, lastlog, logfile
+    config = config.add('logger','lastlog',n)
+    logfile = logfile_name + '.' + str(n)
+    lastlog = n
 
 def use_NTP(ntp):
     global rtc
@@ -64,10 +81,7 @@ def log(message, level = 0):
     logrecord = logformat.format(str(timestamp),str(level),str(NTP_synced),str(index))
     # check file size
     if os.stat(logfile)[6] > filesize_limit_byte:
-        print('logfile reached size of ' + str(os.stat(logfile)[6]) + 'bytes. Limit is ' + str(filesize_limit_byte) + ' bytes')
-        return
-        # purge older records
-        
+        nextLogFile()
     # write to file
     try:
         with open(logfile, 'a') as f:
@@ -88,7 +102,7 @@ def timetuple_to_DTF(timet,timezone='UTC'):
     if len(timet) != 9:
         print('tuple length is not 9')
     Tyear, Tmonth, Tday, Thour, Tmin, Tsec, Tweekday, Tyearday, Tms = (timet)
-    Tdateandtime = "{:02d}:{:02d}:{:02d}T{:02d}/{:02d}/{:02d}{}"
+    Tdateandtime = "{:02d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}{}"
     return Tdateandtime.format(Tyear, Tmonth, Tday, Thour, Tmin, Tsec, timezone)
 
 def now_DTF():

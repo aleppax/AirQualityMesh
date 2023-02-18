@@ -27,6 +27,8 @@ cron = {
 logger = {
     'logfile' : 'system.log',
     'filesize_limit_byte' : 4000,
+    'logfileCount' : 10,
+    'lastlog' : 0,
     'print_log' : True,
 }
 leadacid = {

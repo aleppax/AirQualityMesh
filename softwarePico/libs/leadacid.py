@@ -60,6 +60,6 @@ def levels():
     #temp measure
     temperature = average_n_measurements(10,measure_RP2040_temp)
     #ADC measure
-    voltage = average_n_measurements(100,ADC_voltage)
+    voltage = average_n_measurements(100,ADC_voltage)/1000
     percentage, is_charging = battery_percentage(voltage)
     return temperature, percentage, is_charging
