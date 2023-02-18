@@ -47,6 +47,8 @@ def battery_percentage(voltage):
     if len(voltage_filter) == filter_length:
         voltage_filter.pop(0)
     is_charging = voltage > moving_voltage
+    if voltage > voltage_full_charged:
+        is_charging = True
     #convert voltage in percentage
     # we know if battery is charging if the previous value was lower.
     if is_charging:
@@ -60,6 +62,6 @@ def levels():
     #temp measure
     temperature = average_n_measurements(10,measure_RP2040_temp)
     #ADC measure
-    voltage = average_n_measurements(100,ADC_voltage)/1000
-    percentage, is_charging = battery_percentage(voltage)
+    vvvoltage = average_n_measurements(100,ADC_voltage)/1000
+    percentage, is_charging = battery_percentage(vvvoltage)
     return temperature, percentage, is_charging
