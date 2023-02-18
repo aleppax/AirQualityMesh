@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS "stations" (
 	"O3 sensor model"	TEXT,
 	"NO3 capable"	INTEGER NOT NULL,
 	"NO3 units"	TEXT,
-	"NO3 sensor model"	BLOB,
+	"NO3 sensor model"	TEXT,
 	"wind direction capable"	INTEGER NOT NULL,
 	"wind direction units"	TEXT,
 	"wind direction sensor model"	TEXT,
