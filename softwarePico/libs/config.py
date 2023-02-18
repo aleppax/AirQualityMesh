@@ -84,6 +84,7 @@ mftsc = {
 import gc
 import sys
 import machine
+from time import sleep
 from machine import Pin, I2C
 
 def add(dictname, key, value):
@@ -168,7 +169,8 @@ def _open_file_to_lines():
     return conf_lines
 
 def initialize_board():
-    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']))
+    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']), freq=400000)
+    sleep(0.1)
     gpio = {}
     for pin in board['GPIO_out']:
         gpio['GP'+str(pin)] = machine.Pin(pin, machine.Pin.OUT)
