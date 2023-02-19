@@ -1,6 +1,6 @@
 ## PCB
  
-![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/fatherboard_oPMs.jpg "mainboard")
+![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/base/casing/fatherboard_oPMs.jpg "mainboard")
 
 The PCB design is single sided, has no SMD parts and few parts. Components are on the opposite side of the copper layer. 
 Hence it is very straightforward to make it at home both with a CNC or chemicals. 
@@ -13,14 +13,14 @@ The connection PCB has been designed so that half of the Raspberry Pico, the par
 
 ## Case
 
-![front view](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/pictures/case_1.jpeg "case front view")
-![battery view](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/pictures/case_3.jpeg "4V battery inside")
+![front view](https://github.com/aleppax/outdoorPMstation/blob/base/casing/pictures/case_1.jpeg "case front view")
+![battery view](https://github.com/aleppax/outdoorPMstation/blob/base/casing/pictures/case_3.jpeg "4V battery inside")
 
 the casing is designed to be composed mainly of cheap parts available from electrical component suppliers, for which a compact junction box was chosen (150 X 110 X 70 mm, IP 56), commercially available air vents (to which a double layer of mosquito netting was added for greater protection from small insects). Each air vent has an overall opening of 8 cm^2.
 
 ## Solar panel
 
-![rear view](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/pictures/case_4.jpeg "case rear view")
+![rear view](https://github.com/aleppax/outdoorPMstation/blob/base/casing/pictures/case_4.jpeg "case rear view")
 
 The solar panel (Cellevia CL-SM3P) is extremely cheap but still slightly oversized, it has the secondary function of protecting the casing from direct solar radiation and has an aluminum frame for easier fixing.
 
@@ -32,7 +32,7 @@ A sturdy joint plate with screws and nuts for fixing to a post or railing or fen
 
 The only customized component is the sensor fixing structure which allows to house two particulate sensors and possibly a humidity and temperature sensor. Subsequent redesigns could accommodate a small fan in case it is necessary to force a greater air exchange.
 
-![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/sensor_tunnel.jpg "sensor tunnel")
-![interior](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/pictures/case_interior.jpeg "case interior view")
-![assembly](https://github.com/aleppax/outdoorPMstation/blob/aleppax_project_structure/casing/pictures/case_2.jpeg "3D printing the sensor holder")
+![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/base/casing/sensor_tunnel.jpg "sensor tunnel")
+![interior](https://github.com/aleppax/outdoorPMstation/blob/base/casing/pictures/case_interior.jpeg "case interior view")
+![assembly](https://github.com/aleppax/outdoorPMstation/blob/base/casing/pictures/case_2.jpeg "3D printing the sensor holder")
 
