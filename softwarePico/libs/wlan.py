@@ -49,6 +49,8 @@ def connect_from_list():
     return False
 
 def online():
+    if wlan == '':
+        return initialize()
     if wlan.status() == 3:
         return True
     else:

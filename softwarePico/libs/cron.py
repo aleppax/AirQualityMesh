@@ -1,44 +1,47 @@
 # system scheduler
 import ntptime, os, mip, sys
 from machine import RTC, lightsleep
-from math import fmod, floor
+from math import fmod
 from libs import logger, config
-from time import mktime, sleep_ms, ticks_ms, ticks_diff
-import urequests as requests
+from time import sleep_ms
+from random import randint
 
 rtc = RTC()
 logger.use_NTP(rtc)
-ntptime.host = config.cron['NTP_server']
+server_n = randint(0,config.cron['NTP_server_count']-1)
+ntptime.host = str(server_n) + '.' + config.cron['NTP_server']
 update_available = False
+full_update = False
 current_version = config.cron['current_version']
 measurement_interval = round(86400 / config.cron['measuremens_per_day'])
-logger.log('measurement_interval ' + str(measurement_interval))
 minimum_sleep_s = config.cron['minimum_sleep_s']
 sensor_preheating_s = config.cron['sensor_preheating_s']
 do_measure = False
+updated_NTP_at_boot = False
 
 def updates():
     update_ntp() # every NTPsync_interval
     if not update_available:
         check_software_updates() # every update_interval
+    software_update()
     
 def update_ntp():
-    global config
-    rtc_now = mktime(rtc.datetime())
-    if (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
+    global config, updated_NTP_at_boot
+    rtc_now = ntptime.time()
+    if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
+        logger.info('Using NTP server ' + ntptime.host)
         ntptime.settime()
-        ntp_nowness = rtc.datetime()
-        config = config.add('cron','last_NTPsync',mktime(ntp_nowness))
+        config = config.add('cron','last_NTPsync',ntptime.time())
+        updated_NTP_at_boot = True
 
 def check_software_updates():
-    global config
+    global config, update_available, full_update
     # an extremely simple implementation:
     # it compares the current version number (int) with the online repo
     # and assuming that a network connection is up,
     # downloads version.py from the root of the repository/branch
-    rtc_now = mktime(rtc.datetime())
+    rtc_now = ntptime.time()
     if rtc_now - config.cron['last_update'] > config.cron['update_interval']:
-        global update_available
         if 'version.py' in os.listdir():
             os.remove('version.py')
         mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
@@ -48,7 +51,10 @@ def check_software_updates():
             import version
             if version.version > config.cron['current_version']:
                 update_available = True
-                logger.info('update found. Version ' + str(version.version))
+                # if updating more than one versioning step, fetch everything.
+                if config.cron['current_version'] - version.version > 1:
+                    full_update = True
+                logger.info('Going to update from version ' + str(config.cron['current_version']) + 'to version ' + str(version.version))
             elif version.version == config.cron['current_version']:
                 update_available = False
                 config = config.add('cron','last_update',rtc_now)
@@ -56,16 +62,20 @@ def check_software_updates():
             logger.warning("can't check for new software versions")
 
 def software_update():
-    global config, update_available
+    global config, update_available, full_update
     if update_available:
         success = True
         # bring version in this scope
         import version
-        # this script has many limitations: can't sync nested folders, does not delete old files or folders
+        # this script does not delete old files or folders
         for folder in version.folders:
             if folder[1:] not in os.listdir() and folder != '/':
                 os.mkdir(folder)
-        for directory,files in version.updated_files.items():
+        if full_update:
+            filedict = version.all_files
+        else:
+            filedict = version.updated_files
+        for directory,files in filedict.items():
             for f in files:
                 filemodified = os.stat(directory + '/' + f)[7]
                 mip.install(config.cron['repository'] + directory[1:] + '/' + f, target=directory + '/', version=config.cron['branch'])
@@ -75,7 +85,7 @@ def software_update():
         # now update local version number
         if success:
             config = config.add('cron','current_version',version.version)
-            logger.info("Version upgrade done! Upgraded to version " + version.version)
+            logger.info("Version upgrade done! Upgraded to version " + str(version.version))
             update_available = False
         else:
             logger.error("Version upgrade incomplete! This can lead to instability.")

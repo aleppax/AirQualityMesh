@@ -3,6 +3,7 @@ from time import ticks_diff, ticks_ms, sleep_ms
 #from machine import WDT
 # init logger
 logger.info('booting')
+logger.check_fs_free_space()
 #init I2C and GPIO. access a port with gpio['GP2']
 i2c, gpio = config.initialize_board()
 sensors.init(i2c, gpio)
@@ -17,10 +18,6 @@ while True:
         logger.info('waking up')
         # init network
         start_extra_time = ticks_ms()
-        wlan.initialize()
-        # if online check if it's time to look for NTP and software updates
-        if wlan.online():
-            cron.updates()
         extra_time_ms = ticks_diff(ticks_ms(),start_extra_time)
         still_to_wait = connection_max_time - extra_time_ms
         if still_to_wait > 0:
@@ -29,7 +26,7 @@ while True:
         sensors.measure(logger.now_DTF())
         sensors.shutdown()
         # if online, save data online, otherwise to file
-        if wlan.online():
+        if wlan.initialize():
             #data submission to servers
             # load from file
             # send data
@@ -38,11 +35,11 @@ while True:
         else:
             #store data to file
             logger.info("saving")
-    wlan.initialize()
-    # a software update starts only if an update is available
-    cron.software_update()
+    # if online check if it's time to look for NTP and software updates
+    if wlan.online():
+        # a software upgrade starts only if an update is available
+        cron.updates()
     wlan.turn_off()
-    
     cron.lightsleep_until_next_cycle()
 
 

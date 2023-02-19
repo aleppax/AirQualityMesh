@@ -34,7 +34,6 @@ def nextLogFile():
     else:
         n = logNvalues[lastlog+1]
     updateLastlogConfig(n)
-    return value
 
 def updateLastlogConfig(n):
     global config, lastlog, logfile
@@ -43,6 +42,11 @@ def updateLastlogConfig(n):
     lastlog = n
     os.remove(logfile)
 
+def check_fs_free_space():
+    fs_stat = os.statvfs('/')
+    fs_size = fs_stat[0] * fs_stat[2]/1024
+    fs_free = fs_stat[0] * fs_stat[3]/1024
+    info("File System Size {:,}KB - Free Space {:,}KB".format(fs_size, fs_free))
 
 def use_NTP(ntp):
     global rtc

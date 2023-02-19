@@ -8,9 +8,10 @@ board = {
 
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
+    'NTP_server_count' : 4,
     'NTPsync_interval' : 3600 * 4,
     # 'NTPsync_interval' every x hours
-    'update_interval' : 3600 * 24,
+    'update_interval' : 60, #3600 * 24,
     # 'update_interval' every x hours
     'measuremens_per_day' : 288,
     # 'measuremens_per_day' interval starting at 0:00. do not set too high (1440 is already very battery expensive). better using divisors of 86400
@@ -21,8 +22,10 @@ cron = {
     'last_NTPsync' : 0,
     'last_update' : 0,
     'current_version' : 1,
-    'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
-    'branch' : 'aleppax_project_structure',
+    #'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
+    #'branch' : 'devRemoteUpdate',
+    'repository' : 'http://192.168.0.88:8000/',
+    'branch' : '',
 }
 logger = {
     'logfile' : 'system.log',
@@ -60,8 +63,8 @@ station = {
     'longitude' : 0.0,
 }
 wlan = {
-    'SSID_0' : 'VodafonenofadoV',
-    'PASSW_0' : 'tacos@HOME01',
+    'SSID_0' : 'xxx',
+    'PASSW_0' : 'xxx',
     'connection_timeout' : 15, 
     # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
 }
