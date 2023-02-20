@@ -17,6 +17,19 @@ events = [
     'Wrong wifi credentials',
 ]
 
+
+c = (
+"\033[0m",       # reset#
+"\033[30m",      # Black #
+"\033[31m",      # Red #
+"\033[32m",      # Green #
+"\033[33m",      # Yellow #
+"\033[34m",      # Blue #
+"\033[35m",      # Magenta #
+"\033[36m",      # Cyan #
+"\033[37m",      # White #
+)
+
 logfile_name = config.logger['logfile']
 filesize_limit_byte = config.logger['filesize_limit_byte']
 logfileCount = config.logger['logfileCount']
@@ -53,19 +66,19 @@ def use_NTP(ntp):
     rtc = ntp
 
 def debug(message):
-    log(message,1)
+    log(c[0]+message+c[0],1)
 
 def info(message):
-    log(message,2)
+    log(c[3]+message+c[0],2)
     
 def warning(message):
-    log(message,3)
+    log(c[4]+message+c[0],3)
     
 def error(message):
-    log(message,4)
+    log(c[2]+message+c[0],4)
 
 def critical(message):
-    log(message,5)
+    log(c[5]+message+c[0],5)
     
 def log(message, level = 0):
     #timestamp
