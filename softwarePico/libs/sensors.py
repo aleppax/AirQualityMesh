@@ -1,6 +1,32 @@
 from libs import config, leadacid, sps30, picosngcja5, ahtx0, bmp280
 from machine import Pin
 from math import log
+from collections import OrderedDict
+
+empty_measures = OrderedDict([
+    ('station',''),
+    ('datetime',''),
+    ('humidity',''),
+    ('temperature',''),
+    ('pm1.0',''),
+    ('pm2.5',''),
+    ('pm4',''),
+    ('pm10',''),
+    ('pm1.0_ch2',''),
+    ('pm2.5_ch2',''),
+    ('pm4_ch2',''),
+    ('pm10_ch2',''),
+    ('sound pressure',''),
+    ('barometric pressure',''),
+    ('battery charge percentage',''),
+    ('O3',''),
+    ('NO2',''),
+    ('internal temperature',''),
+    ('wind direction',''),
+    ('wind speed',''),
+    ('battery is charging',''),
+    ('dew point','')
+])
 
 def init(i2c, gpio):
     global pm_p, pm_s, uln2003, th_s, bm_b
@@ -26,7 +52,7 @@ def shutdown():
 
 def measure(time_DTF):
     global measures
-    measures = {}
+    measures = empty_measures
     measures['station'] = config.station['station']
     measures['datetime'] = time_DTF
     measures['internal temperature'], measures['battery charge percentage'], measures['"battery is charging"'] = leadacid.levels()
@@ -37,4 +63,3 @@ def measure(time_DTF):
     p_bar = pressure/100000
     #p_mmHg = pressure/133.3224
     measures['pressure'] = p_bar
-        
