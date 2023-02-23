@@ -1,5 +1,5 @@
 from libs import config, cron, logger, sensors, wlan
-from time import ticks_diff, ticks_ms, sleep_ms
+from time import ticks_diff, ticks_ms
 
 # init logger
 logger.info('booting')
@@ -22,7 +22,7 @@ while True:
         extra_time_ms = ticks_diff(ticks_ms(),start_extra_time)
         still_to_wait = connection_max_time - extra_time_ms
         if still_to_wait > 0:
-            sleep_ms(still_to_wait)
+            cron.sleep_ms_feeded(still_to_wait)
         #sensors measurements, they have been pre-heated for 30s
         sensors.measure(logger.now_DTF())
         sensors.shutdown()
