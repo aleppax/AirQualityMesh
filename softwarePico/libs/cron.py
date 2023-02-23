@@ -147,8 +147,10 @@ def lightsleep_wrapper(ms):
     disable_WdT()
     sleep_ms(100)
     lightsleep(ms - 200)
-    sleep_ms(100)
     enable_WdT()
+    wdt.feed()
+    sleep_ms(100)
+    
     
 def lightsleep_until_next_cycle():
     sleepSeconds = next_cycle_s() - sensor_preheating_s
