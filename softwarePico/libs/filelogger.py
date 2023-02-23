@@ -4,7 +4,7 @@ from os import remove
 
 def write(m):
     # convert single set of measures m to csv, doesn't check the order or number of items
-    csv_m = ';'.join(m.values()) + '\n'
+    csv_m = ';'.join(str(el) for el in m.values()) + '\n'
     # write to file
     try:
         with open(config.filelogger['filename'], 'a+') as f:
