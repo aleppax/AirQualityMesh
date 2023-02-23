@@ -23,13 +23,14 @@ def read():
                 raw_line = line.rstrip('\n').split(';')
                 measures_dict = fill_measures_dict(values)
                 csvdata.append(measures_dict)
-        #delete file
-        os.remove(config.filelogger['filename'])
         return csvdata
     except:
         logger.error("Could not read file: " + config.filelogger['filename'])
         return []
-    
+
+def clear_data():
+    #delete file
+    os.remove(config.filelogger['filename'])    
 
 def fill_measures_dict(values):
     measures = empty_measures

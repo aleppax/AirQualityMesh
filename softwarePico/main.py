@@ -1,4 +1,4 @@
-from libs import config, cron, logger, sensors, wlan
+from libs import config, cron, filelogger, logger, sensors, wlan
 from time import ticks_diff, ticks_ms
 
 # init logger
@@ -28,14 +28,18 @@ while True:
         sensors.shutdown()
         # if online, save data online, otherwise to file
         if wlan.initialize():
+            #success = datalogger.send_data_list(filelogger.read())
+            # if success:
+            #     filelogger.clear_data()
             #data submission to servers
             # load from file
-            # send data
+            # datalogger.send_data(sensors.measures)
             logger.info("sending")
             #if submission is successful, reset file, otherwise write to file
         else:
             #store data to file
             logger.info("saving")
+            filelogger.write(sensors.measures)
     # if online check if it's time to look for NTP and software updates
     if wlan.online():
         # a software upgrade starts only if an update is available
