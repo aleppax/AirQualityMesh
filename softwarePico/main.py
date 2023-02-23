@@ -1,6 +1,6 @@
 from libs import config, cron, logger, sensors, wlan
 from time import ticks_diff, ticks_ms, sleep_ms
-#from machine import WDT
+
 # init logger
 logger.info('booting')
 logger.check_fs_free_space()
@@ -15,6 +15,7 @@ while True:
         sensors.wakeup()
         short_sleep = sensor_preheating - connection_max_time
         cron.lightsleep_wrapper(short_sleep)
+        
         logger.info('waking up')
         # init network
         start_extra_time = ticks_ms()

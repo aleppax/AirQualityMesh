@@ -1,4 +1,5 @@
 from libs import config, leadacid, sps30, picosngcja5, ahtx0, bmp280
+from libs.cron import wdt
 from machine import Pin
 from math import log
 from collections import OrderedDict
@@ -29,6 +30,7 @@ empty_measures = OrderedDict([
 ])
 
 def init(i2c, gpio):
+    wdt.feed()
     global pm_p, pm_s, uln2003, th_s, bm_b
     # bridge GPIO to output connector
     uln2003 = {int(k[8:]): v for k, v in config.sensors.items() if 'uln2003_' in k}
@@ -52,6 +54,7 @@ def shutdown():
 
 def measure(time_DTF):
     global measures
+    wdt.feed()
     measures = empty_measures
     measures['station'] = config.station['station']
     measures['datetime'] = time_DTF

@@ -1,10 +1,13 @@
 # system scheduler
 import ntptime, os, mip, sys
-from machine import RTC, lightsleep
+from machine import RTC, lightsleep, mem32
+from micropython import const
 from math import fmod
 from libs import logger, config
 from time import sleep_ms
 from random import randint
+from machine import WDT
+wdt = WDT(timeout=config.board['WDT_seconds']*1000)
 
 rtc = RTC()
 logger.use_NTP(rtc)
@@ -18,6 +21,17 @@ minimum_sleep_s = config.cron['minimum_sleep_s']
 sensor_preheating_s = config.cron['sensor_preheating_s']
 do_measure = False
 updated_NTP_at_boot = False
+BASE = const(0x40058000)
+_MASK = const(0x40000000)
+
+#set
+def enable_WdT():
+    mem32[BASE + 0x2000] = _MASK
+
+#clear
+def disable_WdT():
+    mem32[BASE + 0x3000] = _MASK
+
 
 def updates():
     update_ntp() # every NTPsync_interval
@@ -114,13 +128,14 @@ def next_cycle_s():
 
 def lightsleep_wrapper(ms):
     logger.info('lightsleeping for ' + str(ms) + 'ms')
+    disable_WdT()
     sleep_ms(100)
     lightsleep(ms - 200)
     sleep_ms(100)
+    enable_WdT()
     
 def lightsleep_until_next_cycle():
     sleepSeconds = next_cycle_s() - sensor_preheating_s
     if sleepSeconds > minimum_sleep_s:
         lightsleep_wrapper(sleepSeconds*1000)
     
-
