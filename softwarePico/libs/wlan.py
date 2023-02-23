@@ -6,7 +6,7 @@ import time
 from libs import logger, config
 from libs.cron import wdt
 
-wlan = ''
+wlan = None
 trying = False
 wlanSw = machine.Pin(23, machine.Pin.OUT)
 statuses = {
@@ -51,7 +51,7 @@ def connect_from_list():
     return False
 
 def online():
-    if wlan == '':
+    if wlan == None:
         return initialize()
     if wlan.status() == 3:
         return True

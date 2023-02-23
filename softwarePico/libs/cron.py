@@ -55,9 +55,15 @@ def update_ntp():
     rtc_now = ntptime.time()
     if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
         logger.info('Using NTP server ' + ntptime.host)
-        ntptime.settime()
-        config = config.add('cron','last_NTPsync',ntptime.time())
-        updated_NTP_at_boot = True
+        try:
+            ntptime.settime()
+            config = config.add('cron','last_NTPsync',ntptime.time())
+            updated_NTP_at_boot = True
+        except OverflowError as error:
+            logger.error(error)
+        except Exception as exception:
+            logger.warning(exception)
+
 
 def check_software_updates():
     global config, update_available, full_update
@@ -70,7 +76,10 @@ def check_software_updates():
     if rtc_now - config.cron['last_update'] > config.cron['update_interval']:
         if 'version.py' in os.listdir():
             os.remove('version.py')
-        mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
+        try:
+            mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
+        except:
+            logger.warning("can't communicate with update server")
         wdt.feed()
         if 'version.py' in os.listdir():
             if 'version' in sys.modules:
