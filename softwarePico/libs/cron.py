@@ -40,7 +40,7 @@ def sleep_ms_feeded(t):
     for i in range(times):
         sleep_ms(wdt_ms-500)
         wdt.feed()
-    sleep_ms(mod)
+    sleep_ms(int(mod))
     wdt.feed()
     
 def updates():
