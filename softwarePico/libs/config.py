@@ -4,6 +4,7 @@ board = {
     'I2C_BUS' : 0,
     'I2C_SDA' : 8,
     'I2C_SCL' : 9,
+    'WDT_seconds' : 6,
 }
 
 cron = {
@@ -26,6 +27,9 @@ cron = {
     #'branch' : 'devRemoteUpdate',
     'repository' : 'http://192.168.0.88:8000/',
     'branch' : '',
+}
+filelogger = {
+    'filename' : '/logs/measures.txt',
 }
 logger = {
     'logfile' : 'system.log',

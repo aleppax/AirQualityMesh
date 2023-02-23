@@ -1,6 +1,6 @@
-from libs import config, cron, logger, sensors, wlan
-from time import ticks_diff, ticks_ms, sleep_ms
-#from machine import WDT
+from libs import config, cron, filelogger, logger, sensors, wlan
+from time import ticks_diff, ticks_ms
+
 # init logger
 logger.info('booting')
 logger.check_fs_free_space()
@@ -15,26 +15,31 @@ while True:
         sensors.wakeup()
         short_sleep = sensor_preheating - connection_max_time
         cron.lightsleep_wrapper(short_sleep)
+        
         logger.info('waking up')
         # init network
         start_extra_time = ticks_ms()
         extra_time_ms = ticks_diff(ticks_ms(),start_extra_time)
         still_to_wait = connection_max_time - extra_time_ms
         if still_to_wait > 0:
-            sleep_ms(still_to_wait)
+            cron.sleep_ms_feeded(still_to_wait)
         #sensors measurements, they have been pre-heated for 30s
         sensors.measure(logger.now_DTF())
         sensors.shutdown()
         # if online, save data online, otherwise to file
         if wlan.initialize():
+            #success = datalogger.send_data_list(filelogger.read())
+            # if success:
+            #     filelogger.clear_data()
             #data submission to servers
             # load from file
-            # send data
+            # datalogger.send_data(sensors.measures)
             logger.info("sending")
             #if submission is successful, reset file, otherwise write to file
         else:
             #store data to file
             logger.info("saving")
+            filelogger.write(sensors.measures)
     # if online check if it's time to look for NTP and software updates
     if wlan.online():
         # a software upgrade starts only if an update is available
