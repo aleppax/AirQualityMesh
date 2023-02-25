@@ -4,6 +4,7 @@ board = {
     'I2C_BUS' : 0,
     'I2C_SDA' : 8,
     'I2C_SCL' : 9,
+    'I2C_freq' : 400000,
     'WDT_seconds' : 6,
 }
 
@@ -176,7 +177,7 @@ def _open_file_to_lines():
     return conf_lines
 
 def initialize_board():
-    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']), freq=400000)
+    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']), freq=board['I2C_freq'])
     sleep(0.1)
     gpio = {}
     for pin in board['GPIO_out']:
