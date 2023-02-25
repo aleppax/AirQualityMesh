@@ -4,6 +4,7 @@ board = {
     'I2C_BUS' : 0,
     'I2C_SDA' : 0,
     'I2C_SCL' : 1,
+    'WDT_seconds' : 6,
 }
 
 cron = {
