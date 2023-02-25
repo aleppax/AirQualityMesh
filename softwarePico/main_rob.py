@@ -26,19 +26,16 @@ logger.info('sensor init done')
 #sensor_preheating = config.cron['sensor_preheating_s']*1000
 connection_max_time = config.wlan['connection_timeout']*1000
 wlan.initialize()
-print(config.wlan['SSID_0'])
-print(connection_max_time)
-print(wlan)
 #print(wlan.isconnected())
-print('IP: ', wlan.ifconfig()[0])
+print('IP: ', wlan.wlan)
 logger.info('activate output')
-if (config.scheduler['mqtt'] == 1):
-    logger.info('mqtt enabled')
-    client_mqtt = output_mqtt.init(i2c)
-    logger.info('init mqtt done')
-    print(client_mqtt)
-    output_mqtt.mqttpub_test(client_mqtt,'proviamo') #rr fake write
-    logger.info('mqtt sending')
+# if (config.scheduler['mqtt'] == 1):
+#     logger.info('mqtt enabled')
+#     client_mqtt = output_mqtt.init(i2c)
+#     logger.info('init mqtt done')
+#     print(client_mqtt)
+#     output_mqtt.mqttpub_test(client_mqtt,'proviamo') #rr fake write
+#     logger.info('mqtt sending')
 
 output_db.db_measure('proviamo db') #rr fake write
 logger.info('db sending')
