@@ -27,14 +27,17 @@ def shutdown():
 def measure(time_DTF):
     global measures
     measures = {}
-    measures['station'] = config.station['station']
-    measures['datetime'] = time_DTF
-    measures['internal temperature'], measures['battery charge percentage'], measures['"battery is charging"'] = leadacid.levels()
-    measures['temperature'], measures['humidity'], = th_s.temperature, th_s.relative_humidity
-    k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
-    measures['dew point'] =  243.12 * k / (17.62 - k)
-    pressure = bm_b.pressure
-    p_bar = pressure/100000
-    #p_mmHg = pressure/133.3224
-    measures['pressure'] = p_bar
-        
+    try: 
+        measures['station'] = config.station['station']
+        measures['datetime'] = time_DTF
+        print(measures['datetime'])
+        measures['internal temperature'], measures['battery charge percentage'], measures['"battery is charging"'] = leadacid.levels()
+#         measures['temperature'], measures['humidity'], = th_s.temperature, th_s.relative_humidity
+#         k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
+#         measures['dew point'] =  243.12 * k / (17.62 - k)
+#         pressure = bm_b.pressure
+#         p_bar = pressure/100000
+#         #p_mmHg = pressure/133.3224
+#         measures['pressure'] = p_bar
+    except OSError as e: 
+        print('boh ',e)

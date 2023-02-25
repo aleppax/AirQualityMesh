@@ -2,8 +2,8 @@ board = {
     'GPIO_out' : ["LED",2,3,4,5,6,7],
     'GPIO_in' : [0,1],
     'I2C_BUS' : 0,
-    'I2C_SDA' : 8,
-    'I2C_SCL' : 9,
+    'I2C_SDA' : 0,
+    'I2C_SCL' : 1,
 }
 
 cron = {
@@ -62,9 +62,10 @@ station = {
     'latitude' : 0.0,
     'longitude' : 0.0,
 }
+
 wlan = {
-    'SSID_0' : 'xxx',
-    'PASSW_0' : 'xxx',
+    'SSID_0' : 'TIM-XXX',
+    'PASSW_0' : 'XXX',
     'connection_timeout' : 15, 
     # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
 }
