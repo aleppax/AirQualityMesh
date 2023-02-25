@@ -53,7 +53,8 @@ def updateLastlogConfig(n):
     config = config.add('logger','lastlog',n)
     logfile = logfile_name + '.' + str(n)
     lastlog = n
-    os.remove(logfile)
+    if logfile in os.listdir('/logs'):
+        os.remove('/logs/' + logfile)
 
 def check_fs_free_space():
     fs_stat = os.statvfs('/')
@@ -100,8 +101,8 @@ def log(message, level = 0):
     logformat = "{},{},{},{}\n"
     logrecord = logformat.format(str(timestamp),str(level),str(NTP_synced),str(index))
     # check file size
-    if logfile in os.listdir():
-        if os.stat(logfile)[6] > filesize_limit_byte:
+    if logfile in os.listdir('/logs'):
+        if os.stat('/logs/' + logfile)[6] > filesize_limit_byte:
             nextLogFile()
     # write to file
     try:
