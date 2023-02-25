@@ -77,13 +77,13 @@ def log(message, level = 0):
     timestamp = time.time()
     now = time.localtime()
     # parse message
-    if message in events:
-        index = events.index(message)
+    if str(message) in events:
+        index = events.index(str(message))
     else:
         index = 2 #unknown
     # print debug information
     if __debug__ & print_log:
-        print(timetuple_to_DTF(now) + ' ' + message)
+        print(timetuple_to_DTF(now) + ' ' + str(message))
     # format log
     logformat = "{},{},{},{}\n"
     logrecord = logformat.format(str(timestamp),str(level),str(NTP_synced),str(index))
