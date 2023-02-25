@@ -7,6 +7,7 @@ from libs.mqtt_local import config_mqtt
 from machine import Pin, I2C
 
 client_mqtt = MQTTClient(config_mqtt)
+#client_mqtt.connect()
 
 #from machine import WDT
 # init logger
@@ -24,9 +25,11 @@ logger.info('I2C active, now sensor init')
 logger.info('sensor init done')
 #sensor_preheating = config.cron['sensor_preheating_s']*1000
 connection_max_time = config.wlan['connection_timeout']*1000
+wlan.initialize()
+print(config.wlan['SSID_0'])
 print(connection_max_time)
 print(wlan)
-print(wlan.isconnected())
+#print(wlan.isconnected())
 print('IP: ', wlan.ifconfig()[0])
 logger.info('activate output')
 if (config.scheduler['mqtt'] == 1):
