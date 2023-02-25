@@ -1,4 +1,4 @@
-from libs import logger, 
+from libs import logger, config
 from libs.sensors import empty_measures
 from os import remove
 
