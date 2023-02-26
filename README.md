@@ -3,3 +3,5 @@
 ![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/base/opms_Paradisa_Flowers.png "mainboard")
 
 IoT system monitoring outdoor air quality with multiple stations, remote data collection and analytics
+
+![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/base/casing/pictures/picture_sensors_installed.jpg "an external photo of the installed system")
