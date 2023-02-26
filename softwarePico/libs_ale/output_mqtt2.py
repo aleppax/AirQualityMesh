@@ -142,73 +142,6 @@ def mqttpub(client,txt):
     return 0
 
 
-def mqttpub_aftermeasure(client,measures,txt):
-    logger.info('dentro mqtt ' + txt)
-#    t, h = 11.1, 22.2
-    t, h = measures['temperature'], measures['humidity']
-    print(t)
-    print(h)
-#   await asyncio.sleep(5)
-    temp = str(t)
-    # If WiFi is down the following will pause for the duration.
-    arrayt = ['{', '"temperature": ' , temp , '}' ]
-    msg = ' '.join(arrayt)
-    print (msg)
-    client.publish('topic/temp', msg)
-    
-    humi = str(h)
-    arrayt = ['{', '"humidity": ' , humi , '}' ]
-    msg = ' '.join(arrayt)
-    print (msg)
-    client.publish('topic/humi', msg)
-    
-    #md_pm1_0, md_pm2_5, md_pm10 = measures['md_pm1_0'], measures['md_pm1_0'], measures['md_pm1_0'],  #RRR decidere i nomi
-    md_pm1_0, md_pm2_5, md_pm10 = 111.1,128.9,222.2
-    
-    arrayt = ['{', '"mass_density_pm1_0": ' , str(md_pm1_0) , '}']
-    text = ' '.join(arrayt)
-    print (text)
-    client.publish(topic_pub_md1_0, text)
-    
-    arrayt = ['{', '"mass_density_pm2_5": ' , str(md_pm2_5) , '}']
-    text = ' '.join(arrayt)
-    print (text)
-    client.publish(topic_pub_md2_5, text)
-    
-    arrayt = ['{', '"mass_density_pm10": ' , str(md_pm10) , '}']
-    text = ' '.join(arrayt)
-    print (text)
-    client.publish(topic_pub_md10, text)
-
-    #md_pm1_0_ch2, md_pm2_5_ch2, md_pm4_0_ch2, md_pm10_ch2 = measures['md_pm1_0'], measures['md_pm1_0'], measures['md_pm1_0'],  #RRR decidere i nomi
-    
-    md_pm1_0_ch2 = 555.567
-    md_pm2_5_ch2 = 777.567
-    md_pm4_0_ch2 = 234.567
-    md_pm10_ch2  = 999.567
-    
-    arrayt = ['{', '"mass_density_pm1_0_ch2": ' , str(md_pm1_0_ch2) , '}']
-    text = ' '.join(arrayt)
-    print (text)
-    client.publish(topic_pub_md1_0_ch2, text)
-    
-    arrayt = ['{', '"mass_density_pm2_5_ch2": ' , str(md_pm2_5_ch2) , '}']
-    text = ' '.join(arrayt)
-    print (text)
-    client.publish(topic_pub_md2_5_ch2, text)
-    
-    arrayt = ['{', '"mass_density_pm4_0_ch2": ' , str(md_pm4_0_ch2) , '}']
-    text = ' '.join(arrayt)
-    print (text)
-    client.publish(topic_pub_md4_0_ch2, text)
-    
-    arrayt = ['{', '"mass_density_pm10_ch2": ' , str(md_pm10_ch2) , '}']
-    text = ' '.join(arrayt)
-    print (text)
-    client.publish(topic_pub_md10_ch2, text)
-    
-    return 0
-
 def mqtt_connect():
     client = MQTTClient(client_id, mqtt_server, user=user_t, password=password_t, keepalive=60)
     client.connect()
@@ -222,15 +155,15 @@ def reconnect():
     
 
 #run test here
-# rp2.country('IT')
-# wlan = network.WLAN(network.STA_IF)
-# wlan.active(True)
-# ssid = secrets['ssid']
-# pw = secrets['pw']
-# wlan.connect(ssid, pw)
-# print(wlan)
-# try:
-#     client = mqtt_connect()
-# except OSError as e:
-#     reconnect()
-# mqttpub_test(client,'prova')
+rp2.country('IT')
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+ssid = secrets['ssid']
+pw = secrets['pw']
+wlan.connect(ssid, pw)
+print(wlan)
+try:
+    client = mqtt_connect()
+except OSError as e:
+    reconnect()
+mqttpub_test(client,'prova')

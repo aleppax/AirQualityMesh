@@ -5,22 +5,28 @@ from time import ticks_diff, ticks_ms
 logger.info('booting')
 logger.check_fs_free_space()
 #init I2C and GPIO. access a port with gpio['GP2']
-i2c, gpio = config.initialize_board()
-sensors.init(i2c, gpio)
+i2c, i2c_1, gpio = config.initialize_board2()
+print('ok00')
+sensors.init2(i2c,i2c_1, gpio)
+print('ok0')
 sensor_preheating = config.cron['sensor_preheating_s']*1000
 connection_max_time = config.wlan['connection_timeout']*1000
 
 while True:
     if cron.do_measure:
         sensors.wakeup()
+        print('ok1')
         short_sleep = sensor_preheating - connection_max_time
         cron.lightsleep_wrapper(short_sleep)
+        print('ok2')
         
         logger.info('waking up')
         # init network
         start_extra_time = ticks_ms()
+        print('ok3')
         extra_time_ms = ticks_diff(ticks_ms(),start_extra_time)
         still_to_wait = connection_max_time - extra_time_ms
+        print('ok4')
         if still_to_wait > 0:
             cron.sleep_ms_feeded(still_to_wait)
         #sensors measurements, they have been pre-heated for 30s

@@ -4,7 +4,7 @@ import socket
 import binascii
 import time
 from libs import logger, config
-#from libs.cron import wdt
+from libs.cron import wdt
 
 wlan = None
 trying = False
@@ -23,7 +23,7 @@ def initialize():
     global wlanSw
     wlanSw.high()
     time.sleep_ms(80)
-#    wdt.feed()
+    wdt.feed()
     if not hasattr(config,'wlan'):
         serve_captive_portal()
     return connect(0)
@@ -59,7 +59,7 @@ def online():
         return False
 
 def connect(wifiNumber):
-#    wdt.feed()
+    wdt.feed()
     global wlan, trying
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
@@ -74,7 +74,7 @@ def connect(wifiNumber):
         timeout = config.wlan['connection_timeout']
         prev_status = -4
         while timeout > 0:
-#            wdt.feed()
+            wdt.feed()
             status = wlan.status()
             if prev_status != status:
                 logger.info(statuses[status])
@@ -114,7 +114,7 @@ def serve_captive_portal():
     # Listen for connections
     waiting_credentials = True
     while waiting_credentials:
-#        wdt.feed()
+        wdt.feed()
         try:
             cl, addr = s.accept()
             cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
