@@ -355,7 +355,7 @@ class SPS30:
                 if not self.read_data_ready_flag():
                     continue
                 
-                print("measurement ready")
+                #print("measurement ready")
                 running = False
 
                 self.i2c.writeto(self.addr, bytearray(CMD_READ_MEASURED_VALUES))
@@ -377,7 +377,7 @@ class SPS30:
                     "timestamp": 0
                 }
 
-                print(f"result " + str(result))
+                #print(f"result " + str(result))
                 self.__data = result if all(self.__valid.values()) else {}
 
             except KeyboardInterrupt:
@@ -416,7 +416,13 @@ class SPS30:
 
     def stop_measurement(self) -> None:
         self.i2c.write(CMD_STOP_MEASUREMENT)
-        self.i2c.close()
+        #self.i2c.close()
+
+    def measure(self) -> dict:
+        self.start_measurement()
+        #self.stop_measurement()
+        return self.__data
+        
 
     def on(self):
         self.pwr_pin.on()
