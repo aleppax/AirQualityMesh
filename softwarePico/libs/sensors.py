@@ -61,7 +61,7 @@ def measure(time_DTF):
     measures['internal temperature'], measures['battery charge percentage'], measures['battery is charging'] = leadacid.levels()
     measures['temperature'], measures['humidity'], = th_s.temperature, th_s.relative_humidity
     pm_0_data = pm_p.measure()['mass_density']
-    measures['pm10'], measures['pm2.5'], measures['pm1.0']  = list(pm_p.measure()['mass_density'].values()) # Panasonic SNGCJA5 PM sensor
+    measures['pm10'], measures['pm2.5'], measures['pm1.0']  = pm_0_data['pm10'], pm_0_data['pm2.5'], pm_0_data['pm1.0'] # Panasonic SNGCJA5 PM sensor
     pm_1_data = pm_s.measure()['sensor_data']['mass_density']
     measures['pm10_ch2'], measures['pm2.5_ch2'], measures['pm4_ch2'], measures['pm1.0_ch2']  = pm_1_data['pm10'], pm_1_data['pm2.5'], pm_1_data['pm4.0'], pm_1_data['pm1.0']
     k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
