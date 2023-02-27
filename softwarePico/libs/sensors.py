@@ -9,7 +9,7 @@ empty_measures = OrderedDict([
     ('datetime',''),
     ('humidity',''),
     ('temperature',''),
-    ('pm1.0',''),
+    ('pm1.0',''), # mass_densities
     ('pm2.5',''),
     ('pm4',''),
     ('pm10',''),
@@ -17,14 +17,14 @@ empty_measures = OrderedDict([
     ('pm2.5_ch2',''),
     ('pm4_ch2',''),
     ('pm10_ch2',''),
-    ('sound pressure',''),
+    ('sound pressure',''), # not implemented yet
     ('barometric pressure',''),
     ('battery charge percentage',''),
-    ('O3',''),
-    ('NO2',''),
+    ('O3',''), # not implemented yet
+    ('NO2',''), # not implemented yet
     ('internal temperature',''),
-    ('wind direction',''),
-    ('wind speed',''),
+    ('wind direction',''), # not implemented yet
+    ('wind speed',''), # not implemented yet
     ('battery is charging',''),
     ('dew point','')
 ])
@@ -58,11 +58,15 @@ def measure(time_DTF):
     measures = empty_measures
     measures['station'] = config.station['station']
     measures['datetime'] = time_DTF
-    measures['internal temperature'], measures['battery charge percentage'], measures['"battery is charging"'] = leadacid.levels()
+    measures['internal temperature'], measures['battery charge percentage'], measures['battery is charging'] = leadacid.levels()
     measures['temperature'], measures['humidity'], = th_s.temperature, th_s.relative_humidity
+    pm_0_data = pm_p.measure()['mass_density']
+    measures['pm10'], measures['pm2.5'], measures['pm1.0']  = list(pm_p.measure()['mass_density'].values()) # Panasonic SNGCJA5 PM sensor
+    pm_1_data = pm_s.measure()['sensor_data']['mass_density']
+    measures['pm10_ch2'], measures['pm2.5_ch2'], measures['pm4_ch2'], measures['pm1.0_ch2']  = pm_1_data['pm10'], pm_1_data['pm2.5'], pm_1_data['pm4.0'], pm_1_data['pm1.0']
     k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
     measures['dew point'] =  243.12 * k / (17.62 - k)
     pressure = bm_b.pressure
     p_bar = pressure/100000
     #p_mmHg = pressure/133.3224
-    measures['pressure'] = p_bar
+    measures['barometric pressure'] = p_bar

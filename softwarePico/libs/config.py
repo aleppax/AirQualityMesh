@@ -4,7 +4,7 @@ board = {
     'I2C_BUS' : 0,
     'I2C_SDA' : 8,
     'I2C_SCL' : 9,
-    'I2C_freq' : 400000,
+    'I2C_freq' : 100000,
     'WDT_seconds' : 6,
 }
 
@@ -44,6 +44,7 @@ leadacid = {
     'ADC_factor' : 0.1122,
     'ADC_port' : 2,
     'filter_length' : 10, # consider 'measuremens_per_day' (how frequently we take a measurement) if its span is too much reduce this number
+    'low_power_mode' : False,
 }
 picosngcja5 = {
     'sensor_power_pin' : 2,
