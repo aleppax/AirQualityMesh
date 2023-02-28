@@ -48,7 +48,7 @@ def wakeup():
     wdt.feed()
     pm_p.on()
     pm_s.on()
-    sleep(0.2)
+    sleep_ms(200)
     pm_s.start_measurement()
 
 def shutdown():
