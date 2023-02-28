@@ -74,8 +74,8 @@ station = {
     'longitude' : 0.0,
 }
 wlan = {
-    'SSID_0' : 'Vodafone-58205218',
-    'PASSW_0' : '25achzww5k6pslh',
+    'SSID_0' : 'xxx',
+    'PASSW_0' : 'xxx',
     'connection_timeout' : 15, 
     # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
 }
