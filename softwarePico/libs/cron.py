@@ -6,7 +6,7 @@ from math import fmod
 from libs import logger, config
 from time import sleep_ms
 from random import randint
-from machine import WDT
+from machine import WDT, deepsleep
 wdt_ms = config.board['WDT_seconds']*1000
 wdt = WDT(timeout=wdt_ms)
 
@@ -170,3 +170,8 @@ def lightsleep_until_next_cycle():
     if sleepSeconds > minimum_sleep_s:
         lightsleep_wrapper(sleepSeconds*1000)
     
+def deepsleep_as_long_as_you_can():
+    logger.info('deepsleeping for 71min33s')
+    disable_WdT()
+    sleep_ms(100)
+    deepsleep(4294000)

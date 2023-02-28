@@ -10,7 +10,7 @@ if config.leadacid['low_power_mode'] == True:
     from machine import deepsleep
     leadacid.levels()
     # maximum allowed sleep time, 71 minutes 33 seconds
-    deepsleep(4294000)
+    cron.deepsleep_as_long_as_you_can()
     
 #init I2C and GPIO. access a port with gpio['GP2']
 i2c, gpio = config.initialize_board()
@@ -45,7 +45,7 @@ while True:
     wlan.turn_off()
     if config.leadacid['low_power_mode'] == True:
         logger.warning("Warning: Low battery level. Switching to low power mode until recharged")
-        deepsleep(4294000)
+        cron.deepsleep_as_long_as_you_can()
     cron.lightsleep_until_next_cycle()
 
 
