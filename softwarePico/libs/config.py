@@ -35,6 +35,9 @@ cron = {
     'repository' : 'http://192.168.0.88:8000/',
     'branch' : '',
 }
+datalogger = {
+    'URL' : 'https://lettori.org/opms/api.php/records/measurements/',
+}
 filelogger = {
     'filename' : '/logs/measures.txt',
 }
@@ -66,13 +69,13 @@ sps30 = {
 }
 
 station = {
-    'station' : 'prototipo 1',
+    'station' : 2,
     'latitude' : 0.0,
     'longitude' : 0.0,
 }
 wlan = {
-    'SSID_0' : 'xxx',
-    'PASSW_0' : 'xxx',
+    'SSID_0' : 'Vodafone-58205218',
+    'PASSW_0' : '25achzww5k6pslh',
     'connection_timeout' : 15, 
     # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
 }

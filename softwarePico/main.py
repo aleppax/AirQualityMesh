@@ -1,4 +1,4 @@
-from libs import config, cron, filelogger, logger, sensors, wlan
+from libs import config, cron, filelogger, logger, sensors, wlan, datalogger
 from time import ticks_diff, ticks_ms
 
 # init logger
@@ -27,13 +27,12 @@ while True:
         # if online, save data online, otherwise to file
         sent = False
         if wlan.initialize():
-            pass
-            #sent = datalogger.send_data_list(filelogger.read())
-            # if success:
-            #     filelogger.clear_data()
+            sent = datalogger.send_data_list(filelogger.read())
+            if sent:
+                filelogger.clear_data()
             #data submission to servers
             # load from file
-            # datalogger.send_data(sensors.measures)
+            datalogger.send_data(sensors.measures)
         if not sent:
             #store data to file
             logger.info("data can't be sent. Saving locally")
