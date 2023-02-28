@@ -3,37 +3,38 @@ from libs.cron import wdt
 from machine import Pin
 from math import log
 from collections import OrderedDict
+from time import ticks_ms, ticks_diff, sleep_ms
 
 empty_measures = OrderedDict([
     ('station',''),
-    ('datetime',''),
-    ('humidity',''),
-    ('temperature',''),
-    ('pm1.0',''), # mass_densities
-    ('pm2.5',''),
-    ('pm4',''),
-    ('pm10',''),
-    ('pm1.0_ch2',''),
-    ('pm2.5_ch2',''),
-    ('pm4_ch2',''),
-    ('pm10_ch2',''),
-    ('sound pressure',''), # not implemented yet
-    ('barometric pressure',''),
-    ('battery charge percentage',''),
-    ('O3',''), # not implemented yet
-    ('NO2',''), # not implemented yet
-    ('internal temperature',''),
-    ('wind direction',''), # not implemented yet
-    ('wind speed',''), # not implemented yet
-    ('battery is charging',''),
-    ('dew point','')
+    ('datetime',0),
+    ('humidity',0),
+    ('temperature',0),
+    ('pm1.0',0), # mass_densities
+    ('pm2.5',0),
+    ('pm4',0),
+    ('pm10',0),
+    ('pm1.0_ch2',0),
+    ('pm2.5_ch2',0),
+    ('pm4_ch2',0),
+    ('pm10_ch2',0),
+    ('sound pressure',0), # not implemented yet
+    ('barometric pressure',0),
+    ('battery charge percentage',0),
+    ('O3',0), # not implemented yet
+    ('NO2',0), # not implemented yet
+    ('internal temperature',0),
+    ('wind direction',0), # not implemented yet
+    ('wind speed',0), # not implemented yet
+    ('battery is charging',0),
+    ('dew point',0)
 ])
 
 def init(i2c, gpio):
     wdt.feed()
     global pm_p, pm_s, uln2003, th_s, bm_b
     # bridge GPIO to output connector
-    uln2003 = {int(k[8:]): v for k, v in config.sensors.items() if 'uln2003_' in k}
+    uln2003 = {int(k[8:]): v for k, v in config.board.items() if 'uln2003_' in k}
     #corresponding GPIO pin name is addressed with uln2003[1] where 1 is the uln2003 output
     p_pwr_pin = gpio[    uln2003[config.picosngcja5['sensor_power_pin']]  ]
     s_pwr_pin = gpio[    uln2003[config.sps30['sensor_power_pin']]   ] 
@@ -44,12 +45,19 @@ def init(i2c, gpio):
     bm_b.oversample(bmp280.BMP280_OS_HIGH)
 
 def wakeup():
+    wdt.feed()
     pm_p.on()
+    wdt.feed()
     pm_s.on()
+    wdt.feed()
+    pm_s.start_measurement()
 
 def shutdown():
+    wdt.feed()
     pm_p.off()
+    wdt.feed()
     pm_s.off()
+    wdt.feed()
     bm_b.sleep()
 
 def measure(time_DTF):
@@ -59,14 +67,41 @@ def measure(time_DTF):
     measures['station'] = config.station['station']
     measures['datetime'] = time_DTF
     measures['internal temperature'], measures['battery charge percentage'], measures['battery is charging'] = leadacid.levels()
-    measures['temperature'], measures['humidity'], = th_s.temperature, th_s.relative_humidity
-    pm_0_data = pm_p.measure()['mass_density']
-    measures['pm10'], measures['pm2.5'], measures['pm1.0']  = pm_0_data['pm10'], pm_0_data['pm2.5'], pm_0_data['pm1.0'] # Panasonic SNGCJA5 PM sensor
-    pm_1_data = pm_s.measure()['sensor_data']['mass_density']
-    measures['pm10_ch2'], measures['pm2.5_ch2'], measures['pm4_ch2'], measures['pm1.0_ch2']  = pm_1_data['pm10'], pm_1_data['pm2.5'], pm_1_data['pm4.0'], pm_1_data['pm1.0']
+    # averaging n measures from sensors with 1Hz interval
+    count = config.sensors['average_particle_measurements']
+    while count > 0:
+        wdt.feed()
+        start_iter_time = ticks_ms()
+        count -= 1
+        measures['temperature'] += th_s.temperature
+        measures['humidity'] += th_s.relative_humidity
+        pressure = bm_b.pressure
+        p_bar = pressure/100000
+        measures['barometric pressure'] += p_bar
+        pm_0_data = pm_p.measure()['mass_density']
+        pm_1_data = pm_s.measure()['mass_density']
+        measures['pm10'] += pm_0_data['pm10'] # Panasonic SNGCJA5 PM sensor
+        measures['pm2.5'] += pm_0_data['pm2.5']
+        measures['pm1.0'] += pm_0_data['pm1.0']
+        measures['pm10_ch2'] += pm_1_data['pm10'] # Sensirion SPS30
+        measures['pm2.5_ch2'] += pm_1_data['pm2.5']
+        measures['pm4_ch2'] += pm_1_data['pm4.0']
+        measures['pm1.0_ch2'] += pm_1_data['pm1.0']
+        rem_iter_time_ms = config.sensors['average_measurement_interval_ms'] - ticks_diff(ticks_ms(),start_iter_time)
+        if rem_iter_time_ms > 0:
+            sleep_ms(rem_iter_time_ms)
+    measures['temperature'] /= config.sensors['average_particle_measurements']
+    measures['humidity'] /= config.sensors['average_particle_measurements']
+    measures['barometric pressure'] /= config.sensors['average_particle_measurements']
+    measures['pm10'] /= config.sensors['average_particle_measurements']
+    measures['pm2.5'] /= config.sensors['average_particle_measurements']
+    measures['pm1.0'] /= config.sensors['average_particle_measurements']
+    measures['pm10_ch2'] /= config.sensors['average_particle_measurements']
+    measures['pm2.5_ch2'] /= config.sensors['average_particle_measurements']
+    measures['pm4_ch2'] /= config.sensors['average_particle_measurements']
+    measures['pm1.0_ch2'] /= config.sensors['average_particle_measurements']
+    wdt.feed()
     k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
     measures['dew point'] =  243.12 * k / (17.62 - k)
-    pressure = bm_b.pressure
-    p_bar = pressure/100000
-    #p_mmHg = pressure/133.3224
-    measures['barometric pressure'] = p_bar
+    
+    

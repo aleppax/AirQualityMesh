@@ -16,21 +16,11 @@ if config.leadacid['low_power_mode'] == True:
 i2c, gpio = config.initialize_board()
 sensors.init(i2c, gpio)
 sensor_preheating = config.cron['sensor_preheating_s']*1000
-connection_max_time = config.wlan['connection_timeout']*1000
 
 while True:
     if cron.do_measure:
         sensors.wakeup()
-        short_sleep = sensor_preheating - connection_max_time
-        cron.lightsleep_wrapper(short_sleep)
-        
-        logger.info('waking up')
-        # init network
-        start_extra_time = ticks_ms()
-        extra_time_ms = ticks_diff(ticks_ms(),start_extra_time)
-        still_to_wait = connection_max_time - extra_time_ms
-        if still_to_wait > 0:
-            cron.sleep_ms_feeded(still_to_wait)
+        cron.lightsleep_wrapper(sensor_preheating)
         #sensors measurements, they have been pre-heated for 30s
         sensors.measure(logger.now_DTF())
         sensors.shutdown()

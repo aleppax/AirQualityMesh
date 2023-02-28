@@ -6,6 +6,12 @@ board = {
     'I2C_SCL' : 9,
     'I2C_freq' : 100000,
     'WDT_seconds' : 6,
+    'uln2003_1' : 'GP7', # hardware connections between Pico GPIOs and ULN2003 channels
+    'uln2003_2' : 'GP6',
+    'uln2003_3' : 'GP5',
+    'uln2003_4' : 'GP4',
+    'uln2003_5' : 'GP3',
+    'uln2003_6' : 'GP2',
 }
 
 cron = {
@@ -15,7 +21,7 @@ cron = {
     # 'NTPsync_interval' every x hours
     'update_interval' : 60, #3600 * 24,
     # 'update_interval' every x hours
-    'measuremens_per_day' : 288,
+    'measuremens_per_day' : 144,
     # 'measuremens_per_day' interval starting at 0:00. do not set too high (1440 is already very battery expensive). better using divisors of 86400
     'minimum_sleep_s' : 4,
     # 'minimum_sleep_s' avoid too short sleep periods leading to malfunction
@@ -51,12 +57,8 @@ picosngcja5 = {
 #    '30s_pre_heating' : True,
 }
 sensors = {
-    'uln2003_1' : 'GP7', # hardware connections between Pico GPIOs and ULN2003 channels
-    'uln2003_2' : 'GP6',
-    'uln2003_3' : 'GP5',
-    'uln2003_4' : 'GP4',
-    'uln2003_5' : 'GP3',
-    'uln2003_6' : 'GP2',
+    'average_particle_measurements' : 20,
+    'average_measurement_interval_ms' : 1000,
 }
 sps30 = {
     'sensor_power_pin' : 1,
