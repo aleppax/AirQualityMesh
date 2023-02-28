@@ -1,8 +1,10 @@
 from libs import logger, config
 from libs.sensors import empty_measures
 from os import remove
+from libs.cron import wdt
 
 def write(m):
+    wdt.feed()
     # convert single set of measures m to csv, doesn't check the order or number of items
     csv_m = ';'.join(str(el) for el in m.values()) + '\n'
     # write to file
@@ -15,6 +17,7 @@ def write(m):
         return False
     
 def read():
+    wdt.feed()
     # retrieve all sets of measures in a list of ordered dicts
     csvdata = []
     try:

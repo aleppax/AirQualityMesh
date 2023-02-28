@@ -52,7 +52,10 @@ def updates():
 def update_ntp():
     global config, updated_NTP_at_boot
     wdt.feed()
-    rtc_now = ntptime.time()
+    try:
+        rtc_now = ntptime.time()
+    except:
+        return
     if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
         logger.info('Using NTP server ' + ntptime.host)
         try:
@@ -80,6 +83,7 @@ def check_software_updates():
             mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
         except:
             logger.warning("can't communicate with update server")
+            return
         wdt.feed()
         if 'version.py' in os.listdir():
             if 'version' in sys.modules:

@@ -31,12 +31,17 @@ def measure_RP2040_temp():
 def ADC_voltage():
     return int(adc.read_u16() * (ADC_factor))   
     
-def average_n_measurements(n,callback):
+def average_n_measurements(n,callback, interval=0):
     count = 0
     sum_measures = 0
+            # init network
     while count < n:
+        start_cycle_time = time.ticks_ms()
         count += 1
         sum_measures += callback()
+        rem_iteration_time_ms = interval - time.ticks_diff(time.ticks_ms(),start_cycle_time)
+        if rem_iteration_time_ms > 0:
+            time.sleep_ms(rem_iteration_time_ms)
     return sum_measures/n
 
 def battery_percentage(voltage):

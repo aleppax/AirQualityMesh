@@ -354,28 +354,19 @@ class SPS30:
             try:
                 if not self.read_data_ready_flag():
                     continue
-                
-                #print("measurement ready")
-                running = False
 
+                running = False
                 self.i2c.writeto(self.addr, bytearray(CMD_READ_MEASURED_VALUES))
                 data = self.i2c.readfrom(self.addr, NBYTES_MEASURED_VALUES_FLOAT)
 
-                #if self.__data.full():
-                #    self.__data.get()
-
                 result = {
-                    "sensor_data": {
                         "mass_density": self.__mass_density_measurement(data[:24]),
                         "particle_count": self.__particle_count_measurement(data[24:54]),
                         "particle_size": self.__particle_size_measurement(data[54:]),
                         "mass_density_unit": "ug/m3",
                         "particle_count_unit": "#/cm3",
                         "particle_size_unit": "um"
-                    },
-                    #"timestamp": int(datetime.now().timestamp())
-                    "timestamp": 0
-                }
+                    }
 
                 #print(f"result " + str(result))
                 self.__data = result if all(self.__valid.values()) else {}
@@ -415,15 +406,13 @@ class SPS30:
         return self.__data
 
     def stop_measurement(self) -> None:
-        self.i2c.write(CMD_STOP_MEASUREMENT)
-        #self.i2c.close()
+        #self.i2c.write(CMD_STOP_MEASUREMENT)
+        self.i2c.writeto(self.addr, bytearray(CMD_STOP_MEASUREMENT))
 
     def measure(self) -> dict:
-        self.start_measurement()
-        #self.stop_measurement()
+        self.__read_measured_value()
         return self.__data
         
-
     def on(self):
         self.pwr_pin.on()
     
