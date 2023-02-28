@@ -118,7 +118,12 @@ def software_update():
             filedict = version.updated_files
         for directory,files in filedict.items():
             for f in files:
-                filemodified = os.stat(directory + '/' + f)[7]
+                # if file didn't exixt, of course don't check for new timestamp
+                existed = f in os.listdir()
+                if existed:
+                    filemodified = os.stat(directory + '/' + f)[7]
+                else:
+                    filemodified = -1
                 mip.install(config.cron['repository'] + directory[1:] + '/' + f, target=directory + '/', version=config.cron['branch'])
                 wdt.feed()
                 if filemodified == os.stat(directory + '/' + f)[7]:
