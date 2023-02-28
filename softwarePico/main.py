@@ -6,7 +6,7 @@ logger.info('booting')
 logger.check_fs_free_space()
 # checking for low power mode (battery saving)
 if config.leadacid['low_power_mode'] == True:
-    import leadacid
+    from libs import leadacid
     from machine import deepsleep
     leadacid.levels()
     # maximum allowed sleep time, 71 minutes 33 seconds
