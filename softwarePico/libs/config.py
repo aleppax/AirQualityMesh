@@ -5,7 +5,7 @@ board = {
     'I2C_SDA' : 8,
     'I2C_SCL' : 9,
     'I2C_freq' : 100000,
-    'WDT_seconds' : 6,
+    'WDT_seconds' : 8,
     'uln2003_1' : 'GP7', # hardware connections between Pico GPIOs and ULN2003 channels
     'uln2003_2' : 'GP6',
     'uln2003_3' : 'GP5',

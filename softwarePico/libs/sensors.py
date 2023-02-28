@@ -57,8 +57,6 @@ def shutdown():
     pm_p.off()
     wdt.feed()
     pm_s.off()
-    wdt.feed()
-    bm_b.sleep()
 
 def measure(time_DTF):
     global measures
