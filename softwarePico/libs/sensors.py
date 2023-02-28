@@ -47,9 +47,8 @@ def init(i2c, gpio):
 def wakeup():
     wdt.feed()
     pm_p.on()
-    wdt.feed()
     pm_s.on()
-    wdt.feed()
+    sleep(0.2)
     pm_s.start_measurement()
 
 def shutdown():
