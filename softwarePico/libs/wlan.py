@@ -1,3 +1,4 @@
+#import rp2 #problems finding SSID when rp2.country is set
 import machine
 import network
 import socket
@@ -61,6 +62,7 @@ def online():
 def connect(wifiNumber):
     wdt.feed()
     global wlan, trying
+    #rp2.country(config.wlan['country_code'])
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     ssid = "SSID_" + str(wifiNumber)

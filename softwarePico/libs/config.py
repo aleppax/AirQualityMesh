@@ -76,8 +76,9 @@ station = {
 wlan = {
     'SSID_0' : 'xxx',
     'PASSW_0' : 'xxx',
-    'connection_timeout' : 15, 
+    'connection_timeout' : 15,
     # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
+    'country_code' : 'IT',
 }
 
 mftsc = {
