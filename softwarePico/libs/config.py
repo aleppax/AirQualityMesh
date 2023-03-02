@@ -1,6 +1,6 @@
 scheduler = {
     'mqtt' : 1,
-    'rest_lettori' : 0,
+    'rest_lettori' : 1,
     'altrodainventare' : 0,
 }    
 board = {
@@ -50,7 +50,7 @@ logger = {
     'logfile' : 'system.log',
     'filesize_limit_byte' : 4000,
     'logfileCount' : 10,
-    'lastlog' : 0,
+    'lastlog' : 3,
     'print_log' : True,
 }
 leadacid = {
@@ -80,8 +80,8 @@ station = {
 }
 
 wlan = {
-    'SSID_0' : 'TIM-31296121',
-    'PASSW_0' : 'uNPMxnPC4GSntJOjf9aKcg1N',
+    'SSID_0' : 'TIM-XXX',
+    'PASSW_0' : 'XXX',
     'connection_timeout' : 15, 
     # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
 }
@@ -189,20 +189,7 @@ def _open_file_to_lines():
     return conf_lines
 
 def initialize_board():
-    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']), freq=100000)
-    sleep(0.1)
-    gpio = {}
-    for pin in board['GPIO_out']:
-        gpio['GP'+str(pin)] = machine.Pin(pin, machine.Pin.OUT)
-        gpio['GP'+str(pin)].off()
-    for pin in board['GPIO_in']:
-        gpio['GP'+str(pin)] = machine.Pin(pin, machine.Pin.IN, machine.Pin.PULL_DOWN)
-    
-    return i2c, gpio
-
-def initialize_board2():
-    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']), freq=100000)
-    i2c_1 = I2C(1, sda=Pin(2), scl=Pin(3), freq=10000)
+    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']), freq=board['I2C_freq'])
     sleep(0.1)
     gpio = {}
     for pin in board['GPIO_out']:
