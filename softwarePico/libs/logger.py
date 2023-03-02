@@ -100,19 +100,19 @@ def log(message, level = 0):
         NTP_synced = 0
     else:
         NTP_synced = 1
-    timestamp = time.time()
-    now = time.localtime()
+
+    now = now_DTF()
     # parse message
-    if message in events:
-        index = events.index(message)
+    if str(message) in events:
+        index = events.index(str(message))
     else:
         index = 2 #unknown
     # print debug information
     if __debug__ & print_log:
-        print(timetuple_to_DTF(now) + ' ' + message)
-    # format log
+        print(now + ' ' + str(message))
+    # format log TODO: replace timestamp with more readable DTF
     logformat = "{},{},{},{}\n"
-    logrecord = logformat.format(str(timestamp),str(level),str(NTP_synced),str(index))
+    logrecord = logformat.format(now,str(level),str(NTP_synced),str(message))
     # check file size
     if logfile in os.listdir('/logs'):
         if os.stat('/logs/' + logfile)[6] > filesize_limit_byte:

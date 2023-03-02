@@ -1,15 +1,14 @@
 # system scheduler
 import ntptime, os, mip, sys
-from machine import RTC, lightsleep, mem32
+from machine import RTC, lightsleep, mem32, reset
 from micropython import const
 from math import fmod
 from libs import logger, config
 from time import sleep_ms
 from random import randint
-#from machine import WDT
-
+from machine import WDT, deepsleep
 wdt_ms = config.board['WDT_seconds']*1000
-#wdt = WDT(timeout=wdt_ms)
+wdt = WDT(timeout=wdt_ms)
 
 rtc = RTC()
 logger.use_NTP(rtc)
@@ -35,14 +34,14 @@ def disable_WdT():
     mem32[BASE + 0x3000] = _MASK
 
 def sleep_ms_feeded(t):
-#    wdt.feed()
+    wdt.feed()
     mod = fmod(t,wdt_ms-500)
     times = int(t/wdt_ms-500)
     for i in range(times):
         sleep_ms(wdt_ms-500)
-#        wdt.feed()
+        wdt.feed()
     sleep_ms(int(mod))
-#    wdt.feed()
+    wdt.feed()
     
 def updates():
     update_ntp() # every NTPsync_interval
@@ -52,8 +51,11 @@ def updates():
     
 def update_ntp():
     global config, updated_NTP_at_boot
-#    wdt.feed()
-    rtc_now = ntptime.time()
+    wdt.feed()
+    try:
+        rtc_now = ntptime.time()
+    except:
+        return
     if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
         logger.info('Using NTP server ' + ntptime.host)
         try:
@@ -72,7 +74,7 @@ def check_software_updates():
     # it compares the current version number (int) with the online repo
     # and assuming that a network connection is up,
     # downloads version.py from the root of the repository/branch
-#    wdt.feed()
+    wdt.feed()
     rtc_now = ntptime.time()
     if rtc_now - config.cron['last_update'] > config.cron['update_interval']:
         if 'version.py' in os.listdir():
@@ -81,7 +83,8 @@ def check_software_updates():
             mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
         except:
             logger.warning("can't communicate with update server")
-#        wdt.feed()
+            return
+        wdt.feed()
         if 'version.py' in os.listdir():
             if 'version' in sys.modules:
                 del sys.modules['version']
@@ -100,7 +103,7 @@ def check_software_updates():
 
 def software_update():
     global config, update_available, full_update
-#    wdt.feed()
+    wdt.feed()
     if update_available:
         success = True
         # bring version in this scope
@@ -115,18 +118,25 @@ def software_update():
             filedict = version.updated_files
         for directory,files in filedict.items():
             for f in files:
-                filemodified = os.stat(directory + '/' + f)[7]
+                # if file didn't exixt, of course don't check for new timestamp
+                existed = f in os.listdir()
+                if existed:
+                    filemodified = os.stat(directory + '/' + f)[7]
+                else:
+                    filemodified = -1
                 mip.install(config.cron['repository'] + directory[1:] + '/' + f, target=directory + '/', version=config.cron['branch'])
-#                wdt.feed()
+                wdt.feed()
                 if filemodified == os.stat(directory + '/' + f)[7]:
                     success = False
                     logger.warning("Problem updating file " + directory + '/' + f)
         # now update local version number
         if success:
-#            wdt.feed()
+            wdt.feed()
             config = config.add('cron','current_version',version.version)
             logger.info("Version upgrade done! Upgraded to version " + str(version.version))
             update_available = False
+            # rebooting
+            reset()
         else:
             logger.error("Version upgrade incomplete! This can lead to instability.")
             # TODO: maybe restoring the previus version could be a good idea...
@@ -158,7 +168,7 @@ def lightsleep_wrapper(ms):
     sleep_ms(100)
     lightsleep(ms - 200)
     enable_WdT()
-#    wdt.feed()
+    wdt.feed()
     sleep_ms(100)
     
     
@@ -167,3 +177,8 @@ def lightsleep_until_next_cycle():
     if sleepSeconds > minimum_sleep_s:
         lightsleep_wrapper(sleepSeconds*1000)
     
+def deepsleep_as_long_as_you_can():
+    logger.info('deepsleeping for 71min33s')
+    disable_WdT()
+    sleep_ms(100)
+    deepsleep(4294000)

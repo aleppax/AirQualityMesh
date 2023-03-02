@@ -1,4 +1,4 @@
-from libs import config, cron, filelogger, logger, sensors, wlan, datalogger
+from libs import config, cron, filelogger, logger, leadacid, sensors, wlan, datalogger
 from time import ticks_diff, ticks_ms
 from umqtt.simple import MQTTClient
 
@@ -6,8 +6,7 @@ from umqtt.simple import MQTTClient
 logger.info('booting')
 logger.check_fs_free_space()
 # checking for low power mode (battery saving)
-if config.leadacid['low_power_mode'] == True:
-    from libs import leadacid
+if leadacid.config.leadacid['low_power_mode'] == True:
     from machine import deepsleep
     leadacid.levels()
     # maximum allowed sleep time, 71 minutes 33 seconds
@@ -79,9 +78,8 @@ while True:
 #        cron.updates()
         rr=0
     wlan.turn_off()
-    if config.leadacid['low_power_mode'] == True:
+    if leadacid.config.leadacid['low_power_mode'] == True:
         logger.warning("Warning: Low battery level. Switching to low power mode until recharged")
         cron.deepsleep_as_long_as_you_can()
     cron.lightsleep_until_next_cycle()
-
 

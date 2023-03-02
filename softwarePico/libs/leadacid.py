@@ -31,12 +31,17 @@ def measure_RP2040_temp():
 def ADC_voltage():
     return int(adc.read_u16() * (ADC_factor))   
     
-def average_n_measurements(n,callback):
+def average_n_measurements(n,callback, interval=0):
     count = 0
     sum_measures = 0
+            # init network
     while count < n:
+        start_cycle_time = time.ticks_ms()
         count += 1
         sum_measures += callback()
+        rem_iteration_time_ms = interval - time.ticks_diff(time.ticks_ms(),start_cycle_time)
+        if rem_iteration_time_ms > 0:
+            time.sleep_ms(rem_iteration_time_ms)
     return sum_measures/n
 
 def battery_percentage(voltage):
@@ -58,10 +63,18 @@ def battery_percentage(voltage):
     return percentage, is_charging
 
 def levels():
-    global previous_voltage
+    global config
     #temp measure
     temperature = average_n_measurements(10,measure_RP2040_temp)
     #ADC measure
     vvvoltage = average_n_measurements(100,ADC_voltage)/1000
     percentage, is_charging = battery_percentage(vvvoltage)
+    # if battery is too low, switch to low power mode. 
+    # Restore normal power if battery is charging and level is greater than minimum safe lvl.
+    if vvvoltage < safe_min_discharge:
+        if config.leadacid['low_power_mode'] == False:
+            config = config.add('leadacid','low_power_mode',True)
+    if is_charging and (vvvoltage > safe_min_discharge + 0.1):
+        if config.leadacid['low_power_mode'] == True:
+            config = config.add('leadacid','low_power_mode',False)
     return temperature, percentage, is_charging
