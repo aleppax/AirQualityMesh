@@ -1,5 +1,7 @@
-from libs import logger , config
+from libs import logger , config, wlan
+from libs.cron import wdt
 from time import localtime
+import urequests as requests
 import ujson
 
 url_site = "https://lettori.org"   #RR  da metter in config 
@@ -39,9 +41,11 @@ data = """
 datajson = ujson.loads(data)
 
 def init():
-    wlan = wlan.wlan
+    wdt.feed()
+    logger.info('DB connected')
 
 def dbpub_measure_test(wlan,txt):
+    wdt.feed()
     yr, mo, md, h, m, s, wd = localtime()[:7]
     fst = '{} {:02d}:{:02d}:{:02d} on {:02d}/{:02d}/{:02d}'
     print(fst.format(txt, h, m, s, md, mo, yr))
@@ -93,6 +97,7 @@ def dbpub_measure_test(wlan,txt):
         print(e)
 
 def dbpub_measures(measures,txt):
+    wdt.feed()
     yr, mo, md, h, m, s, wd = localtime()[:7]
     fst = '{} {:02d}:{:02d}:{:02d} on {:02d}/{:02d}/{:02d}'
     print(fst.format(txt, h, m, s, md, mo, yr))
@@ -113,7 +118,7 @@ def dbpub_measures(measures,txt):
     "pm10": "",
     "pm1.0_ch2": "",
     "pm2.5_ch2": "",
-    "pm4_ch2": "",
+    "pm4_0_ch2": "",
     "pm10_ch2": ""
   }
 """
@@ -130,12 +135,12 @@ def dbpub_measures(measures,txt):
     datajson["temperature"] = t
     datajson["pm1.0"] = md_pm1_0
     datajson["pm2.5"] = md_pm2_5
-    datajson["pm4"] = md_pm4
+#    datajson["pm4"] = md_pm4
     datajson["pm10"] = md_pm10
     datajson["pm1.0_ch2"] = md_pm1_0_ch2
     datajson["pm2.5_ch2"] = md_pm2_5_ch2
-    datajson["pm4ch_2"] = md_pm4_ch2
-    datajson["pm10ch_2"] = md_pm10_ch2
+    datajson["pm4_0_ch2"] = md_pm4_0_ch2
+    datajson["pm10_ch2"] = md_pm10_ch2
 
     data = ujson.dumps(datajson)
  
