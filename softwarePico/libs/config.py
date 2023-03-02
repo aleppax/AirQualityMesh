@@ -1,61 +1,16 @@
-board = {
-    'GPIO_out' : ["LED",4,5,6,7],   #2,3,4,5,6,7],
-    'GPIO_in' : [0,1,2,3],
-    'I2C_BUS' : 0,
-    'I2C_SDA' : 0,
-    'I2C_SCL' : 1,
-    'WDT_seconds' : 6,
-}
-picosps30 = {
-    'i2c' : 1,
-    'sda_pin' : 2,
-    'scl_pin' : 3,
-    'freq' : 10000,
-}
 scheduler = {
     'mqtt' : 1,
     'rest_lettori' : 0,
     'altrodainventare' : 0,
 }    
-cron = {
-    'NTP_server' : 'it.pool.ntp.org',
-    'NTP_server_count' : 4,
-    'NTPsync_interval' : 3600 * 4,
-    # 'NTPsync_interval' every x hours
-    'update_interval' : 60, #3600 * 24,
-    # 'update_interval' every x hours
-    'measuremens_per_day' : 1440, #288,
-    # 'measuremens_per_day' interval starting at 0:00. do not set too high (1440 is already very battery expensive). better using divisors of 86400
-    'minimum_sleep_s' : 4,
-    # 'minimum_sleep_s' avoid too short sleep periods leading to malfunction
-    'sensor_preheating_s' : 30,
-    # 'sensor_preheating_s' do not change, suggested by the manufacturers' datasheets
-    'last_NTPsync' : 1677320331,
-    'last_update' : 0,
-    'current_version' : 1,
-    'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
-    'branch' : 'devRemoteUpdate',
-    #'repository' : 'http://192.168.0.88:8000/',
-    #'branch' : '',
-}
-logger = {
-    'logfile' : 'system.log',
-    'filesize_limit_byte' : 4000,
-    'logfileCount' : 10,
-    'lastlog' : 3,
-    'print_log' : True,
-}
-leadacid = {
-    'battery_voltage' : 4.0,
-    'ADC_factor' : 0.1122,
-    'ADC_port' : 2,
-    'filter_length' : 10, # consider 'measuremens_per_day' (how frequently we take a measurement) if its span is too much reduce this number
-}
-picosngcja5 = {
-    'sensor_power_pin' : 2,
-#    '30s_pre_heating' : True,
-}
-sensors = {
+board = {
+    'GPIO_out' : ["LED",2,3,4,5,6,7],
+    'GPIO_in' : [0,1],
+    'I2C_BUS' : 0,
+    'I2C_SDA' : 8,
+    'I2C_SCL' : 9,
+    'I2C_freq' : 100000,
+    'WDT_seconds' : 8,
     'uln2003_1' : 'GP7', # hardware connections between Pico GPIOs and ULN2003 channels
     'uln2003_2' : 'GP6',
     'uln2003_3' : 'GP5',
@@ -63,19 +18,70 @@ sensors = {
     'uln2003_5' : 'GP3',
     'uln2003_6' : 'GP2',
 }
+
+cron = {
+    'NTP_server' : 'it.pool.ntp.org',
+    'NTP_server_count' : 4,
+    'NTPsync_interval' : 3600 * 4,
+    # 'NTPsync_interval' every x hours
+    'update_interval' : 60, #3600 * 24,
+    # 'update_interval' every x hours
+    'measuremens_per_day' : 720, #144
+    # 'measuremens_per_day' interval starting at 0:00. do not set too high (1440 is already very battery expensive). better using divisors of 86400
+    'minimum_sleep_s' : 4,
+    # 'minimum_sleep_s' avoid too short sleep periods leading to malfunction
+    'sensor_preheating_s' : 30,
+    # 'sensor_preheating_s' do not change, suggested by the manufacturers' datasheets
+    'last_NTPsync' : 0,
+    'last_update' : 0,
+    'current_version' : 1,
+    #'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
+    #'branch' : 'devRemoteUpdate',
+    'repository' : 'http://192.168.0.88:8000/',
+    'branch' : '',
+}
+datalogger = {
+    'URL' : 'https://lettori.org/opms/api.php/records/measurements/',
+}
+filelogger = {
+    'filename' : '/logs/measures.txt',
+}
+logger = {
+    'logfile' : 'system.log',
+    'filesize_limit_byte' : 4000,
+    'logfileCount' : 10,
+    'lastlog' : 0,
+    'print_log' : True,
+}
+leadacid = {
+    'battery_voltage' : 4.0,
+    'ADC_factor' : 0.1122,
+    'ADC_port' : 2,
+    'filter_length' : 10, # consider 'measuremens_per_day' (how frequently we take a measurement) if its span is too much reduce this number
+    'low_power_mode' : False,
+}
+picosngcja5 = {
+    'sensor_power_pin' : 2,
+#    '30s_pre_heating' : True,
+}
+sensors = {
+    'average_particle_measurements' : 20,
+    'average_measurement_interval_ms' : 1000,
+}
 sps30 = {
     'sensor_power_pin' : 1,
 #    '30s_pre_heating' : True,
 }
 
 station = {
-    'station' : 'prototipo 1',
+    'station' : 2,
     'latitude' : 0.0,
     'longitude' : 0.0,
 }
+
 wlan = {
-    'SSID_0' : 'TIM-xxx',
-    'PASSW_0' : 'xxx',
+    'SSID_0' : 'TIM-31296121',
+    'PASSW_0' : 'uNPMxnPC4GSntJOjf9aKcg1N',
     'connection_timeout' : 15, 
     # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
 }
@@ -183,7 +189,7 @@ def _open_file_to_lines():
     return conf_lines
 
 def initialize_board():
-    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']), freq=400000)
+    i2c = I2C(board['I2C_BUS'], sda=Pin(board['I2C_SDA']), scl=Pin(board['I2C_SCL']), freq=100000)
     sleep(0.1)
     gpio = {}
     for pin in board['GPIO_out']:
