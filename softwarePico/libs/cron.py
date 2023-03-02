@@ -1,6 +1,6 @@
 # system scheduler
 import ntptime, os, mip, sys
-from machine import RTC, lightsleep, mem32
+from machine import RTC, lightsleep, mem32, reset
 from micropython import const
 from math import fmod
 from libs import logger, config
@@ -135,6 +135,8 @@ def software_update():
             config = config.add('cron','current_version',version.version)
             logger.info("Version upgrade done! Upgraded to version " + str(version.version))
             update_available = False
+            # rebooting
+            reset()
         else:
             logger.error("Version upgrade incomplete! This can lead to instability.")
             # TODO: maybe restoring the previus version could be a good idea...
