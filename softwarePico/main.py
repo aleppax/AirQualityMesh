@@ -1,13 +1,13 @@
 from libs import config, cron, filelogger, logger, sensors, wlan, datalogger
 from time import ticks_diff, ticks_ms
-from sensors import leadacid
+
 # init logger
 logger.info('booting')
 logger.check_fs_free_space()
 # checking for low power mode (battery saving)
-if leadacid.config.leadacid['low_power_mode'] == True:
+if sensors.leadacid.config.leadacid['low_power_mode'] == True:
     from machine import deepsleep
-    leadacid.levels()
+    sensors.leadacid.levels()
     # maximum allowed sleep time, 71 minutes 33 seconds
     cron.deepsleep_as_long_as_you_can()
     
@@ -41,7 +41,7 @@ while True:
         # a software upgrade starts only if an update is available
         cron.updates()
     wlan.turn_off()
-    if leadacid.config.leadacid['low_power_mode'] == True:
+    if sensors.leadacid.config.leadacid['low_power_mode'] == True:
         logger.warning("Warning: Low battery level. Switching to low power mode until recharged")
         cron.deepsleep_as_long_as_you_can()
     cron.lightsleep_until_next_cycle()
