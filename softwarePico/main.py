@@ -17,9 +17,11 @@ i2c, gpio = config.initialize_board()
 sensors.init(i2c, gpio)
 sensor_preheating = config.cron['sensor_preheating_s']*1000
 
+
+###########
 print(i2c)
 sensors.wakeup()
-print('ok wakeup')
+print('calling measure')
 sensors.measure(logger.now_DTF())
 print(sensors.measures)
 
@@ -29,28 +31,39 @@ client_id = 'PicoWeather'
 user_t = 'pico'
 password_t = 'picopassword'
 
-if wlan.initialize():
-    rr='wait'
-client_mqtt = MQTTClient(client_id, mqtt_server, user=user_t, password=password_t, keepalive=60)
-client_mqtt.connect()
-#prova su mqtt .. .. usando mqtt.simple (no async enabled)
+# TODO spostare sotto nel loop main, chiedere hint ale
+#prova su mqtt, ok usando mqtt.simple (no async enabled)
 if (config.scheduler['mqtt'] == 1):
     from libs import mqttlogger
-    mqttlogger.init(client_mqtt)
-    logger.info('mqtt enabled')
-    print(mqttlogger.client_mqtt)
-    mqttlogger.mqttpub_measures(sensors.measures,'proviamo mqtt') 
-    logger.info('mqtt sent')
-#prova su db, ora va  importante usare http 1.1
+    client_mqtt_ok = 0
+    if wlan.initialize():
+        client_mqtt = MQTTClient(client_id, mqtt_server, user=user_t, password=password_t, keepalive=60)
+        client_mqtt.connect()
+        mqttlogger.init(client_mqtt)
+        logger.info('mqtt enabled')
+        client_mqtt_ok = 1
+    else:
+        logger.error('mqtt server MISSING')
+    if  client_mqtt_ok == 1:
+        mqttlogger.mqttpub_measures(sensors.measures,'proviamo mqtt') 
+        logger.info('mqtt sent')
+#prova su db, ora va  importante usare http 1.1  ogni tanto non risponde al primo giro , sto provando a risvegliarlo con un fake get
 if (config.scheduler['rest_lettori'] == 1):
     from libs import dblogger
-    logger.info('db insert enabled')
-    print(dblogger.wlan)
-    dblogger.dbpub_measures(sensors.measures,'proviamo db')
-    logger.info('db sent')
+    if wlan.initialize():
+        logger.info('db insert enabled')
+        dblogger.dbget_station(wlan,'read station , dummy to wake up')
+        print('test read done)')
+        dblogger.dbpub_measures(sensors.measures,'proviamo db')
+        logger.info('db sent')
+    else:
+        logger.error('WLAN  MISSING')
 
+###simply break here
+cron.disable_WdT()
 exit()
 ###simply break here
+###########
 
 while True:
     if cron.do_measure:
@@ -63,6 +76,7 @@ while True:
         sent = False
         if wlan.initialize():
             sent = datalogger.send_data_list(filelogger.read())
+            logger.warning('TODO send to mqtt e db')
             if sent:
                 filelogger.clear_data()
             #data submission to servers
