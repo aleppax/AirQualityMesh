@@ -4,7 +4,7 @@ from machine import RTC, lightsleep, mem32, reset
 from micropython import const
 from math import fmod
 from libs import logger, config
-from time import sleep_ms
+from time import sleep_ms, time
 from random import randint
 from machine import WDT, deepsleep
 wdt_ms = config.board['WDT_seconds']*1000
@@ -52,20 +52,20 @@ def updates():
 def update_ntp():
     global config, updated_NTP_at_boot
     wdt.feed()
-    try:
-        rtc_now = ntptime.time()
-    except:
-        return
+    rtc_now = time()
+
     if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
         logger.info('Using NTP server ' + ntptime.host)
-        try:
-            ntptime.settime()
-            config = config.add('cron','last_NTPsync',ntptime.time())
-            updated_NTP_at_boot = True
-        except OverflowError as error:
-            logger.error(error)
-        except Exception as exception:
-            logger.warning(exception)
+        while not updated_NTP_at_boot:
+            try:
+                ntptime.settime()
+                config = config.add('cron','last_NTPsync',time())
+                not_synced = False
+                updated_NTP_at_boot = True
+            except OverflowError as error:
+                logger.error(error)
+            except Exception as exception:
+                logger.warning(exception)
 
 
 def check_software_updates():
@@ -75,7 +75,7 @@ def check_software_updates():
     # and assuming that a network connection is up,
     # downloads version.py from the root of the repository/branch
     wdt.feed()
-    rtc_now = ntptime.time()
+    rtc_now = time()
     if rtc_now - config.cron['last_update'] > config.cron['update_interval']:
         if 'version.py' in os.listdir():
             os.remove('version.py')
