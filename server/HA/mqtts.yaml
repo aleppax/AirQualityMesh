@@ -25,7 +25,7 @@ sensor:
     payload_not_available: "offline"
   - name: "oPMs Dew Point" 
     state_topic: "opms/dew point"
-    unit_of_measurement: "V"
+    unit_of_measurement: "°C"
     json_attributes_template: "{{ value }}"
     payload_available: "online"
     payload_not_available: "offline"
