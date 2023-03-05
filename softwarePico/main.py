@@ -20,6 +20,13 @@ i2c, gpio = config.initialize_board()
 sensors.init(i2c, gpio)
 sensor_preheating = config.cron['sensor_preheating_s']*1000
 
+#le 5 righe qui sotto, create per test,  sono ok
+sensors.wakeup()
+sensors.measure(logger.now_DTF())
+cron.disable_WdT()
+wlan.initialize()
+mqttlogger.send_data(sensors.measures)
+
 while True:
     if cron.do_measure:
         sensors.wakeup()
@@ -30,26 +37,27 @@ while True:
         # if online, save data online, otherwise to file
         sent = False
         if wlan.initialize():
-            sent = datalogger.send_data_list(filelogger.read())
-            if sent:
-                mqttlogger.send_data_list(filelogger.read())
-                filelogger.clear_data()
-            #data submission to servers
-            # load from file
-            datalogger.send_data(sensors.measures)
+            print('qui wlan')
             mqttlogger.send_data(sensors.measures)
-        if not sent:
-            #store data to file
-            logger.info("data can't be sent. Saving locally")
-            filelogger.write(sensors.measures)
-    # if online check if it's time to look for NTP and software updates
-    if wlan.online():
-        # a software upgrade starts only if an update is available
-        cron.updates()
-    wlan.turn_off()
-    if sensors.leadacid.config.leadacid['low_power_mode'] == True:
-        logger.warning("Warning: Low battery level. Switching to low power mode until recharged")
-        cron.deepsleep_as_long_as_you_can()
-    cron.lightsleep_until_next_cycle()
-
-
+            print('non arrivo qui?')
+#             sent = datalogger.send_data_list(filelogger.read())
+#             if sent:
+#                 mqttlogger.send_data_list(filelogger.read()) #??
+#                 filelogger.clear_data()
+#             #data submission to servers
+#             # load from file
+#             datalogger.send_data(sensors.measures)
+#             mqttlogger.send_data(sensors.measures)
+#         if not sent:
+#             #store data to file
+#             logger.info("data can't be sent. Saving locally")
+#             filelogger.write(sensors.measures)
+#     # if online check if it's time to look for NTP and software updates
+#     if wlan.online():
+#         # a software upgrade starts only if an update is available
+#         cron.updates()
+#     wlan.turn_off()
+#     if sensors.leadacid.config.leadacid['low_power_mode'] == True:
+#         logger.warning("Warning: Low battery level. Switching to low power mode until recharged")
+#         cron.deepsleep_as_long_as_you_can()
+#     cron.lightsleep_until_next_cycle()
