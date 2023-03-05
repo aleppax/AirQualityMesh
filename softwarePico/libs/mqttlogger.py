@@ -11,8 +11,7 @@ mqtt_user = config.mqttlogger['user']
 mqtt_password = config.mqttlogger['pass']
 mqtt_QOS = config.mqttlogger['QOS']
 
-#c = MQTTClient(client_ID, server, user=mqtt_user, password=mqtt_password)
-c = MQTTClient('2', server, user=mqtt_user, password=mqtt_password)
+c = MQTTClient(client_ID, server, user=mqtt_user, password=mqtt_password)
 
 def send_data(d):
     if config.mqttlogger['enable']:
