@@ -1,5 +1,6 @@
-from libs import config, cron, filelogger, logger, sensors, wlan, datalogger
+from libs import config, cron, filelogger, logger, mqttlogger, sensors, wlan, datalogger
 from time import ticks_diff, ticks_ms
+from machine import reset
 
 # init logger
 logger.info('booting')
@@ -8,8 +9,11 @@ logger.check_fs_free_space()
 if sensors.leadacid.config.leadacid['low_power_mode'] == True:
     from machine import deepsleep
     sensors.leadacid.levels()
-    # maximum allowed sleep time, 71 minutes 33 seconds
-    cron.deepsleep_as_long_as_you_can()
+    if sensors.leadacid.config.leadacid['low_power_mode'] == True:
+        cron.deepsleep_as_long_as_you_can()
+        # maximum allowed sleep time, 71 minutes 33 seconds
+    else:
+        reset()
     
 #init I2C and GPIO. access a port with gpio['GP2']
 i2c, gpio = config.initialize_board()
@@ -28,10 +32,12 @@ while True:
         if wlan.initialize():
             sent = datalogger.send_data_list(filelogger.read())
             if sent:
+                mqttlogger.send_data_list(filelogger.read())
                 filelogger.clear_data()
             #data submission to servers
             # load from file
             datalogger.send_data(sensors.measures)
+            mqttlogger.send_data(sensors.measures)
         if not sent:
             #store data to file
             logger.info("data can't be sent. Saving locally")

@@ -13,7 +13,6 @@ board = {
     'uln2003_5' : 'GP3',
     'uln2003_6' : 'GP2',
 }
-
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
     'NTP_server_count' : 4,
@@ -54,6 +53,14 @@ leadacid = {
     'ADC_port' : 2,
     'filter_length' : 10, # consider 'measuremens_per_day' (how frequently we take a measurement) if its span is too much reduce this number
     'low_power_mode' : False,
+}
+mqttlogger = {
+    'enable' : False,
+    'server' : '',
+    'topic' : b'opms/',
+    'user' : None,
+    'pass' : None,
+    'QOS' : 0, # default QOS is 0 and can be changed to 1
 }
 picosngcja5 = {
     'sensor_power_pin' : 2,
