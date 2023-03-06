@@ -1,12 +1,11 @@
 # system scheduler
 import ntptime, os, mip, sys
-from machine import RTC, lightsleep, mem32, reset
+from machine import RTC, lightsleep, mem32, reset, WDT, deepsleep
 from micropython import const
 from math import fmod
 from libs import logger, config
-from time import sleep_ms, time
+from time import sleep_ms, time, gmtime
 from random import randint
-from machine import WDT, deepsleep
 wdt_ms = config.board['WDT_seconds']*1000
 wdt = WDT(timeout=wdt_ms)
 
@@ -162,7 +161,15 @@ def next_cycle_s():
             do_measure = True
         return next_cycle_in_s
 
+def restore_latest_timestamp():
+    latest = config.cron['latest_timestamp']
+    rtc.datetime(gmtime(latest))
+
+def store_latest_timestamp():
+    config = config.add('cron','latest_timestamp',time())
+
 def lightsleep_wrapper(ms):
+    store_latest_timestamp()
     logger.info('lightsleeping for ' + str(ms) + 'ms')
     disable_WdT()
     sleep_ms(100)
@@ -178,6 +185,7 @@ def lightsleep_until_next_cycle():
         lightsleep_wrapper(sleepSeconds*1000)
     
 def deepsleep_as_long_as_you_can():
+    store_latest_timestamp()
     logger.info('deepsleeping for 71min33s')
     disable_WdT()
     sleep_ms(100)

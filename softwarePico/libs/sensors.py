@@ -1,6 +1,6 @@
 from libs import config, leadacid, sps30, picosngcja5, ahtx0, bmp280
-from libs.cron import wdt
-from machine import Pin
+from libs.cron import wdt, deepsleep_as_long_as_you_can
+from machine import Pin, reset
 from math import log
 from collections import OrderedDict
 from time import ticks_ms, ticks_diff, sleep_ms
@@ -101,4 +101,10 @@ def measure(time_DTF):
     k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
     measures['dew point'] =  243.12 * k / (17.62 - k)
     
-    
+def check_low_power():
+    wdt.feed()  
+    # checking for low power mode (battery saving)
+    if leadacid.config.leadacid['low_power_mode'] == True:
+        sensors.leadacid.levels()
+        if sensors.leadacid.config.leadacid['low_power_mode'] == True:
+            deepsleep_as_long_as_you_can()

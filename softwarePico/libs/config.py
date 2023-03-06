@@ -33,6 +33,7 @@ cron = {
     #'branch' : 'devRemoteUpdate',
     'repository' : 'http://192.168.0.88:8000/',
     'branch' : '',
+    'latest_timestamp' : 1609459200,
 }
 datalogger = {
     'URL' : 'https://lettori.org/opms/api.php/records/measurements/',

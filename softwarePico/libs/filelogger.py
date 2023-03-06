@@ -4,6 +4,7 @@ from os import remove, listdir
 from libs.cron import wdt
 
 def write(m):
+    logger.info("data can't be sent. Saving locally")
     wdt.feed()
     # convert single set of measures m to csv, doesn't check the order or number of items
     csv_m = ';'.join(str(el) for el in m.values()) + '\n'
