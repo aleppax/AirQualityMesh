@@ -1,9 +1,9 @@
-from libs import config, leadacid, sps30, picosngcja5, ahtx0, bmp280
+from libs import  ahtx0, bmp280, config, leadacid, logger, picosngcja5, sps30
 from libs.cron import feed_wdt, deepsleep_as_long_as_you_can
 from machine import Pin, reset
 from math import log
 from collections import OrderedDict
-from time import ticks_ms, ticks_diff, sleep_ms
+from time import ticks_ms, ticks_diff, sleep_ms, time
 
 empty_measures = OrderedDict([
     ('station',''),
@@ -46,12 +46,21 @@ def init(i2c, gpio):
         bm_b.oversample(bmp280.BMP280_OS_HIGH)
 
 def wakeup():
+    global config
     if not config.sensors['disable_sensors']:
         feed_wdt()
         pm_p.on()
         pm_s.on()
         sleep_ms(200)
         pm_s.start_measurement()
+        sleep_ms(10)
+        # check if sps30 requires to be cleaned, it can be done while preheating
+        rtc_now = time()
+        if rtc_now - config.sps30['last_cleaning'] > config.sps30['cleaning_interval']:
+            feed_wdt()
+            logger.info('Cleaning SPS30 sensor')
+            pm_s.start_fan_cleaning()
+            config = config.add('sps30','last_cleaning',rtc_now)
 
 def shutdown():
     if not config.sensors['disable_sensors']:
