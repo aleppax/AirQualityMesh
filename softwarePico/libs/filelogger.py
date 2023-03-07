@@ -1,11 +1,11 @@
 from libs import logger, config
 from libs.sensors import empty_measures
 from os import remove, listdir
-from libs.cron import wdt
+from libs.cron import feed_wdt
 
 def write(m):
     logger.info("data can't be sent. Saving locally")
-    wdt.feed()
+    feed_wdt()
     # convert single set of measures m to csv, doesn't check the order or number of items
     csv_m = ';'.join(str(el) for el in m.values()) + '\n'
     # write to file TODO: fix wrong file opening
@@ -18,25 +18,25 @@ def write(m):
         return False
     
 def read():
-    wdt.feed()
+    feed_wdt()
     # retrieve all sets of measures in a list of ordered dicts
     csvdata = []
-    try:
-        with open(config.filelogger['filename'], 'r') as f:
-            for line in f:
-                raw_line = line.rstrip('\n').split(';')
-                measures_dict = fill_measures_dict(values)
-                csvdata.append(measures_dict)
-        return csvdata
-    except:
-        logger.error("Could not read file: " + config.filelogger['filename'])
-        return []
+    if file_exists(config.filelogger['filename']):
+        try:
+            with open(config.filelogger['filename'], 'r') as f:
+                for line in f:
+                    raw_line = line.rstrip('\n').split(';')
+                    measures_dict = fill_measures_dict(values)
+                    csvdata.append(measures_dict)
+            return csvdata
+        except:
+            logger.error("Could not read file: " + config.filelogger['filename'])
+    return []
 
 def clear_data():
     #delete file
-    splitted = config.filelogger['filename'].split('/')
-    log_path = '/'.join(splitted[:-1])+'/'
-    if splitted[-1] in listdir(log_path):
+    feed_wdt()
+    if file_exists(config.filelogger['filename']):
         remove(config.filelogger['filename'])
 
 def fill_measures_dict(values):
@@ -47,3 +47,8 @@ def fill_measures_dict(values):
         measures[keys[count]] = v
         count += 1
     return measures
+
+def file_exists(fileURI):
+    _splitted = config.filelogger['filename'].split('/')
+    _log_path = '/'.join(_splitted[:-1])+'/'
+    return _splitted[-1] in listdir(_log_path)

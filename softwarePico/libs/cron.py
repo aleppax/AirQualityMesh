@@ -7,8 +7,11 @@ from libs import logger, config
 from time import sleep_ms, time, gmtime
 from random import randint
 wdt_ms = config.board['WDT_seconds']*1000
-wdt = WDT(timeout=wdt_ms)
-
+if config.cron['use_wdt']:
+    wdt = WDT(timeout=wdt_ms)
+    wdt_enabled = True
+else:
+    wdt_enabled = False
 rtc = RTC()
 logger.use_NTP(rtc)
 server_n = randint(0,config.cron['NTP_server_count']-1)
@@ -26,21 +29,29 @@ _MASK = const(0x40000000)
 
 #set
 def enable_WdT():
+    global wdt_enabled
     mem32[BASE + 0x2000] = _MASK
+    wdt_enabled = True
 
 #clear
 def disable_WdT():
+    global wdt_enabled
     mem32[BASE + 0x3000] = _MASK
+    wdt_enabled = False
+
+def feed_wdt():
+    if wdt_enabled:
+        wdt.feed()
 
 def sleep_ms_feeded(t):
-    wdt.feed()
+    feed_wdt()
     mod = fmod(t,wdt_ms-500)
     times = int(t/wdt_ms-500)
     for i in range(times):
         sleep_ms(wdt_ms-500)
-        wdt.feed()
+        feed_wdt()
     sleep_ms(int(mod))
-    wdt.feed()
+    feed_wdt()
     
 def updates():
     update_ntp() # every NTPsync_interval
@@ -50,7 +61,7 @@ def updates():
     
 def update_ntp():
     global config, updated_NTP_at_boot
-    wdt.feed()
+    feed_wdt()
     rtc_now = time()
 
     if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
@@ -73,7 +84,7 @@ def check_software_updates():
     # it compares the current version number (int) with the online repo
     # and assuming that a network connection is up,
     # downloads version.py from the root of the repository/branch
-    wdt.feed()
+    feed_wdt()
     rtc_now = time()
     if rtc_now - config.cron['last_update'] > config.cron['update_interval']:
         if 'version.py' in os.listdir():
@@ -83,7 +94,7 @@ def check_software_updates():
         except:
             logger.warning("can't communicate with update server")
             return
-        wdt.feed()
+        feed_wdt()
         if 'version.py' in os.listdir():
             if 'version' in sys.modules:
                 del sys.modules['version']
@@ -102,7 +113,7 @@ def check_software_updates():
 
 def software_update():
     global config, update_available, full_update
-    wdt.feed()
+    feed_wdt()
     if update_available:
         success = True
         # bring version in this scope
@@ -124,13 +135,13 @@ def software_update():
                 else:
                     filemodified = -1
                 mip.install(config.cron['repository'] + directory[1:] + '/' + f, target=directory + '/', version=config.cron['branch'])
-                wdt.feed()
+                feed_wdt()
                 if filemodified == os.stat(directory + '/' + f)[7]:
                     success = False
                     logger.warning("Problem updating file " + directory + '/' + f)
         # now update local version number
         if success:
-            wdt.feed()
+            feed_wdt()
             config = config.add('cron','current_version',version.version)
             logger.info("Version upgrade done! Upgraded to version " + str(version.version))
             update_available = False
@@ -157,27 +168,37 @@ def next_cycle_s():
         if next_cycle_in_s < minimum_sleep_s + sensor_preheating_s:
             do_measure = False
             logger.warning('skipping measurement, not enough time to preheat sensors')
+            sleep_ms_feeded(next_cycle_in_s*1000)
         else:    
             do_measure = True
         return next_cycle_in_s
 
+def timetuple_to_rtctuple(t):
+    return (t[0],t[1],t[2],t[6],t[3],t[4],t[5],0)
+
 def restore_latest_timestamp():
-    latest = config.cron['latest_timestamp']
-    rtc.datetime(gmtime(latest))
+    latest = gmtime(config.cron['latest_timestamp'])
+    rtc.datetime(timetuple_to_rtctuple(latest))
 
 def store_latest_timestamp():
+    global config
     config = config.add('cron','latest_timestamp',time())
 
 def lightsleep_wrapper(ms):
     store_latest_timestamp()
-    logger.info('lightsleeping for ' + str(ms) + 'ms')
-    disable_WdT()
-    sleep_ms(100)
-    lightsleep(ms - 200)
-    enable_WdT()
-    wdt.feed()
-    sleep_ms(100)
-    
+    if config.cron['use_wdt']:
+        logger.info('lightsleeping for ' + str(ms) + 'ms')
+        disable_WdT()
+        sleep_ms(100)
+        lightsleep(ms - 200)
+        enable_WdT()
+        feed_wdt()
+        sleep_ms(100)
+    else:    
+        logger.info('lightsleeping for ' + str(ms) + 'ms, WDT unused')
+        sleep_ms(100)
+        lightsleep(ms - 200)
+        sleep_ms(100)
     
 def lightsleep_until_next_cycle():
     sleepSeconds = next_cycle_s() - sensor_preheating_s

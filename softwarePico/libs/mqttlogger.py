@@ -1,5 +1,5 @@
 from libs import logger, config
-from libs.cron import wdt
+from libs.cron import feed_wdt
 from libs.simple import MQTTClient
 import ubinascii
 import machine
@@ -15,12 +15,12 @@ c = MQTTClient(client_ID, server, user=mqtt_user, password=mqtt_password)
 
 def send_data(d):
     if config.mqttlogger['enable']:
-        wdt.feed()
+        feed_wdt()
         c.connect()
         for measure_key, measure_value in d.items():
             if measure_key not in ['station','datetime']:
                 if measure_value != 0:
-                    wdt.feed()
+                    feed_wdt()
                     # topic levels: main_topic(opms) / key
                     topic = main_topic + measure_key
                     # publish relies on socket and expects bytes
