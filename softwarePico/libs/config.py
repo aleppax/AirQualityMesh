@@ -13,7 +13,6 @@ board = {
     'uln2003_5' : 'GP3',
     'uln2003_6' : 'GP2',
 }
-
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
     'NTP_server_count' : 4,
@@ -30,13 +29,16 @@ cron = {
     'last_NTPsync' : 0,
     'last_update' : 0,
     'current_version' : 1,
-    #'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
-    #'branch' : 'devRemoteUpdate',
-    'repository' : 'http://192.168.0.88:8000/',
-    'branch' : '',
+    'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
+    'branch' : 'mvpRemoteUpdate',
+    #'repository' : 'http://192.168.0.88:8000/', # example of local update server (base directory should be softwarePico/)
+    #'branch' : '',
+    'latest_timestamp' : 1609459200,
+    'use_wdt' : True,
 }
 datalogger = {
-    'URL' : 'https://lettori.org/opms/api.php/records/measurements/',
+    'URL' : 'https://example.org/opms/api.php/records/measurements/',
+    # use your REST server, change this line
 }
 filelogger = {
     'filename' : '/logs/measures.txt',
@@ -52,8 +54,16 @@ leadacid = {
     'battery_voltage' : 4.0,
     'ADC_factor' : 0.1122,
     'ADC_port' : 2,
-    'filter_length' : 10, # consider 'measuremens_per_day' (how frequently we take a measurement) if its span is too much reduce this number
+    'filter_length' : 5, # consider 'measuremens_per_day' (how frequently we take a measurement) if its span is too much reduce this number
     'low_power_mode' : False,
+}
+mqttlogger = {
+    'enable' : False,
+    'server' : '',
+    'topic' : b'opms/',
+    'user' : None,
+    'pass' : None,
+    'QOS' : 0, # default QOS is 0 and can be changed to 1
 }
 picosngcja5 = {
     'sensor_power_pin' : 2,
@@ -62,6 +72,7 @@ picosngcja5 = {
 sensors = {
     'average_particle_measurements' : 20,
     'average_measurement_interval_ms' : 1000,
+    'disable_sensors' : False,
 }
 sps30 = {
     'sensor_power_pin' : 1,

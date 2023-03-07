@@ -1,0 +1,45 @@
+sensor:
+  - name: "oPMs Temperature"
+    device_class: temperature
+    state_topic: "opms/temperature"
+    unit_of_measurement: "°C"
+  - name: "battery charge percentage"
+    device_class: battery
+    state_topic: "opms/battery charge percentage"
+    unit_of_measurement: "%"
+  - name: "oPMs Humidity"
+    device_class: humidity
+    state_topic: "opms/humidity"
+    unit_of_measurement: "%"
+  - name: "oPMs Dew Point"
+    device_class: temperature 
+    state_topic: "opms/dew point"
+    unit_of_measurement: "°C"
+  - name: "oPMs barometric pressure"
+    device_class: pressure
+    state_topic: "opms/barometric pressure"
+    unit_of_measurement: "atm"
+  - name: "oPMs Mass Density PM1.0 sensor 1"
+    device_class: pm1 
+    state_topic: "opms/pm1.0"
+    unit_of_measurement: "ug/m3"
+  - name: "oPMs Mass Density PM2.5 sensor 1"
+    device_class: pm25 
+    state_topic: "opms/pm2.5"
+    unit_of_measurement: "ug/m3"
+  - name: "oPMs Mass Density PM10 sensor 1"
+    device_class: pm10
+    state_topic: "opms/pm10"
+    unit_of_measurement: "ug/m3"
+  - name: "oPMs Mass Density PM1.0 sensor 2"
+    device_class: pm1
+    state_topic: "opms/pm1.0_ch2"
+    unit_of_measurement: "ug/m3"
+  - name: "oPMs Mass Density PM2.5 sensor 2"
+    device_class: pm25
+    state_topic: "opms/pm2.5_ch2"
+    unit_of_measurement: "ug/m3"
+  - name: "oPMs Mass Density PM10 sensor 2"
+    device_class: pm10
+    state_topic: "opms/pm10_ch2"
+    unit_of_measurement: "ug/m3"
