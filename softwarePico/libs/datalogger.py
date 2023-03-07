@@ -4,8 +4,13 @@ import urequests as requests
 
 def send_data(d):
     feed_wdt()
-    resp = requests.post(config.datalogger['URL'], json=d)
-    logger.info(resp.content)
+    try:
+        resp = requests.post(config.datalogger['URL'], json=d, timeout=config.board['WDT_seconds']-0.2)
+        logger.info(resp.content)
+    except OSError:
+        feed_wdt()
+        logger.warning("Couldn't reach datalogging URL")
+        return False
     feed_wdt()
     isInt = True
     try:
