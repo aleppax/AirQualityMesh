@@ -8,7 +8,7 @@ def write(m):
     feed_wdt()
     # convert single set of measures m to csv, doesn't check the order or number of items
     csv_m = ';'.join(str(el) for el in m.values()) + '\n'
-    # write to file TODO: fix wrong file opening
+    # write to file
     try:
         with open(config.filelogger['filename'], 'a+') as f:
             f.write(csv_m)
@@ -26,7 +26,7 @@ def read():
             with open(config.filelogger['filename'], 'r') as f:
                 for line in f:
                     raw_line = line.rstrip('\n').split(';')
-                    measures_dict = fill_measures_dict(values)
+                    measures_dict = fill_measures_dict(raw_line)
                     csvdata.append(measures_dict)
             return csvdata
         except:

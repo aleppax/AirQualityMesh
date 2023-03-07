@@ -9,7 +9,6 @@ def send_data(d):
         logger.info(resp.content)
     except OSError:
         feed_wdt()
-        logger.warning("Couldn't reach datalogging URL")
         return False
     feed_wdt()
     isInt = True
@@ -25,4 +24,6 @@ def send_data_list(l):
     result = True
     for d in l:
         result &= send_data(d)
+    if result == False:
+        logger.warning("Couldn't reach datalogging URL")
     return result
