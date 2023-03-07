@@ -77,6 +77,8 @@ sensors = {
 sps30 = {
     'sensor_power_pin' : 1,
 #    '30s_pre_heating' : True,
+    'last_cleaning' : 0,
+    'cleaning_interval' : 604800/2, # twice a week
 }
 
 station = {
