@@ -178,12 +178,16 @@ def timetuple_to_rtctuple(t):
     return (t[0],t[1],t[2],t[6],t[3],t[4],t[5],0)
 
 def restore_latest_timestamp():
-    latest = gmtime(config.cron['latest_timestamp']+4294)
-    rtc.datetime(timetuple_to_rtctuple(latest))
+    global config
+    if config.cron['deepsleep_reset']:
+        latest = gmtime(config.cron['latest_timestamp']+4294)
+        rtc.datetime(timetuple_to_rtctuple(latest))
+        config = config.add('cron','deepsleep_reset',False)
 
 def store_latest_timestamp():
     global config
     config = config.add('cron','latest_timestamp',time())
+    config = config.add('cron','deepsleep_reset',True)
 
 def lightsleep_wrapper(ms):
     store_latest_timestamp()

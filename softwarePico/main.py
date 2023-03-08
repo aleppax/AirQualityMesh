@@ -1,13 +1,11 @@
 from libs import config, cron, filelogger, logger, mqttlogger, sensors, wlan, datalogger
 from time import ticks_diff, ticks_ms
-import machine
 
 logger.info('booting')
 #this test works also before initializing i2c and sensors
 # if power is low, revert to deepsleep
 # still we do not have an idea of when we are, but better than nothing
-if machine.reset_cause() == machine.DEEPSLEEP_RESET:
-    cron.restore_latest_timestamp()
+cron.restore_latest_timestamp()
 sensors.check_low_power()
 # init system
 logger.check_fs_free_space()

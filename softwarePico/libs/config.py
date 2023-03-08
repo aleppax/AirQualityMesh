@@ -34,6 +34,7 @@ cron = {
     #'repository' : 'http://192.168.0.88:8000/', # example of local update server (base directory should be softwarePico/)
     #'branch' : '',
     'latest_timestamp' : 1609459200,
+    'deepsleep_reset' : False,
     'use_wdt' : True,
 }
 datalogger = {
