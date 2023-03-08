@@ -46,7 +46,7 @@ def feed_wdt():
 def sleep_ms_feeded(t):
     feed_wdt()
     mod = fmod(t,wdt_ms-500)
-    times = int(t/wdt_ms-500)
+    times = int(t/(wdt_ms-500))
     for i in range(times):
         sleep_ms(wdt_ms-500)
         feed_wdt()
@@ -74,11 +74,14 @@ def update_ntp():
                 config = config.add('cron','last_NTPsync',time())
                 not_synced = False
                 updated_NTP_at_boot = True
+                updated_NTP = True
+                break
             except OverflowError as error:
                 logger.error(error)
             except Exception as exception:
                 logger.warning(exception)
-
+        logger.info('retrying NTP update in 64 seconds')
+        sleep_ms_feeded(64000)
 
 def check_software_updates():
     global config, update_available, full_update
