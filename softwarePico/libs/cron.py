@@ -63,10 +63,11 @@ def update_ntp():
     global config, updated_NTP_at_boot
     feed_wdt()
     rtc_now = time()
-
-    if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
-        logger.info('Using NTP server ' + ntptime.host)
-        while not updated_NTP_at_boot:
+    updated_NTP = False
+    # this can lead to wdt intervention, a reboot is better than not knowing for sure the actual time 
+    while not updated_NTP:
+        if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
+            logger.info('Using NTP server ' + ntptime.host)
             try:
                 ntptime.settime()
                 config = config.add('cron','last_NTPsync',time())
