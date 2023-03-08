@@ -66,6 +66,7 @@ def update_ntp():
     updated_NTP = False
     # this can lead to wdt intervention, a reboot is better than not knowing for sure the actual time 
     while not updated_NTP:
+        feed_wdt()
         if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
             logger.info('Using NTP server ' + ntptime.host)
             try:
@@ -190,7 +191,6 @@ def store_latest_timestamp():
     config = config.add('cron','deepsleep_reset',True)
 
 def lightsleep_wrapper(ms):
-    store_latest_timestamp()
     if config.cron['use_wdt']:
         logger.info('lightsleeping for ' + str(ms) + 'ms')
         disable_WdT()
