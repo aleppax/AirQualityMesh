@@ -80,8 +80,8 @@ def update_ntp():
                 logger.error(error)
             except Exception as exception:
                 logger.warning(exception)
-        logger.info('retrying NTP update in 64 seconds')
-        sleep_ms_feeded(64000)
+            logger.info('retrying NTP update in 64 seconds')
+            sleep_ms_feeded(64000)
 
 def check_software_updates():
     global config, update_available, full_update
