@@ -177,7 +177,7 @@ def timetuple_to_rtctuple(t):
     return (t[0],t[1],t[2],t[6],t[3],t[4],t[5],0)
 
 def restore_latest_timestamp():
-    latest = gmtime(config.cron['latest_timestamp'])
+    latest = gmtime(config.cron['latest_timestamp']+4294)
     rtc.datetime(timetuple_to_rtctuple(latest))
 
 def store_latest_timestamp():
