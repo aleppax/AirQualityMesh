@@ -118,6 +118,6 @@ def check_low_power():
     feed_wdt()  
     # checking for low power mode (battery saving)
     if leadacid.config.leadacid['low_power_mode'] == True:
-        sensors.leadacid.levels()
-        if sensors.leadacid.config.leadacid['low_power_mode'] == True:
+        leadacid.levels()
+        if leadacid.config.leadacid['low_power_mode'] == True:
             deepsleep_as_long_as_you_can()
