@@ -11,7 +11,7 @@ from libs import logger, config
 battery_voltage = config.leadacid['battery_voltage'] # 4.0, 6.0 or 12.0
 voltage_full_charged = battery_voltage * 1.1 # voltage can be higher than this when charging. Valid at least 15 minutes after end of charge
 max_voltage = battery_voltage * 1.25 # above this value the battery will be damaged and the ADC too
-charging_voltage = battery_voltage * 1.175 # this is typical when topping charge, current drops until full charged
+charging_voltage = battery_voltage * 1.2375 # this is typical when topping charge, current drops until full charged
 final_discharge_voltage = battery_voltage * 0.975 # below this lower limit the battery will be irreversibly damaged
 safe_min_discharge = 4.1 # below this limit the battery life will be reduced from 700 to 150-200 cycles
 # 
