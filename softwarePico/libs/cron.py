@@ -72,7 +72,6 @@ def update_ntp():
             try:
                 ntptime.settime()
                 config = config.add('cron','last_NTPsync',time())
-                not_synced = False
                 updated_NTP_at_boot = True
                 updated_NTP = True
                 break
