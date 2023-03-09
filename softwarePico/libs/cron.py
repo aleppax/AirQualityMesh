@@ -215,6 +215,7 @@ def lightsleep_until_next_cycle():
         lightsleep_wrapper(sleepSeconds*1000)
     
 def deepsleep_as_long_as_you_can():
+    restore_latest_timestamp()
     store_latest_timestamp()
     logger.info('deepsleeping for 71min33s')
     disable_WdT()

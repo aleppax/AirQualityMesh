@@ -1,5 +1,5 @@
 from libs import  ahtx0, bmp280, config, leadacid, logger, picosngcja5, sps30
-from libs.cron import feed_wdt, deepsleep_as_long_as_you_can, restore_latest_timestamp
+from libs.cron import feed_wdt, deepsleep_as_long_as_you_can
 from machine import Pin, reset
 from math import log
 from collections import OrderedDict
@@ -118,7 +118,6 @@ def check_low_power():
     feed_wdt()
     # checking for low power mode (battery saving)
     if leadacid.config.leadacid['low_power_mode'] == True:
-        cron.restore_latest_timestamp()
         leadacid.levels()
         if leadacid.config.leadacid['low_power_mode'] == True:
             deepsleep_as_long_as_you_can()
