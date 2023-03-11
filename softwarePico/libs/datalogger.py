@@ -1,6 +1,11 @@
 from libs import logger, config
 from libs.cron import feed_wdt
 import urequests as requests
+from machine import unique_id
+import binascii
+
+iam = unique_id()
+UID = str(int(binascii.hexlify(iam).decode('utf-8'),16))
 
 def send_data(d):
     feed_wdt()
