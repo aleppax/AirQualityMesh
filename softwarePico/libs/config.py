@@ -74,6 +74,7 @@ sensors = {
     'average_particle_measurements' : 20,
     'average_measurement_interval_ms' : 1000,
     'disable_sensors' : False,
+    'aux_pm_measure_s' : 3600, # 1 hour
 }
 sps30 = {
     'sensor_power_pin' : 1,

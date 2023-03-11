@@ -39,6 +39,8 @@ while True:
         #sensors measurements with timestamp, they have been pre-heated for 30s
         sensors.measure(logger.now_DTF())
         sensors.shutdown()
+        # periodically take a comparison test measurement with the auxiliary sensor
+        sensors.measure_aux_pm_sensor()
         # check again if online, save data online, otherwise to file
         sent = False
         if wlan.initialize():
