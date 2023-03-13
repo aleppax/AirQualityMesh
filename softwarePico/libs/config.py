@@ -1,5 +1,5 @@
 board = {
-    'GPIO_out' : ["LED",2,3,4,5,6,7],
+    'GPIO_out' : [2,3,4,5,6,7],
     'GPIO_in' : [0,1],
     'I2C_BUS' : 0,
     'I2C_SDA' : 8,
