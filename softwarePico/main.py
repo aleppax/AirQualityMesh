@@ -49,8 +49,6 @@ while True:
         #sensors measurements with timestamp, they have been pre-heated for 30s
         sensors.measure(logger.now_DTF())
         sensors.shutdown()
-        # periodically take a comparison test measurement with the auxiliary sensor
-        sensors.measure_aux_pm_sensor()
         # check again if online, save data online, otherwise to file
         sent = False
         # connect to wifi only if sending data is cheduled
@@ -59,10 +57,10 @@ while True:
             if wlan.initialize():
                 sent = send_values()
             wlan.turn_off()
-        if not sent:
-            filelogger.write(sensors.measures)
-        else:
+        if sent:
             cron.update_last_data_sent()
+        else:
+            filelogger.write(sensors.measures)
     # we need a way to exit the while cycle if power is low
     sensors.check_low_power()
     # otherwise work done, rest until next task

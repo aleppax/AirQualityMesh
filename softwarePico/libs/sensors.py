@@ -32,8 +32,9 @@ empty_measures = OrderedDict([
 
 def init(i2c, gpio):
     feed_wdt()
-    global pm_p, pm_s, uln2003, th_s, bm_b, measures, latest_aux_pm_measure
+    global pm_p, pm_s, uln2003, th_s, bm_b, measures, latest_aux_pm_measure, use_aux_sensor
     measures = empty_measures
+    use_aux_sensor = False
     latest_aux_pm_measure = time()
     # bridge GPIO to output connector
     uln2003 = {int(k[8:]): v for k, v in config.board.items() if 'uln2003_' in k}
@@ -49,56 +50,17 @@ def init(i2c, gpio):
         pm_p.off()
         pm_s.off()
 
-def measure_aux_pm_sensor():
-    if config.sensors['disable_sensors']:
-        return
-    global latest_aux_pm_measure, measures
-    feed_wdt()
-    # aux sensor should wake up when the other one is powered down,
-    # to limit the current peak
-    # auxiliary sensor (only wakes up once per sensors['aux_pm_measure_s'] seconds)
-    # to limit battery usage
-    rtc_now = time()
-    if rtc_now - config.sensors['aux_pm_measure_s'] < latest_aux_pm_measure:
-        measures['pm10'] = 0
-        measures['pm2.5'] = 0
-        measures['pm1.0'] = 0
-        return
-    latest_aux_pm_measure = rtc_now
-    # wake up
-    pm_p.on()
-    # wait 30 seconds to heat the sensor
-    lightsleep_wrapper(config.cron['sensor_preheating_s']*1000)
-    # measure 
-    # averaging n measures from sensors with 1Hz frequency
-    count = config.sensors['average_particle_measurements']
-    while count > 0:
-        feed_wdt()
-        start_iter_time = ticks_ms()
-        count -= 1
-        pm_s.on()
-        sleep_ms(2)
-        pm_0_data = pm_p.measure()['mass_density']
-        pm_s.off()
-        measures['pm10'] += pm_0_data['pm10'] # Panasonic SNGCJA5 PM sensor
-        measures['pm2.5'] += pm_0_data['pm2.5']
-        measures['pm1.0'] += pm_0_data['pm1.0']
-        rem_iter_time_ms = config.sensors['average_measurement_interval_ms'] - ticks_diff(ticks_ms(),start_iter_time)
-        if rem_iter_time_ms > 0:
-            sleep_ms(rem_iter_time_ms)
-    measures['pm10'] /= config.sensors['average_particle_measurements']
-    measures['pm2.5'] /= config.sensors['average_particle_measurements']
-    measures['pm1.0'] /= config.sensors['average_particle_measurements']
-    #shutdown
-    pm_p.off()
-
 def wakeup():
-    global config
+    global config, use_aux_sensor
     if not config.sensors['disable_sensors']:
         feed_wdt()
+        if rtc_now - config.sensors['aux_pm_measure_s'] < latest_aux_pm_measure:
+            use_aux_sensor = False
+        else:
+            use_aux_sensor = True
         pm_s.on()
-        sleep_ms(200)
         pm_p.on()
+        sleep_ms(200)
         pm_s.start_measurement()
         sleep_ms(10)
         # check if sps30 requires to be cleaned, it can be done while preheating
@@ -109,15 +71,18 @@ def wakeup():
             pm_s.start_fan_cleaning()
             # this has to be written to file
             config = config.add('sps30','last_cleaning',rtc_now)
-        pm_p.off()
+        if not use_aux_sensor:
+            pm_p.off()
 
 def shutdown():
     if not config.sensors['disable_sensors']:
         feed_wdt()
         pm_s.off()
+        if use_aux_sensor:
+            pm_p.off()
 
 def measure(time_DTF):
-    global measures
+    global measures, latest_aux_pm_measure
     feed_wdt()
     measures = empty_measures
     measures['station'] = config.station['station']
@@ -125,20 +90,34 @@ def measure(time_DTF):
     measures['internal temperature'], measures['battery charge percentage'], measures['battery is charging'] = leadacid.levels()
     # averaging n measures from sensors with 1Hz frequency
     if not config.sensors['disable_sensors']:
+        rtc_now = time()
+        if use_aux_sensor:
+            latest_aux_pm_measure = rtc_now
+        else:
+            measures['pm10'] = 0
+            measures['pm2.5'] = 0
+            measures['pm1.0'] = 0        
         count = config.sensors['average_particle_measurements']
         while count > 0:
             feed_wdt()
             start_iter_time = ticks_ms()
             count -= 1
-            pm_p.on()
+            if not use_aux_sensor:
+                pm_p.on()
             sleep_ms(10)
             measures['temperature'] += th_s.temperature
             measures['humidity'] += th_s.relative_humidity
             pressure = bm_b.pressure
             p_bar = pressure/100000
             measures['barometric pressure'] += p_bar
+            if use_aux_sensor:
+                pm_0_data = pm_p.measure()['mass_density']
+                measures['pm10'] += pm_0_data['pm10'] # Panasonic SNGCJA5 PM sensor
+                measures['pm2.5'] += pm_0_data['pm2.5']
+                measures['pm1.0'] += pm_0_data['pm1.0']    
             pm_1_data = pm_s.measure()['mass_density']
-            pm_p.off()
+            if not use_aux_sensor:
+                pm_p.off()
             measures['pm10_ch2'] += pm_1_data['pm10'] # Sensirion SPS30
             measures['pm2.5_ch2'] += pm_1_data['pm2.5']
             measures['pm4_ch2'] += pm_1_data['pm4.0']
@@ -149,6 +128,10 @@ def measure(time_DTF):
         measures['temperature'] /= config.sensors['average_particle_measurements']
         measures['humidity'] /= config.sensors['average_particle_measurements']
         measures['barometric pressure'] /= config.sensors['average_particle_measurements']
+        if use_aux_sensor:
+            measures['pm10'] /= config.sensors['average_particle_measurements']
+            measures['pm2.5'] /= config.sensors['average_particle_measurements']
+            measures['pm1.0'] /= config.sensors['average_particle_measurements']
         measures['pm10_ch2'] /= config.sensors['average_particle_measurements']
         measures['pm2.5_ch2'] /= config.sensors['average_particle_measurements']
         measures['pm4_ch2'] /= config.sensors['average_particle_measurements']
