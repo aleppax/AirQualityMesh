@@ -30,7 +30,6 @@ cron = {
     # 'minimum_sleep_s' avoid too short sleep periods leading to malfunction
     'sensor_preheating_s' : 30,
     # 'sensor_preheating_s' do not change, suggested by the manufacturers' datasheets
-    'last_NTPsync' : 0,
     'last_update_check' : 0,
     'current_version' : 1,
     'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
