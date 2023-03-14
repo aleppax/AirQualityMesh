@@ -24,7 +24,7 @@ last_data_sent = 0
 minimum_sleep_s = config.cron['minimum_sleep_s']
 sensor_preheating_s = config.cron['sensor_preheating_s']
 do_measure = False
-updated_NTP_at_boot = False
+last_NTPsync = 0
 BASE = const(0x40058000)
 _MASK = const(0x40000000)
 
@@ -69,7 +69,7 @@ def check_data_schedule():
         return False
 
 def check_ntp_schedule():
-    if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (time() - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
+    if time() - last_NTPsync > config.cron['NTPsync_interval']:
         return True
     else:
         return False
@@ -78,7 +78,7 @@ def update_last_data_sent():
     last_data_sent = time()
 
 def update_ntp():
-    global config, updated_NTP_at_boot
+    global config, last_NTPsync
     feed_wdt()
     rtc_now = time()
     updated_NTP = False
@@ -88,8 +88,7 @@ def update_ntp():
         logger.info('Using NTP server ' + ntptime.host)
         try:
             ntptime.settime()
-            config = config.add('cron','last_NTPsync',time())
-            updated_NTP_at_boot = True
+            last_NTPsync = time()
             updated_NTP = True
             break
         except OverflowError as error:
