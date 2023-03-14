@@ -3,6 +3,7 @@ from libs.cron import feed_wdt
 import urequests as requests
 from machine import unique_id
 import binascii
+from time import sleep_ms
 
 iam = unique_id()
 UID = str(int(binascii.hexlify(iam).decode('utf-8'),16))
@@ -30,6 +31,7 @@ def send_data_list(l):
     result = True
     for d in l:
         result &= send_data(d)
+        sleep_ms(100)
     if result == False:
         logger.warning("Couldn't reach datalogging URL")
     return result
