@@ -24,7 +24,7 @@ def read():
     if file_exists(config.filelogger['filename']):
         try:
             with open(config.filelogger['filename'], 'r') as f:
-                for line in f:
+                for line in f.readlines():
                     raw_line = line.rstrip('\n').split(';')
                     measures_dict = fill_measures_dict(raw_line)
                     csvdata.append(measures_dict)
