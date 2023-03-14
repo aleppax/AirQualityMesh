@@ -1,5 +1,5 @@
 board = {
-    'GPIO_out' : ["LED",2,3,4,5,6,7],
+    'GPIO_out' : [2,3,4,5,6,7], # Even if you could, Do NOT add "LED" because it sucks (current)
     'GPIO_in' : [0,1],
     'I2C_BUS' : 0,
     'I2C_SDA' : 8,
@@ -27,7 +27,7 @@ cron = {
     'sensor_preheating_s' : 30,
     # 'sensor_preheating_s' do not change, suggested by the manufacturers' datasheets
     'last_NTPsync' : 0,
-    'last_update' : 0,
+    'last_update_check' : 0,
     'current_version' : 1,
     'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
     'branch' : 'mvpRemoteUpdate',
@@ -84,7 +84,7 @@ sps30 = {
 }
 
 station = {
-    'station' : 2,
+    'station' : 1, # this should be unique at least server wise.
     'latitude' : 0.0,
     'longitude' : 0.0,
 }

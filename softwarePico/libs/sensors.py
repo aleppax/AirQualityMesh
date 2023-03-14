@@ -5,8 +5,6 @@ from math import log
 from collections import OrderedDict
 from time import ticks_ms, ticks_diff, sleep_ms, time
 
-latest_aux_pm_measure = time()
-
 empty_measures = OrderedDict([
     ('station',''),
     ('datetime',0),
@@ -34,7 +32,9 @@ empty_measures = OrderedDict([
 
 def init(i2c, gpio):
     feed_wdt()
-    global pm_p, pm_s, uln2003, th_s, bm_b
+    global pm_p, pm_s, uln2003, th_s, bm_b, measures, latest_aux_pm_measure
+    measures = empty_measures
+    latest_aux_pm_measure = time()
     # bridge GPIO to output connector
     uln2003 = {int(k[8:]): v for k, v in config.board.items() if 'uln2003_' in k}
     #corresponding GPIO pin name is addressed with uln2003[1] where 1 is the uln2003 output
@@ -46,6 +46,8 @@ def init(i2c, gpio):
         th_s = ahtx0.AHT10(i2c) # AHT20 temperature humidity sensor
         bm_b = bmp280.BMP280(i2c, addr=0x77, use_case = bmp280.BMP280_CASE_WEATHER) # Bosh BMP280 pressure temperature sensor
         bm_b.oversample(bmp280.BMP280_OS_HIGH)
+        pm_p.off()
+        pm_s.off()
 
 def measure_aux_pm_sensor():
     if config.sensors['disable_sensors']:
@@ -57,7 +59,10 @@ def measure_aux_pm_sensor():
     # auxiliary sensor (only wakes up once per sensors['aux_pm_measure_s'] seconds)
     # to limit battery usage
     rtc_now = time()
-    if rtc_now - sensors['aux_pm_measure_s'] < latest_aux_pm_measure:
+    if rtc_now - config.sensors['aux_pm_measure_s'] < latest_aux_pm_measure:
+        measures['pm10'] = 0
+        measures['pm2.5'] = 0
+        measures['pm1.0'] = 0
         return
     latest_aux_pm_measure = rtc_now
     # wake up
@@ -71,10 +76,13 @@ def measure_aux_pm_sensor():
         feed_wdt()
         start_iter_time = ticks_ms()
         count -= 1
+        pm_s.on()
+        sleep_ms(2)
         pm_0_data = pm_p.measure()['mass_density']
+        pm_s.off()
         measures['pm10'] += pm_0_data['pm10'] # Panasonic SNGCJA5 PM sensor
         measures['pm2.5'] += pm_0_data['pm2.5']
-        measures['pm1.0'] += pm_0_data['pm1.0']  
+        measures['pm1.0'] += pm_0_data['pm1.0']
         rem_iter_time_ms = config.sensors['average_measurement_interval_ms'] - ticks_diff(ticks_ms(),start_iter_time)
         if rem_iter_time_ms > 0:
             sleep_ms(rem_iter_time_ms)
@@ -90,6 +98,7 @@ def wakeup():
         feed_wdt()
         pm_s.on()
         sleep_ms(200)
+        pm_p.on()
         pm_s.start_measurement()
         sleep_ms(10)
         # check if sps30 requires to be cleaned, it can be done while preheating
@@ -100,6 +109,7 @@ def wakeup():
             pm_s.start_fan_cleaning()
             # this has to be written to file
             config = config.add('sps30','last_cleaning',rtc_now)
+        pm_p.off()
 
 def shutdown():
     if not config.sensors['disable_sensors']:
@@ -120,12 +130,15 @@ def measure(time_DTF):
             feed_wdt()
             start_iter_time = ticks_ms()
             count -= 1
+            pm_p.on()
+            sleep_ms(10)
             measures['temperature'] += th_s.temperature
             measures['humidity'] += th_s.relative_humidity
             pressure = bm_b.pressure
             p_bar = pressure/100000
             measures['barometric pressure'] += p_bar
             pm_1_data = pm_s.measure()['mass_density']
+            pm_p.off()
             measures['pm10_ch2'] += pm_1_data['pm10'] # Sensirion SPS30
             measures['pm2.5_ch2'] += pm_1_data['pm2.5']
             measures['pm4_ch2'] += pm_1_data['pm4.0']

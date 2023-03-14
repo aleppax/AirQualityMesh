@@ -10,7 +10,8 @@ UID = str(int(binascii.hexlify(iam).decode('utf-8'),16))
 def send_data(d):
     feed_wdt()
     try:
-        resp = requests.post(config.datalogger['URL'], json=d, timeout=config.board['WDT_seconds']-0.2)
+        # if resp takes too long to arrive, 
+        resp = requests.post(config.datalogger['URL'], json=d, timeout=config.board['WDT_seconds']-0.5)
         logger.info(resp.content)
     except OSError:
         feed_wdt()

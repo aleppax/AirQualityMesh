@@ -84,7 +84,6 @@ def log(message, level = 0):
     # print debug information
     if __debug__ & print_log:
         print(now + ' ' + str(message))
-    # format log TODO: replace timestamp with more readable DTF
     logformat = "{},{},{},{}\n"
     logrecord = logformat.format(now,str(level),str(NTP_synced),str(message))
     # check file size

@@ -1,5 +1,4 @@
 from libs import config, cron, filelogger, logger, mqttlogger, sensors, wlan, datalogger
-from time import ticks_diff, ticks_ms
 
 logger.info('booting')
 #this test works also before initializing i2c and sensors
@@ -9,6 +8,20 @@ logger.check_fs_free_space()
 #init I2C and GPIO. access a port with gpio['GP2']
 i2c, gpio = config.initialize_board()
 sensors.init(i2c, gpio)
+
+def updates():
+    # connect to wifi only if updates are required
+    ntp_scheduled = cron.check_ntp_schedule()
+    update_scheduled = cron.check_software_schedule()
+    if (ntp_scheduled or update_scheduled):
+        if wlan.initialize():
+            if ntp_scheduled:
+                cron.update_ntp() # every NTPsync_interval
+            if update_scheduled:
+                if not cron.update_available:
+                    cron.check_software_updates() # every update_interval
+                cron.software_update()
+        wlan.turn_off()
 
 def send_values():
     #stored data submission to servers
@@ -26,11 +39,8 @@ def send_values():
     return done
 
 while True:
-    # first thing, check if network is reachable
-    if wlan.initialize():
-        # check if it's time to look for NTP and software updates
-        cron.updates()
-        wlan.turn_off()
+     # check if it's time to look for NTP or software updates
+    updates()  
     # if a measurement is scheduled during this wake cycle, do the job
     if cron.do_measure:
         sensors.wakeup()
@@ -52,4 +62,5 @@ while True:
     sensors.check_low_power()
     # otherwise work done, rest until next task
     cron.lightsleep_until_next_cycle()
+
 

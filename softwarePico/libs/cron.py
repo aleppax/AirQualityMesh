@@ -53,12 +53,20 @@ def sleep_ms_feeded(t):
     sleep_ms(int(mod))
     feed_wdt()
     
-def updates():
-    update_ntp() # every NTPsync_interval
-    if not update_available:
-        check_software_updates() # every update_interval
-    software_update()
-    
+def check_software_schedule():
+    rtc_now = time()
+    if rtc_now - config.cron['last_update_check'] > config.cron['update_interval']:
+        return True
+    else:
+        return False
+
+def check_ntp_schedule():
+    rtc_now = time()
+    if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
+        return True
+    else:
+        return False
+
 def update_ntp():
     global config, updated_NTP_at_boot
     feed_wdt()
@@ -67,22 +75,20 @@ def update_ntp():
     # this can lead to wdt intervention, a reboot is better than not knowing for sure the actual time 
     while not updated_NTP:
         feed_wdt()
-        if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
-            logger.info('Using NTP server ' + ntptime.host)
-            try:
-                ntptime.settime()
-                config = config.add('cron','last_NTPsync',time())
-                updated_NTP_at_boot = True
-                updated_NTP = True
-                break
-            except OverflowError as error:
-                logger.error(error)
-            except Exception as exception:
-                logger.warning(exception)
-            logger.info('retrying NTP update in 64 seconds')
-            sleep_ms_feeded(64000)
-        else:
+        logger.info('Using NTP server ' + ntptime.host)
+        try:
+            ntptime.settime()
+            config = config.add('cron','last_NTPsync',time())
+            updated_NTP_at_boot = True
+            updated_NTP = True
             break
+        except OverflowError as error:
+            logger.error(error)
+        except Exception as exception:
+            logger.warning(exception)
+        logger.info('retrying NTP update in 4 seconds')
+        sleep_ms_feeded(4000)
+
 
 def check_software_updates():
     global config, update_available, full_update
@@ -91,31 +97,29 @@ def check_software_updates():
     # and assuming that a network connection is up,
     # downloads version.py from the root of the repository/branch
     feed_wdt()
-    rtc_now = time()
-    if rtc_now - config.cron['last_update'] > config.cron['update_interval']:
-        if 'version.py' in os.listdir():
-            os.remove('version.py')
-        try:
-            mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
-        except:
-            logger.warning("can't communicate with update server")
-            return
-        feed_wdt()
-        if 'version.py' in os.listdir():
-            if 'version' in sys.modules:
-                del sys.modules['version']
-            import version
-            if version.version > config.cron['current_version']:
-                update_available = True
-                # if updating more than one versioning step, fetch everything.
-                if config.cron['current_version'] - version.version > 1:
-                    full_update = True
-                logger.info('Going to update from version ' + str(config.cron['current_version']) + 'to version ' + str(version.version))
-            elif version.version == config.cron['current_version']:
-                update_available = False
-                config = config.add('cron','last_update',rtc_now)
-        else:
-            logger.warning("can't check for new software versions")
+    if 'version.py' in os.listdir():
+        os.remove('version.py')
+    try:
+        mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
+    except:
+        logger.warning("can't communicate with update server")
+        return
+    feed_wdt()
+    if 'version.py' in os.listdir():
+        if 'version' in sys.modules:
+            del sys.modules['version']
+        import version
+        if version.version > config.cron['current_version']:
+            update_available = True
+            # if updating more than one versioning step, fetch everything.
+            if config.cron['current_version'] - version.version > 1:
+                full_update = True
+            logger.info('Going to update from version ' + str(config.cron['current_version']) + 'to version ' + str(version.version))
+        elif version.version == config.cron['current_version']:
+            update_available = False
+        config = config.add('cron','last_update_check',time())
+    else:
+        logger.warning("can't check for new software versions")
 
 def software_update():
     global config, update_available, full_update
@@ -155,7 +159,7 @@ def software_update():
             reset()
         else:
             logger.error("Version upgrade incomplete! This can lead to instability.")
-            # TODO: maybe restoring the previus version could be a good idea...
+            # TODO: having space left, maybe restoring the previus version could be a good idea...
 
 def next_cycle_s():
     # returns how long to lightsleep
