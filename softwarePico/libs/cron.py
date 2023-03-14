@@ -75,6 +75,7 @@ def check_ntp_schedule():
         return False
 
 def update_last_data_sent():
+    global last_data_sent
     last_data_sent = time()
 
 def update_ntp():
