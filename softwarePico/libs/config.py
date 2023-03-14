@@ -18,7 +18,7 @@ cron = {
     'NTP_server_count' : 4,
     'NTPsync_interval' : 3600 * 4,
     # 'NTPsync_interval' every x hours
-    'update_interval' : 60, #3600 * 24,
+    'update_interval' : 3600 * 24,
     # 'update_interval' every x hours
     'measuremens_per_day' : 144,
     # 'measuremens_per_day' interval starting at 0:00. do not set too high (1440 is already very battery expensive). better using divisors of 86400
