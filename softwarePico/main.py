@@ -53,11 +53,16 @@ while True:
         sensors.measure_aux_pm_sensor()
         # check again if online, save data online, otherwise to file
         sent = False
-        if wlan.initialize():
-            sent = send_values()
+        # connect to wifi only if sending data is cheduled
+        submission_scheduled = cron.check_data_schedule()
+        if submission_scheduled:
+            if wlan.initialize():
+                sent = send_values()
             wlan.turn_off()
         if not sent:
             filelogger.write(sensors.measures)
+        else:
+            cron.update_last_data_sent()
     # we need a way to exit the while cycle if power is low
     sensors.check_low_power()
     # otherwise work done, rest until next task

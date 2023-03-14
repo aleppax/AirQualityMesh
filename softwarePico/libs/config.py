@@ -18,8 +18,12 @@ cron = {
     'NTP_server_count' : 4,
     'NTPsync_interval' : 3600 * 4,
     # 'NTPsync_interval' every x hours
-    'update_interval' : 60, #3600 * 24,
+    'update_interval' : 3600 * 24,
     # 'update_interval' every x hours
+    'data_submission_interval' : 3600,
+    # 'data_submission_interval' every hour
+    'data_submission_just_in_time' : False,
+    # if you need realtime data submission, it overrides 'data_submission_interval'
     'measuremens_per_day' : 144,
     # 'measuremens_per_day' interval starting at 0:00. do not set too high (1440 is already very battery expensive). better using divisors of 86400
     'minimum_sleep_s' : 4,

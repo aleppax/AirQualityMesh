@@ -20,6 +20,7 @@ update_available = False
 full_update = False
 current_version = config.cron['current_version']
 measurement_interval = round(86400 / config.cron['measuremens_per_day'])
+last_data_sent = 0
 minimum_sleep_s = config.cron['minimum_sleep_s']
 sensor_preheating_s = config.cron['sensor_preheating_s']
 do_measure = False
@@ -54,18 +55,27 @@ def sleep_ms_feeded(t):
     feed_wdt()
     
 def check_software_schedule():
-    rtc_now = time()
-    if rtc_now - config.cron['last_update_check'] > config.cron['update_interval']:
+    if time() - config.cron['last_update_check'] > config.cron['update_interval']:
+        return True
+    else:
+        return False
+
+def check_data_schedule():
+    if config.cron['data_submission_just_in_time']:
+        return True
+    if time() - last_data_sent > config.cron['data_submission_interval']:
         return True
     else:
         return False
 
 def check_ntp_schedule():
-    rtc_now = time()
-    if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (rtc_now - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
+    if (updated_NTP_at_boot == False) or (config.cron['last_NTPsync'] == 0) or (time() - config.cron['last_NTPsync'] > config.cron['NTPsync_interval']):
         return True
     else:
         return False
+
+def update_last_data_sent():
+    last_data_sent = time()
 
 def update_ntp():
     global config, updated_NTP_at_boot
