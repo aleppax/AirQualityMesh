@@ -54,6 +54,7 @@ def wakeup():
     global config, use_aux_sensor
     if not config.sensors['disable_sensors']:
         feed_wdt()
+        rtc_now = time()
         if rtc_now - config.sensors['aux_pm_measure_s'] < latest_aux_pm_measure:
             use_aux_sensor = False
         else:
@@ -64,7 +65,6 @@ def wakeup():
         pm_s.start_measurement()
         sleep_ms(10)
         # check if sps30 requires to be cleaned, it can be done while preheating
-        rtc_now = time()
         if rtc_now - config.sps30['last_cleaning'] > config.sps30['cleaning_interval']:
             feed_wdt()
             logger.info('Cleaning SPS30 sensor')
