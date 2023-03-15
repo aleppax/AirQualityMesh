@@ -33,4 +33,5 @@ def send_data_list(l):
     result = True
     for d in l:
         result &= send_data(d)
+    del l
     return result

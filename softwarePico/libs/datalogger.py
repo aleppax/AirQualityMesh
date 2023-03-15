@@ -29,9 +29,10 @@ def send_data(d):
 
 def send_data_list(l):
     result = True
-    for d in l:
-        result &= send_data(d)
+    for di in l:
+        result &= send_data(di)
         sleep_ms(100)
     if result == False:
         logger.warning("Couldn't reach datalogging URL")
+    del l
     return result

@@ -33,7 +33,7 @@ empty_measures = OrderedDict([
 def init(i2c, gpio):
     feed_wdt()
     global pm_p, pm_s, uln2003, th_s, bm_b, measures, latest_aux_pm_measure, use_aux_sensor
-    measures = empty_measures
+    measures = empty_measures.copy()
     use_aux_sensor = False
     latest_aux_pm_measure = time()
     # bridge GPIO to output connector
