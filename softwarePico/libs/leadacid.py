@@ -9,7 +9,7 @@ from libs import logger, config
 # measures are referred to a typical load of 0,01% of battery capacity
 # charging voltage is fixed, it doesn't adapt to temperature.
 battery_voltage = config.leadacid['battery_voltage'] # 4.0, 6.0 or 12.0
-voltage_full_charged = battery_voltage * 1.1 # voltage can be higher than this when charging. Valid at least 15 minutes after end of charge
+voltage_full_charged = battery_voltage * 1.15 # voltage can be higher than this when charging. Valid at least 15 minutes after end of charge
 max_voltage = battery_voltage * 1.25 # above this value the battery will be damaged and the ADC too
 charging_voltage = battery_voltage * 1.2375 # this is typical when topping charge, current drops until full charged
 #final_discharge_voltage = battery_voltage * 0.8 # below this lower limit the battery will be irreversibly damaged

@@ -10,8 +10,8 @@ def write(m):
     csv_m = ';'.join(str(el) for el in m.values()) + '\n'
     # write to file
     try:
-        with open(config.filelogger['filename'], 'a+') as f:
-            f.write(csv_m)
+        with open(config.filelogger['filename'], 'a+') as fa:
+            fa.write(csv_m)
         return True
     except:
         logger.error("Could not write file: " + config.filelogger['filename'])
@@ -23,11 +23,10 @@ def read():
     csvdata = []
     if file_exists(config.filelogger['filename']):
         try:
-            with open(config.filelogger['filename'], 'r') as f:
-                for line in f.readlines():
+            with open(config.filelogger['filename'], 'r') as fr:
+                for line in fr.readlines():
                     raw_line = line.rstrip('\n').split(';')
-                    measures_dict = fill_measures_dict(raw_line)
-                    csvdata.append(measures_dict)
+                    csvdata.append(fill_measures_dict(raw_line))
             return csvdata
         except:
             logger.error("Could not read file: " + config.filelogger['filename'])
@@ -40,13 +39,13 @@ def clear_data():
         remove(config.filelogger['filename'])
 
 def fill_measures_dict(values):
-    measures = empty_measures
-    keys = [k for k in measures.keys()]
+    gauges = empty_measures.copy()
+    keys = [k for k in gauges.keys()]
     count = 0
     for v in values:
-        measures[keys[count]] = v
+        gauges[keys[count]] = v
         count += 1
-    return measures
+    return gauges
 
 def file_exists(fileURI):
     _splitted = config.filelogger['filename'].split('/')
