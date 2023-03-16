@@ -165,6 +165,7 @@ def software_update():
             config = config.add('cron','current_version',version.version)
             logger.info("Version upgrade done! Upgraded to version " + str(version.version))
             update_available = False
+            sleep_ms(1000)
             # rebooting
             reset()
         else:
