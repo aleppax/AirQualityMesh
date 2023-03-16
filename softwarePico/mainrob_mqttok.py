@@ -1,9 +1,19 @@
+#backup main con led e lighsleep
+# RDF 20230316
+
 from libs import config, cron, filelogger, logger, mqttlogger, sensors, wlan, datalogger
 from time import ticks_diff, ticks_ms, sleep
 import machine
 from machine import lightsleep, Pin
 
-
+led = machine.Pin('LED', machine.Pin.OUT)
+i = 0
+while (i<5):
+    led.on()
+    sleep(.2)
+    led.off()
+    sleep(.2)
+    i = i + 1
 logger.info('booting')
 #this test works also before initializing i2c and sensors
 # if power is low, revert to deepsleep
@@ -31,27 +41,26 @@ def send_values():
         mqttlogger.send_data(sensors.measures)
     return done
 
-def led_flash(second):
-    led = machine.Pin('LED', machine.Pin.OUT)
-    i = 0
-    while (i<5):
-        led.on()
-        sleep(second)
-        led.off()
-        sleep(second)
-        i = i + 1
-        
+
 ###########
 #rr prova rapida
+led = machine.Pin('LED', machine.Pin.OUT)
+i = 0
+while (i<5):
+    led.on()
+    sleep(.2)
+    led.off()
+    sleep(.2)
+    i = i + 1
+    
 while True:
     sensors.wakeup()
     sensors.measure(logger.now_DTF())
     print(sensors.measures)
     if wlan.initialize():
         sleep(2)
-        print('mqtt & database')
+        print('mqtt')
         mqttlogger.send_data(sensors.measures)
-        datalogger.send_data(sensors.measures)
         print('published')
 #         wlan.turn_off()
 #         print('spento wifi')
@@ -61,16 +70,27 @@ while True:
         wlan.wlan.deinit()    #spegnere chip wifi
         sleep(.1)
         wlan.wlan=None
-        print('spento wlan')
+        print('spento  wlan')
         sleep(.1)
-        led_flash(0.2)
+        i = 0
+        while (i<10):
+            led.on()
+            sleep(.2)
+            led.off()
+            sleep(.2)
+            i = i + 1
         ############
         lightsleep(300000)
         print('uscito lightsleep')
         ############
-        led_flash(0.5)
-        
-
+        i = 0
+        while (i<10):
+            led.on()
+            sleep(.5)
+            led.off()
+            sleep(.5)
+            i = i + 1
+###########
 # 
 # while True:
 #     # first thing, check if network is reachable
