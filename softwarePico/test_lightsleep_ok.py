@@ -36,6 +36,7 @@ while (i<30):
 print('prima LS')
 msecondi = 10000
 lightsleep(msecondi)
+sleep(.5)
 print(f'fuori! dopo {msecondi} ms')
 
 i = 0

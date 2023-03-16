@@ -1,13 +1,22 @@
 from libs import config, cron, filelogger, logger, mqttlogger, sensors, wlan, datalogger
 from time import ticks_diff, ticks_ms, sleep
 import machine
+from machine import lightsleep, Pin
 
+led = machine.Pin('LED', machine.Pin.OUT)
+i = 0
+while (i<5):
+    led.on()
+    sleep(.2)
+    led.off()
+    sleep(.2)
+    i = i + 1
 logger.info('booting')
 #this test works also before initializing i2c and sensors
 # if power is low, revert to deepsleep
 # still we do not have an idea of when we are, but better than nothing
 #cron.restore_latest_timestamp()
-sensors.check_low_power()
+#sensors.check_low_power()
 # init system
 logger.check_fs_free_space()
 #init I2C and GPIO. access a port with gpio['GP2']
@@ -32,6 +41,15 @@ def send_values():
 
 ###########
 #rr prova rapida
+led = machine.Pin('LED', machine.Pin.OUT)
+i = 0
+while (i<5):
+    led.on()
+    sleep(.2)
+    led.off()
+    sleep(.2)
+    i = i + 1
+    
 while True:
     sensors.wakeup()
     sensors.measure(logger.now_DTF())
@@ -41,7 +59,34 @@ while True:
         print('mqtt')
         mqttlogger.send_data(sensors.measures)
         print('published')
-        sleep(50)
+#         wlan.turn_off()
+#         print('spento wifi')
+        #do the magic
+        wlan.wlan.disconnect()
+        wlan.wlan.active(False)
+        wlan.wlan.deinit()    #spegnere chip wifi
+        sleep(.1)
+        wlan.wlan=None
+        print('spento  wlan')
+        sleep(.1)
+        i = 0
+        while (i<10):
+            led.on()
+            sleep(.2)
+            led.off()
+            sleep(.2)
+            i = i + 1
+        ############
+        lightsleep(300000)
+        print('uscito lightsleep')
+        ############
+        i = 0
+        while (i<10):
+            led.on()
+            sleep(.5)
+            led.off()
+            sleep(.5)
+            i = i + 1
 ###########
 # 
 # while True:
