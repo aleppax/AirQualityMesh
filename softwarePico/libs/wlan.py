@@ -9,7 +9,6 @@ from libs.cron import feed_wdt
 
 wlan = None
 trying = False
-wlanSw = machine.Pin(23, machine.Pin.OUT)
 statuses = {
     -3 : 'authentication failure',
     -2 : 'No matching SSID found (could be out of range, or down)',
@@ -21,8 +20,6 @@ statuses = {
 }
 
 def initialize():
-    global wlanSw
-    wlanSw.high()
     time.sleep_ms(80)
     feed_wdt()
     if not hasattr(config,'wlan'):
@@ -30,8 +27,7 @@ def initialize():
     return connect(0)
 
 def turn_off():
-    global wlan, wlanSw
-    wlanSw.low()
+    global wlan
     time.sleep_ms(100)
     wlan.disconnect()
     wlan.active(False)
