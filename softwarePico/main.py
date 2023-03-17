@@ -1,4 +1,5 @@
 from libs import config, cron, filelogger, logger, mqttlogger, sensors, wlan, datalogger
+from machine import reset
 
 logger.info('booting')
 #this test works also before initializing i2c and sensors
@@ -21,6 +22,10 @@ def updates():
                 if not cron.update_available:
                     cron.check_software_updates() # every update_interval
                 cron.software_update()
+        else:
+            logger.info("An update is required, but the sistem can't connect. Rebooting in 60s.")
+            cron.lightsleep_wrapper(60000)
+            reset()
         wlan.turn_off()
 
 def send_values():
