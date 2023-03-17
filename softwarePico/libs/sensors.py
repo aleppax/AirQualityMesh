@@ -107,9 +107,9 @@ def measure(time_DTF):
             sleep_ms(10)
             measures['temperature'] += th_s.temperature
             measures['humidity'] += th_s.relative_humidity
-            pressure = bm_b.pressure
-            p_bar = pressure/100000
-            measures['barometric pressure'] += p_bar
+            pressure = bm_b.pressure # Pascal
+            p_hPa = pressure/100
+            measures['barometric pressure'] += p_hPa
             if use_aux_sensor:
                 pm_0_data = pm_p.measure()['mass_density']
                 measures['pm10'] += pm_0_data['pm10'] # Panasonic SNGCJA5 PM sensor
