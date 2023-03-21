@@ -32,7 +32,7 @@ def measure_RP2040_temp():
 def ADC_voltage():
     reading = adc.read_u16()
     result = (reading * (ADC_factor1)) + 1 / (reading * (ADC_factor2))
-    return int(adc.read_u16() * (ADC_factor))   
+    return int(result)   
     
 def average_n_measurements(n,callback, interval=0):
     count = 0
