@@ -24,8 +24,9 @@ def read():
     if file_exists(config.filelogger['filename']):
         try:
             with open(config.filelogger['filename'], 'r') as fr:
-                for line in fr.readlines():
-                    raw_line = line.rstrip('\n').split(';')
+                for line in fr:
+                    linestr = fr.readline()
+                    raw_line = linestr.rstrip('\n').split(';')
                     csvdata.append(fill_measures_dict(raw_line))
             return csvdata
         except:
