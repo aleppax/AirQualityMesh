@@ -17,7 +17,8 @@ safe_min_discharge = battery_voltage * 0.9 # below this limit the battery life w
 # 
 t_m_callback = False
 adc = ADC(config.leadacid['ADC_port'])
-ADC_factor = config.leadacid['ADC_factor']
+ADC_factor1 = config.leadacid['ADC_factor1']
+ADC_factor2 = config.leadacid['ADC_factor2']
 rp2040_temp = ADC(4)
 rp2040_temp_factor = 3.3 / (65535)
 voltage_filter = []
@@ -29,6 +30,8 @@ def measure_RP2040_temp():
     return temperature
 
 def ADC_voltage():
+    reading = adc.read_u16()
+    result = (reading * (ADC_factor1)) + 1 / (reading * (ADC_factor2))
     return int(adc.read_u16() * (ADC_factor))   
     
 def average_n_measurements(n,callback, interval=0):

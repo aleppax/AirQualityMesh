@@ -56,7 +56,9 @@ logger = {
 }
 leadacid = {
     'battery_voltage' : 4.0,
-    'ADC_factor' : 0.1122,
+    'ADC_factor1' : 0.108, # there isn't a linear correlation, with two factors we achieve a better result at values where knowing the effective voltage is critical
+    'ADC_factor2' : 0.085,
+    # =adc*0,108+1/(adc*0,085)
     'ADC_port' : 2,
     'filter_length' : 5, # consider 'measuremens_per_day' (how frequently we take a measurement) if its span is too much reduce this number
     'low_power_mode' : False,
