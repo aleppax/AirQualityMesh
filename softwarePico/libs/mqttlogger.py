@@ -1,8 +1,9 @@
 from libs import logger, config
 from libs.cron import feed_wdt
 from libs.simple import MQTTClient
-import ubinascii
+import ubinascii, gc
 import machine
+from libs.sensors import empty_measures
 
 client_ID = ubinascii.hexlify(machine.unique_id())
 server = config.mqttlogger['server']
@@ -10,8 +11,17 @@ main_topic = config.mqttlogger['topic']
 mqtt_user = config.mqttlogger['user']
 mqtt_password = config.mqttlogger['pass']
 mqtt_QOS = config.mqttlogger['QOS']
+mqtt_gauges = empty_measures.copy()
 
 c = MQTTClient(client_ID, server, user=mqtt_user, password=mqtt_password)
+
+def fill_measures_dict(values):
+    global mqtt_gauges
+    keys = [k for k in mqtt_gauges.keys()]
+    count = 0
+    for v in values:
+        mqtt_gauges[keys[count]] = v
+        count += 1
 
 def send_data(d):
     if config.mqttlogger['enable']:
@@ -32,6 +42,8 @@ def send_data(d):
 def send_data_list(l):
     result = True
     for d in l:
-        result &= send_data(d)
+        gc.collect()
+        fill_measures_dict(d)
+        result &= send_data(mqtt_gauges)
     del l
     return result

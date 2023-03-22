@@ -1,7 +1,8 @@
 from libs import logger, config
-from libs.sensors import empty_measures
 from os import remove, listdir
 from libs.cron import feed_wdt
+
+lines = []
 
 def write(m):
     logger.info("data can't be sent. Saving locally")
@@ -18,35 +19,38 @@ def write(m):
         return False
     
 def read():
+    global lines
     feed_wdt()
     # retrieve all sets of measures in a list of ordered dicts
     csvdata = []
     if file_exists(config.filelogger['filename']):
+        lines = []
         try:
             with open(config.filelogger['filename'], 'r') as fr:
-                for line in fr:
-                    linestr = fr.readline()
-                    raw_line = linestr.rstrip('\n').split(';')
-                    csvdata.append(fill_measures_dict(raw_line))
-            return csvdata
-        except:
+                count = 30
+                for line in fr.readlines():
+                    count -= 1
+                    if count < 0:
+                        lines.append(line)
+                        continue
+                    raw_line = line.rstrip('\n').split(';')
+                    csvdata.append(raw_line)
+        except Exception as e:
             logger.error("Could not read file: " + config.filelogger['filename'])
-    return []
+            print(e)
+    return csvdata
 
 def clear_data():
-    #delete file
+    global lines
+    #delete lines
     feed_wdt()
-    if file_exists(config.filelogger['filename']):
-        remove(config.filelogger['filename'])
-
-def fill_measures_dict(values):
-    gauges = empty_measures.copy()
-    keys = [k for k in gauges.keys()]
-    count = 0
-    for v in values:
-        gauges[keys[count]] = v
-        count += 1
-    return gauges
+    try:
+        with open(config.filelogger['filename'], 'w') as fw:
+            for lain in lines:
+                fw.write(lain)
+    except Exception as e:
+        print("Could not write file: ", config.filelogger['filename'])
+        print(e)
 
 def file_exists(fileURI):
     _splitted = config.filelogger['filename'].split('/')

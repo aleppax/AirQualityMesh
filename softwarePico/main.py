@@ -30,11 +30,17 @@ def updates():
 
 def send_values():
     #stored data submission to servers
-    done = datalogger.send_data_list(filelogger.read())
-    if done:
-        # success in submission of data, log also to mqtt and clead data
-        mqttlogger.send_data_list(filelogger.read())
-        filelogger.clear_data()
+    while True:
+        file_lines = filelogger.read()
+        if file_lines == []:
+            break
+        done = datalogger.send_data_list(file_lines)
+        if done:
+            # success in submission of data, log also to mqtt and clead data
+            mqttlogger.send_data_list(file_lines)
+            filelogger.clear_data()
+        else:
+            break
     #current data submission to servers
     done = datalogger.send_data(sensors.measures)
     if done:
