@@ -2,7 +2,7 @@ from libs import logger, config
 from libs.cron import feed_wdt
 import urequests as requests
 from machine import unique_id
-import binascii
+import binascii, gc
 from time import sleep_ms
 from libs.sensors import empty_measures
 gauges = empty_measures.copy()
@@ -11,11 +11,11 @@ UID = str(int(binascii.hexlify(iam).decode('utf-8'),16))
 
 def send_data(d):
     feed_wdt()
+    gc.collect()
     try:
         # if resp takes too long to arrive,
-        print(d)
         resp = requests.post(config.datalogger['URL'], json=d, timeout=config.board['WDT_seconds']-0.5)
-        resp.close()
+        sleep_ms(30)
         logger.info(resp.text)
     except Exception as e:
         print(e)
@@ -43,6 +43,7 @@ def fill_measures_dict(values):
 def send_data_list(l):
     result = True
     for di in l:
+        gc.collect()
         fill_measures_dict(di)
         result &= send_data(gauges)
         sleep_ms(100)

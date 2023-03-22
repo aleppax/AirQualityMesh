@@ -27,7 +27,7 @@ def read():
         lines = []
         try:
             with open(config.filelogger['filename'], 'r') as fr:
-                count = 30
+                count = 5
                 for line in fr.readlines():
                     count -= 1
                     if count < 0:
