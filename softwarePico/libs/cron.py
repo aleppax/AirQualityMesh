@@ -158,7 +158,7 @@ def software_update():
                 else:
                     filemodified = -1
                 mip.install(config.cron['repository'] + directory[1:] + '/' + f, target=directory + '/', version=config.cron['branch'])
-                if f == 'config.py':
+                if (f == 'config.py') and (directory == '/libs'):
                     update_config()
                 feed_wdt()
                 if filemodified == os.stat(directory + '/' + f)[7]:
