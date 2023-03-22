@@ -138,6 +138,7 @@ def update_config():
     for El in s:
         if El[:2] != '__':
             if type(El) == type({}):
+            # if type(new_config[El]) == type({}):
                 print(El)
 
 def software_update():
