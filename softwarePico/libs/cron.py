@@ -134,7 +134,10 @@ def check_software_updates():
 def update_config():
     from libs import config as new_config
     # now dir of new_config content
-    pass
+    s = dir(new_config)
+    for El in s:
+        if El[:2] != '__':
+            print(El)
 
 def software_update():
     global config, update_available, full_update
