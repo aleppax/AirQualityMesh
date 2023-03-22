@@ -131,6 +131,9 @@ def check_software_updates():
     else:
         logger.warning("can't check for new software versions")
 
+def update_config():
+    pass
+
 def software_update():
     global config, update_available, full_update
     feed_wdt()
@@ -155,6 +158,8 @@ def software_update():
                 else:
                     filemodified = -1
                 mip.install(config.cron['repository'] + directory[1:] + '/' + f, target=directory + '/', version=config.cron['branch'])
+                if f == 'config.py':
+                    update_config()
                 feed_wdt()
                 if filemodified == os.stat(directory + '/' + f)[7]:
                     success = False
