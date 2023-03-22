@@ -137,7 +137,8 @@ def update_config():
     s = dir(new_config)
     for El in s:
         if El[:2] != '__':
-            print(El)
+            if type(El) == type({}):
+                print(El)
 
 def software_update():
     global config, update_available, full_update
