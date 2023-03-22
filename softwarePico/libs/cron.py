@@ -132,6 +132,8 @@ def check_software_updates():
         logger.warning("can't check for new software versions")
 
 def update_config():
+    from libs import config as new_config
+    # now dir of new_config content
     pass
 
 def software_update():
