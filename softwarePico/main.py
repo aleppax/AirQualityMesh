@@ -22,11 +22,12 @@ def updates():
                 if not cron.update_available:
                     cron.check_software_updates() # every update_interval
                 cron.software_update()
-        else:
-            logger.info("An update is required, but the sistem can't connect. Rebooting in 60s.")
-            cron.lightsleep_wrapper(60000)
-            reset()
         wlan.turn_off()
+        if cron.check_ntp_schedule():
+            logger.info("An update of the clock is required, but the sistem can't do it now. Rebooting in 180s.")
+            cron.lightsleep_wrapper(180000)
+            reset()
+        
 
 def send_values():
     #stored data submission to servers
