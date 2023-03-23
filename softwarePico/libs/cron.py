@@ -199,7 +199,6 @@ def next_cycle_s():
     now = rtc.datetime()
     time_since_midnight = now[4]*3600 + now[5]*60 + now[6] # there will be some misalignment every day at midnight
     next_cycle_in_s = int(measurement_interval - fmod(time_since_midnight,measurement_interval)) # seconds. calculates when should occur the first feasible measurement in the future
-    logger.log('next_cycle_in_s ' + str(next_cycle_in_s))
     # max RP2040 sleep time seems to be 2^32-1us or 4294966ms or 4294s or 71min33s
     # if next_measurement_in_s is higher than max sleep time go to sleep for max time without measuring anything
     if next_cycle_in_s > 4294:
@@ -232,7 +231,7 @@ def store_latest_timestamp():
 
 def lightsleep_wrapper(ms):
     if config.cron['use_wdt']:
-        logger.info('lightsleeping for ' + str(ms) + 'ms')
+        logger.info('lightsleeping for ' + str(ms/1000) + ' s')
         disable_WdT()
         sleep_ms(100)
         lightsleep(ms - 200)
@@ -240,7 +239,7 @@ def lightsleep_wrapper(ms):
         feed_wdt()
         sleep_ms(100)
     else:    
-        logger.info('lightsleeping for ' + str(ms) + 'ms, WDT unused')
+        logger.info('lightsleeping for ' + str(ms/1000) + ' s, WDT unused')
         sleep_ms(100)
         lightsleep(ms - 200)
         sleep_ms(100)
