@@ -132,14 +132,21 @@ def check_software_updates():
         logger.warning("can't check for new software versions")
 
 def update_config():
-    from libs import config as new_config
-    # now dir of new_config content
-    s = dir(new_config)
-    for El in s:
-        if El[:2] != '__':
-            if type(El) == type({}):
-            # if type(new_config[El]) == type({}):
-                print(El)
+    global config
+    logger.info('updating config while preserving custom settings (hopefully...)')
+    sleep_ms(1000)
+    new_config = __import__('/libs/config')
+    sgs = dict([(name, cls) for name, cls in new_config.__dict__.items() if isinstance(cls, dict)])
+    for sg_name in sgs:
+        for par in sgs[sg_name]:
+            # if already exists, and is different, then restore the modified setting
+            if par in config.__dict__[sg_name]:
+                if sgs[sg_name][par] != config.__dict__[sg_name][par]:
+                    # rewrite to file the pre-existing modified setting
+                    feed_wdt()
+                    msg = 'writing ' + str(sg_name) + ' ' + str(par) + ' ' + str(config.__dict__[sg_name][par])
+                    logger.info(msg)
+                    config.add(sg_name,par,config.__dict__[sg_name][par],do_reload=False)
 
 def software_update():
     global config, update_available, full_update
@@ -164,6 +171,8 @@ def software_update():
                     filemodified = os.stat(directory + '/' + f)[7]
                 else:
                     filemodified = -1
+                if (f == 'config.py') and (directory == '/libs'):
+                    os.rename('/libs/config.py','/libs/configold.py')
                 mip.install(config.cron['repository'] + directory[1:] + '/' + f, target=directory + '/', version=config.cron['branch'])
                 if (f == 'config.py') and (directory == '/libs'):
                     update_config()

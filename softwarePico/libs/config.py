@@ -122,7 +122,7 @@ import machine
 from time import sleep
 from machine import Pin, I2C
 
-def add(dictname, key, value):
+def add(dictname, key, value, do_reload=True):
     newrow = _key_value_dict(key,value)
     me = _open_file_to_lines()
     dict_start = -1
@@ -159,10 +159,13 @@ def add(dictname, key, value):
         #print('adding new row')
         me.insert(dict_end,newrow)
         result = _write_lines_to_file(me)
-    if result:
-        return _reload()
+    if do_reload:
+        if result:
+            return _reload()
+        else:
+            return sys.modules[__name__]
     else:
-        return sys.modules[__name__]
+        return result
 
 def _reload():
     mod_name = __name__
@@ -214,3 +217,4 @@ def initialize_board():
         gpio['GP'+str(pin)] = machine.Pin(pin, machine.Pin.IN, machine.Pin.PULL_DOWN)
     
     return i2c, gpio
+
