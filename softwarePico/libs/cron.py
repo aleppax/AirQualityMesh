@@ -147,6 +147,8 @@ def update_config():
                     msg = 'writing ' + str(sg_name) + ' ' + str(par) + ' ' + str(config.__dict__[sg_name][par])
                     logger.info(msg)
                     config.add(sg_name,par,config.__dict__[sg_name][par],do_reload=False)
+            else:
+                config.add(sg_name,par,sgs[sg_name][par],do_reload=False)
 
 def software_update():
     global config, update_available, full_update
