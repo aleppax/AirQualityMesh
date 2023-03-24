@@ -59,11 +59,12 @@ def startupTests(i2c, gpio):
     if len(addresses) > len(config.sensors['i2c_sensors']):
         logger.error("the i2c bus is connected to unpowered devices, it is delirious. Or maybe a new device has been added, in that case please update the i2c_sensors dict.")
         return False
+    success = True
     for device_id, device_name in config.sensors['i2c_sensors'].items():
         if device_id not in addresses:
-            logger.error("Can't find the " + device_name + " with address " + device_id + ". Please check the connections and the sensor functionality.")
-            return False
-    return True
+            logger.error("Can't find the " + device_name + " with address " + str(device_id) + ". Please check the connections and the sensor functionality.")
+            success = False
+    return success
 
 def wakeup():
     global config, use_aux_sensor
