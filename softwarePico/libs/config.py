@@ -80,6 +80,7 @@ sensors = {
     'average_measurement_interval_ms' : 1000,
     'disable_sensors' : False,
     'aux_pm_measure_s' : 3600, # 1 hour
+    'i2c_sensors' : {33 : 'Laser Type PM Sensor SN-GCJA5', 38 : 'Humidity and Temperature Sensor AHT20', 69 : 'PM Sensor SPS30', 77 : 'Pressure sensor BMP280'},
 }
 sps30 = {
     'sensor_power_pin' : 1,
