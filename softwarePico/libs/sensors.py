@@ -40,8 +40,10 @@ def init(i2c, gpio):
     uln2003 = {int(k[8:]): v for k, v in config.board.items() if 'uln2003_' in k}
     #corresponding GPIO pin name is addressed with uln2003[1] where 1 is the uln2003 output
     if not config.sensors['disable_sensors']:
-        p_pwr_pin = gpio[    uln2003[config.picosngcja5['sensor_power_pin']]  ]
-        s_pwr_pin = gpio[    uln2003[config.sps30['sensor_power_pin']]   ] 
+        # TODO: next thing to do is, for instance, using the success variable to send a warning to the API server.
+        success = startupTests(i2c, gpio)
+        p_pwr_pin = gpio[uln2003[config.picosngcja5['sensor_power_pin']]]
+        s_pwr_pin = gpio[uln2003[config.sps30['sensor_power_pin']]] 
         pm_p = picosngcja5.SNGCJA5(i2c, p_pwr_pin) # Panasonic SNGCJA5 PM sensor
         pm_s = sps30.SPS30(i2c, s_pwr_pin) # Sensirion SPS30 PM sensor
         th_s = ahtx0.AHT10(i2c) # AHT20 temperature humidity sensor
@@ -49,6 +51,19 @@ def init(i2c, gpio):
         bm_b.oversample(bmp280.BMP280_OS_HIGH)
         pm_p.off()
         pm_s.off()
+
+def startupTests(i2c, gpio):
+    # list i2c devices
+    addresses = i2c.scan()
+    # sometimes if a device is not powered, the bus floats and shows a lot of inexistent devices, check this
+    if len(addresses) > len(config.sensors['i2c_sensors']):
+        logger.error("the i2c bus is connected to unpowered devices, it is delirious. Or maybe a new device has been added, in that case please update the i2c_sensors dict.")
+        return False
+    for device_id, device_name in config.sensors['i2c_sensors'].items():
+        if device_id not in addresses:
+            logger.error("Can't find the " + device_name + " with address " + device_id + ". Please check the connections and the sensor functionality.")
+            return False
+    return True
 
 def wakeup():
     global config, use_aux_sensor
