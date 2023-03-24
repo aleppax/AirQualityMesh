@@ -21,6 +21,7 @@ empty_measures = OrderedDict([
     ('sound pressure',0), # not implemented yet
     ('barometric pressure',0),
     ('battery charge percentage',0),
+    ('vsys voltage',0),
     ('O3',0), # not implemented yet
     ('NO2',0), # not implemented yet
     ('internal temperature',0),
@@ -103,7 +104,7 @@ def measure(time_DTF):
     measures = empty_measures
     measures['station'] = config.station['station']
     measures['datetime'] = time_DTF
-    measures['internal temperature'], measures['battery charge percentage'], measures['battery is charging'] = leadacid.levels()
+    measures['internal temperature'], measures['battery charge percentage'], measures['vsys voltage'], measures['battery is charging'] = leadacid.levels()
     # averaging n measures from sensors with 1Hz frequency
     if not config.sensors['disable_sensors']:
         rtc_now = time()
