@@ -3,7 +3,7 @@ from libs.cron import feed_wdt
 from libs.simple import MQTTClient
 import ubinascii, gc
 import machine
-from libs.sensors import empty_measures
+from libs.sensors import measures
 
 client_ID = ubinascii.hexlify(machine.unique_id())
 server = config.mqttlogger['server']
@@ -11,7 +11,7 @@ main_topic = config.mqttlogger['topic']
 mqtt_user = config.mqttlogger['user']
 mqtt_password = config.mqttlogger['pass']
 mqtt_QOS = config.mqttlogger['QOS']
-mqtt_gauges = empty_measures.copy()
+mqtt_gauges = measures.copy()
 
 c = MQTTClient(client_ID, server, user=mqtt_user, password=mqtt_password)
 

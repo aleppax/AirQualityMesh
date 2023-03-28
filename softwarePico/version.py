@@ -1,9 +1,9 @@
-version = 27
+version = 28
 folders = ['/', '/libs', '/html', '/logs']
 #updates or new files. this file is manually updated and can only add or modify files or add folders
 updated_files = {
-    '/'     : [], # there is no need to include version.py
-    '/libs' : ['config.py','sensors.py'],
+    '/'     : ['main.py'], # there is no need to include version.py
+    '/libs' : ['ahtx0.py','bmp280.py','config.py','datalogger.py','mqttlogger.py','picosngcja5.py','qmc5883.py','sensors.py','sps30.py'],
     '/html' : [],
 }
 # full update requires a list of all files

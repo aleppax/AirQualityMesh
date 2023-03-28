@@ -48,10 +48,8 @@ TOTAL_DATA_LENGTH = ADDRESS_MASS_DENSITY_LENGTH + ADDRESS_PARTICLE_COUNT_LENGTH
 
 class SNGCJA5:
 
-    def __init__(self, i2c, pwrpin, addr=0x33):
+    def __init__(self, i2c, addr=0x33):
         # KSP13 connect base to sensor_power_on_pin with a resistor of 4k7 ohm
-        self.pwr_pin = pwrpin
-        self.on()
         self.address = addr
         self.i2c = i2c
         self.__mass_density_addresses = {pm_type: MASS_DENSITY_BLOCK_SIZE*order 
@@ -62,12 +60,6 @@ class SNGCJA5:
 
         self.status_addresses = {"Sensor status": 6, "PD Status": 4, "LD Status": 2, "Fan status": 0}
         self.__data = []
-
-    def on(self):
-        self.pwr_pin.on()
-    
-    def off(self):
-        self.pwr_pin.off()
     
     def get_mass_density_data(self, data:list):
 
@@ -136,3 +128,10 @@ class SNGCJA5:
     
     def empty_measurements_queue(self):
         self.__data = []
+
+    # opms custom measurement wrapper
+    def add_measure_to(self, report):
+        pm_1_data = self.measure()['mass_density']
+        report['pm10_ch2'] += pm_1_data['pm10']
+        report['pm2.5_ch2'] += pm_1_data['pm2.5']
+        report['pm1.0_ch2'] += pm_1_data['pm1.0']

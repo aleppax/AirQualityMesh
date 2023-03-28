@@ -56,15 +56,13 @@ SIZE_INTEGER = 3  # unsigned 16 bit integer
 
 class SPS30:
 
-    def __init__(self,  i2c, pwrpin, address: int = 0x69, sampling_period: int = 1, logger: str = None):
+    def __init__(self,  i2c, address: int = 0x69, sampling_period: int = 1, logger: str = None):
         self.logger = None
         if logger:
             self.logger = logger
         self.addr = address
         self.sampling_period = sampling_period
         self.i2c = i2c
-        self.pwr_pin = pwrpin
-        self.on()
         self.__data = {}
         self.__valid = {
             "mass_density": False,
@@ -412,9 +410,16 @@ class SPS30:
     def measure(self) -> dict:
         self.__read_measured_value()
         return self.__data
-        
-    def on(self):
-        self.pwr_pin.on()
-    
-    def off(self):
-        self.pwr_pin.off()
+
+    # opms custom measurement wrapper
+    def add_measure_to(self, report):
+        pm_0_data = self.measure()['mass_density']
+        report['pm2.5'] += pm_0_data['pm2.5']
+        report['pm1.0'] += pm_0_data['pm1.0']
+
+    # opms custom wakeup wrapper
+    def wakeup(self, clean=False):
+        self.start_measurement()
+        # check if sps30 requires to be cleaned, it can be done while preheating
+        if clean:
+            self.start_fan_cleaning()

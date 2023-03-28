@@ -1,3 +1,21 @@
+aht20 = {
+    'name' : 'Humidity and Temperature Sensor AHT20',
+    'is_sensor' : True,
+    'is_auxiliary' : False,
+    'driver' : 'ahtx0',
+    'cls' : 'AHT10',
+    'init_arguments' : {},
+    'i2c_address' : '0x38',
+}
+bmp280 = {
+    'name' : 'Pressure sensor BMP280',
+    'is_sensor' : True,
+    'is_auxiliary' : False,
+    'driver' : 'bmp280',
+    'cls' : 'BMP280',
+    'init_arguments' : {'addr' : 0x77, 'use_case' : 2},
+    'i2c_address' : '0x77',
+}
 board = {
     'GPIO_out' : [2,3,4,5,6,7], # Even if you could, Do NOT add "LED" because it sucks (current)
     'GPIO_in' : [0,1],
@@ -6,17 +24,11 @@ board = {
     'I2C_SCL' : 9,
     'I2C_freq' : 100000,
     'WDT_seconds' : 8,
-    'uln2003_1' : 'GP7', # hardware connections between Pico GPIOs and ULN2003 channels
-    'uln2003_2' : 'GP6',
-    'uln2003_3' : 'GP5',
-    'uln2003_4' : 'GP4',
-    'uln2003_5' : 'GP3',
-    'uln2003_6' : 'GP2',
 }
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
     'NTP_server_count' : 4,
-    'NTPsync_interval' : 3600 * 4,
+    'NTPsync_interval' : 3600 * 24,
     # 'NTPsync_interval' every x hours
     'update_interval' : 3600 * 24,
     # 'update_interval' every x hours
@@ -72,19 +84,39 @@ mqttlogger = {
     'QOS' : 0, # default QOS is 0 and can be changed to 1
 }
 picosngcja5 = {
-    'sensor_power_pin' : 2,
-#    '30s_pre_heating' : True,
+    'name' : 'Laser Type PM Sensor SN-GCJA5',
+    'is_sensor' : True,
+    'is_auxiliary' : True,
+    'driver' : 'picosngcja5',
+    'cls' : 'SNGCJA5',
+    'init_arguments' : {},
+    'i2c_address' : '0x33',
+    'power_pin_name' : 'GP6',
+}
+qmc5883 = {
+    'name' : 'Magnetic field sensor QMC5883',
+    'is_sensor' : True,
+    'is_auxiliary' : False,
+    'driver' : 'qmc5883',
+    'cls' : 'QMC5883',
+    'init_arguments' : {},
+    'i2c_address' : '0x13',
 }
 sensors = {
     'average_particle_measurements' : 20,
     'average_measurement_interval_ms' : 1000,
     'disable_sensors' : False,
-    'aux_pm_measure_s' : 3600, # 1 hour
-    'i2c_sensors' : {33 : 'Laser Type PM Sensor SN-GCJA5', 38 : 'Humidity and Temperature Sensor AHT20', 69 : 'PM Sensor SPS30', 77 : 'Pressure sensor BMP280'},
+    'aux_measure_s' : 3600, # 1 hour
 }
 sps30 = {
-    'sensor_power_pin' : 1,
-#    '30s_pre_heating' : True,
+    'name' : 'PM Sensor SPS30',
+    'is_sensor' : True,
+    'is_auxiliary' : False,
+    'driver' : 'sps30',
+    'cls' : 'SPS30',
+    'init_arguments' : {},
+    'i2c_address' : '0x69',
+    'power_pin_name' : 'GP7',
     'last_cleaning' : 0,
     'cleaning_interval' : 604800/2, # twice a week
 }

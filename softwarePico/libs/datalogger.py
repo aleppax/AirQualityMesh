@@ -4,8 +4,8 @@ import urequests as requests
 from machine import unique_id
 import binascii, gc
 from time import sleep_ms
-from libs.sensors import empty_measures
-gauges = empty_measures.copy()
+from libs.sensors import measures
+gauges = measures.copy()
 iam = unique_id()
 UID = str(int(binascii.hexlify(iam).decode('utf-8'),16))
 
