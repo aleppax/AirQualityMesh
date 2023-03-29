@@ -122,7 +122,7 @@ def reset_measures():
         measures[m] = 0
 
 def measure(time_DTF):
-    global measures, latest_aux_pm_measure
+    global measures, latest_aux_measure
     feed_wdt()
     reset_measures()
     measures['station'] = config.station['station']
@@ -132,7 +132,7 @@ def measure(time_DTF):
     if not config.sensors['disable_sensors']:
         rtc_now = time()
         if use_aux_sensors:
-            latest_aux_pm_measure = rtc_now       
+            latest_aux_measure = rtc_now       
         count = config.sensors['average_particle_measurements']
         while count > 0:
             feed_wdt()
