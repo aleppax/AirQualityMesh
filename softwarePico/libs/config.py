@@ -3,7 +3,7 @@ aht20 = {
     'is_sensor' : True,
     'is_auxiliary' : False,
     'driver' : 'ahtx0',
-    'cls' : 'AHT10',
+    'cls' : 'AHT20',
     'init_arguments' : {},
     'i2c_address' : '0x38',
 }

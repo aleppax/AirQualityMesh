@@ -150,8 +150,11 @@ def measure(time_DTF):
         feed_wdt()   
         for measurand in ['temperature','humidity','barometric pressure','pm10','pm2.5','pm1.0','pm10_ch2','pm2.5_ch2','pm4_ch2','pm1.0_ch2']:
             measures[measurand] /= config.sensors['average_particle_measurements']
-        k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
-        measures['dew point'] =  243.12 * k / (17.62 - k)
+        if (measures['temperature'] != 0) and (measures['humidity'] != 0):
+            k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
+            measures['dew point'] =  243.12 * k / (17.62 - k)
+        else:
+            measures['dew point'] = 0
 
 def check_low_power():
     feed_wdt()
