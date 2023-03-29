@@ -320,3 +320,10 @@ class BMP280:
         assert 0 <= oss <= 4
         p_os, t_os, self.read_wait_ms = _BMP280_OS_MATRIX[oss]
         self._write_bits(_BMP280_REGISTER_CONTROL, p_os + (t_os << 3), 2)
+
+    # opms custom measurement wrapper
+    def add_measure_to(self, report):
+        pressure = self.pressure # Pascal
+        p_hPa = int(pressure/100)
+        report['barometric pressure'] += p_hPa
+        

@@ -115,6 +115,11 @@ class AHT10:
         self._trigger_measurement()
         self._wait_for_idle()
         self._read_to_buffer()
+    
+    # opms custom measurement wrapper
+    def add_measure_to(self, report):
+        report['temperature'] += self.temperature
+        report['humidity'] += self.relative_humidity
 
 
 class AHT20(AHT10):

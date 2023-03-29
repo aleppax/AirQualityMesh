@@ -1,4 +1,4 @@
-from libs import config, cron, filelogger, logger, mqttlogger, sensors, wlan, datalogger
+from libs import config, cron, datalogger, filelogger, logger, mqttlogger, sensors, wlan
 from machine import reset
 
 logger.info('booting')
@@ -27,7 +27,6 @@ def updates():
             logger.info("An update of the clock is required, but the sistem can't do it now. Rebooting in 180s.")
             cron.lightsleep_wrapper(180000)
             reset()
-        
 
 def send_values():
     #stored data submission to servers
