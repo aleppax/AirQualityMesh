@@ -132,6 +132,6 @@ class SNGCJA5:
     # opms custom measurement wrapper
     def add_measure_to(self, report):
         pm_1_data = self.measure()['mass_density']
-        report['pm10_ch2'] += pm_1_data['pm10']
-        report['pm2.5_ch2'] += pm_1_data['pm2.5']
-        report['pm1.0_ch2'] += pm_1_data['pm1.0']
+        report['pm10'] += pm_1_data['pm10']
+        report['pm2.5'] += pm_1_data['pm2.5']
+        report['pm1.0'] += pm_1_data['pm1.0']
