@@ -127,7 +127,7 @@ def check_software_updates():
             logger.info('Going to update from version ' + str(config.cron['current_version']) + 'to version ' + str(version.version))
         elif version.version == config.cron['current_version']:
             update_available = False
-        config = config.add('cron','last_update_check',time())
+        config.add('cron','last_update_check',time())
     else:
         logger.warning("can't check for new software versions")
 
@@ -187,7 +187,7 @@ def software_update():
         # now update local version number
         if success:
             feed_wdt()
-            config = config.add('cron','current_version',version.version)
+            config.add('cron','current_version',version.version)
             logger.info("Version upgrade done! Upgraded to version " + str(version.version))
             update_available = False
             sleep_ms(1000)
@@ -226,12 +226,12 @@ def restore_latest_timestamp():
     if config.cron['deepsleep_reset']:
         latest = gmtime(config.cron['latest_timestamp']+4294)
         rtc.datetime(timetuple_to_rtctuple(latest))
-        config = config.add('cron','deepsleep_reset',False)
+        config.add('cron','deepsleep_reset',False)
 
 def store_latest_timestamp():
     global config
-    config = config.add('cron','latest_timestamp',time())
-    config = config.add('cron','deepsleep_reset',True)
+    config.add('cron','latest_timestamp',time())
+    config.add('cron','deepsleep_reset',True)
 
 def lightsleep_wrapper(ms):
     if config.cron['use_wdt']:

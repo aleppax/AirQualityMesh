@@ -106,7 +106,7 @@ def wakeup():
                 feed_wdt()
                 logger.info('Cleaning SPS30 sensor')
                 # this has to be written to file
-                config = config.add('sps30','last_cleaning',rtc_now)
+                config.add('sps30','last_cleaning',rtc_now)
         ### sps30 end custom wakeup code ###
         if not use_aux_sensors:
             power_i2c_devices(True,'off')
@@ -156,7 +156,7 @@ def measure(time_DTF):
 def check_low_power():
     feed_wdt()
     # checking for low power mode (battery saving)
-    if leadacid.config.leadacid['low_power_mode'] == True:
+    if config.leadacid['low_power_mode'] == True:
         leadacid.levels()
-        if leadacid.config.leadacid['low_power_mode'] == True:
+        if config.leadacid['low_power_mode'] == True:
             deepsleep_as_long_as_you_can()
