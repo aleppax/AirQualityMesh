@@ -127,7 +127,8 @@ def check_software_updates():
             logger.info('Going to update from version ' + str(config.cron['current_version']) + 'to version ' + str(version.version))
         elif version.version == config.cron['current_version']:
             update_available = False
-        config.add('cron','last_update_check',time())
+        tt = time()
+        config.add('cron','last_update_check',tt)
     else:
         logger.warning("can't check for new software versions")
 
@@ -230,7 +231,8 @@ def restore_latest_timestamp():
 
 def store_latest_timestamp():
     global config
-    config.add('cron','latest_timestamp',time())
+    now = time()
+    config.add('cron','latest_timestamp',now)
     config.add('cron','deepsleep_reset',True)
 
 def lightsleep_wrapper(ms):
