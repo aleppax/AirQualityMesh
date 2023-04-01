@@ -5,7 +5,7 @@ from libs.cron import feed_wdt
 lines = []
 
 def write(m):
-    logger.info("data can't be sent. Saving locally")
+    logger.info("Saving locally to data queue.")
     feed_wdt()
     # convert single set of measures m to csv, doesn't check the order or number of items
     csv_m = ';'.join(str(el) for el in m.values()) + '\n'

@@ -26,7 +26,10 @@ def fill_measures_dict(values):
 def send_data(d):
     if config.mqttlogger['enable']:
         feed_wdt()
-        c.connect()
+        try:
+            c.connect()
+        except:
+            return False
         for measure_key, measure_value in d.items():
             if measure_key not in ['station','datetime']:
                 if measure_value != 0:
