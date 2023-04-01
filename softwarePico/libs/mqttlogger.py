@@ -11,9 +11,10 @@ main_topic = config.mqttlogger['topic']
 mqtt_user = config.mqttlogger['user']
 mqtt_password = config.mqttlogger['pass']
 mqtt_QOS = config.mqttlogger['QOS']
+mqtt_max_keepalive = config.board['WDT_seconds']-1
 mqtt_gauges = measures.copy()
 
-c = MQTTClient(client_ID, server, user=mqtt_user, password=mqtt_password)
+c = MQTTClient(client_ID, server, user=mqtt_user, password=mqtt_password, keepalive=mqtt_max_keepalive )
 
 def fill_measures_dict(values):
     global mqtt_gauges
