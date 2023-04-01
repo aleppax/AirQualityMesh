@@ -37,7 +37,7 @@ def nextLogFile():
 
 def updateLastlogConfig(n):
     global config, lastlog, logfile
-    config = config.add('logger','lastlog',n)
+    config.add('logger','lastlog',n)
     logfile = logfile_name + '.' + str(n)
     lastlog = n
     if logfile in os.listdir('/logs'):

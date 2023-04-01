@@ -106,7 +106,7 @@ def wakeup():
                 feed_wdt()
                 logger.info('Cleaning SPS30 sensor')
                 # this has to be written to file
-                config = config.add('sps30','last_cleaning',rtc_now)
+                config.add('sps30','last_cleaning',rtc_now)
         ### sps30 end custom wakeup code ###
         if not use_aux_sensors:
             power_i2c_devices(True,'off')
@@ -150,13 +150,16 @@ def measure(time_DTF):
         feed_wdt()   
         for measurand in ['temperature','humidity','barometric pressure','pm10','pm2.5','pm1.0','pm10_ch2','pm2.5_ch2','pm4_ch2','pm1.0_ch2']:
             measures[measurand] /= config.sensors['average_particle_measurements']
-        k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
-        measures['dew point'] =  243.12 * k / (17.62 - k)
+        if (measures['temperature'] != 0) or (measures['humidity'] != 0):
+            k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
+            measures['dew point'] =  243.12 * k / (17.62 - k)
+        else:
+            measures['dew point'] = 0
 
 def check_low_power():
     feed_wdt()
     # checking for low power mode (battery saving)
-    if leadacid.config.leadacid['low_power_mode'] == True:
+    if config.leadacid['low_power_mode'] == True:
         leadacid.levels()
-        if leadacid.config.leadacid['low_power_mode'] == True:
+        if config.leadacid['low_power_mode'] == True:
             deepsleep_as_long_as_you_can()

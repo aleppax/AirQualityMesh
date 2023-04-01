@@ -3,7 +3,7 @@ aht20 = {
     'is_sensor' : True,
     'is_auxiliary' : False,
     'driver' : 'ahtx0',
-    'cls' : 'AHT10',
+    'cls' : 'AHT20',
     'init_arguments' : {},
     'i2c_address' : '0x38',
 }
@@ -194,20 +194,16 @@ def add(dictname, key, value, do_reload=True):
         result = _write_lines_to_file(me)
     if do_reload:
         if result:
-            return _reload()
+            _reload()
         else:
-            return sys.modules[__name__]
+            return
     else:
-        return result
+        return
 
 def _reload():
-    mod_name = __name__
-    del sys.modules[mod_name]
+    del sys.modules['libs.config']
     gc.collect()
-    if mod_name == 'config':
-        return __import__(mod_name)
-    else:
-        return __import__(mod_name).config
+    sys.modules['libs.config'] = __import__('libs.config').config
 
 def _new_dict(dictname,key,value):
     return [dictname + ' = {\n',
