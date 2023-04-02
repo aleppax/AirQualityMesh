@@ -19,9 +19,9 @@ def write(m):
         return False
     
 def read():
-    global lines
+    global lines, sent
     feed_wdt()
-    # retrieve all sets of measures in a list of ordered dicts
+    # retrieve all sets of measures in a list
     csvdata = []
     if file_exists(config.filelogger['filename']):
         lines = []
@@ -40,12 +40,15 @@ def read():
             print(e)
     return csvdata
 
-def clear_data():
+def clear_data(sent):
     global lines
-    #delete lines
+    #delete sent lines from lines
     feed_wdt()
+    lines = [l for l in lines if sent[lines.index(l)] == False]
+    # write the lines that could not be sent, if any.
     try:
         with open(config.filelogger['filename'], 'w') as fw:
+            # if lines is empty, it should write an empty file
             for lain in lines:
                 fw.write(lain)
     except Exception as e:

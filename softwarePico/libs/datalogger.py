@@ -42,13 +42,10 @@ def fill_measures_dict(values):
         count += 1
 
 def send_data_list(l):
-    result = True
+    results = []
     for di in l:
         gc.collect()
         fill_measures_dict(di)
-        result &= send_data(gauges)
-        sleep_ms(100)
-    if result == False:
-        logger.warning("Couldn't reach datalogging URL")
-    del l
-    return result
+        results.append(send_data(gauges))
+        sleep_ms(10)
+    return results
