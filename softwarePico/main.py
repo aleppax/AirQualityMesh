@@ -41,10 +41,8 @@ def send_values():
                 if file_lines == []:
                     break
                 sent = datalogger.send_data_list(file_lines)
-                # success in submission of data, log also to mqtt and clead data
-                # pass to mqtt logger lines that have been sent
+                # pass to mqtt logger the lines that have been sent by datalogger
                 sent_lines = [l for l in file_lines if sent[file_lines.index(l)] == True]
-                # TODO: sent_mqtt could be used to keep records that cuoldn't be sent
                 sent_mqtt = mqttlogger.send_data_list(sent_lines)
                 filelogger.clear_data(sent)
             #current data submission to servers
