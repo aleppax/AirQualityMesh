@@ -19,7 +19,7 @@ def write(m):
         return False
     
 def read():
-    global lines, sent
+    global lines
     feed_wdt()
     # retrieve all sets of measures in a list
     csvdata = []
