@@ -29,25 +29,34 @@ def updates():
             reset()
 
 def send_values():
-    #stored data submission to servers
-    while True:
-        file_lines = filelogger.read()
-        if file_lines == []:
-            break
-        done = datalogger.send_data_list(file_lines)
-        if done:
-            # success in submission of data, log also to mqtt and clead data
-            mqttlogger.send_data_list(file_lines)
-            filelogger.clear_data()
-        else:
-            break
-    #current data submission to servers
-    done = datalogger.send_data(sensors.measures)
-    if done:
-        # REST submission and mqtt are done together
-        # but only REST delivery is guaranteed
-        mqttlogger.send_data(sensors.measures)
-    return done
+    submission_scheduled = cron.check_data_schedule()
+    if submission_scheduled:
+        # connect to wifi only if sending data is scheduled
+        if wlan.initialize():
+            # submission of stored data to servers
+            attempts = 3
+            while attempts > 0:
+                attempts -= 1
+                file_lines = filelogger.read()
+                if file_lines == []:
+                    break
+                sent = datalogger.send_data_list(file_lines)
+                # success in submission of data, log also to mqtt and clead data
+                # pass to mqtt logger lines that have been sent
+                sent_lines = [l for l in file_lines if sent[file_lines.index(l)] == True]
+                # TODO: sent_mqtt could be used to keep records that cuoldn't be sent
+                sent_mqtt = mqttlogger.send_data_list(sent_lines)
+                filelogger.clear_data(sent)
+            #current data submission to servers
+            done = datalogger.send_data(sensors.measures)
+            if done:
+                mqttlogger.send_data(sensors.measures)
+                cron.update_last_data_sent()
+            else:
+                filelogger.write(sensors.measures)
+        wlan.turn_off()
+    else:
+        filelogger.write(sensors.measures)
 
 while True:
      # check if it's time to look for NTP or software updates
@@ -60,18 +69,7 @@ while True:
         #sensors measurements with timestamp, they have been pre-heated for 30s
         sensors.measure(logger.now_DTF())
         sensors.shutdown()
-        # check again if online, save data online, otherwise to file
-        sent = False
-        # connect to wifi only if sending data is cheduled
-        submission_scheduled = cron.check_data_schedule()
-        if submission_scheduled:
-            if wlan.initialize():
-                sent = send_values()
-            wlan.turn_off()
-        if sent:
-            cron.update_last_data_sent()
-        else:
-            filelogger.write(sensors.measures)
+        send_values()
     # we need a way to exit the while cycle if power is low
     sensors.check_low_power()
     # otherwise work done, rest until next task

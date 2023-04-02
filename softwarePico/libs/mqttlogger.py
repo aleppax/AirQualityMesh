@@ -4,6 +4,7 @@ from libs.simple import MQTTClient
 import ubinascii, gc
 import machine
 from libs.sensors import measures
+from time import sleep_ms
 
 client_ID = ubinascii.hexlify(machine.unique_id())
 server = config.mqttlogger['server']
@@ -44,10 +45,10 @@ def send_data(d):
     return False
 
 def send_data_list(l):
-    result = True
+    results = []
     for d in l:
         gc.collect()
         fill_measures_dict(d)
-        result &= send_data(mqtt_gauges)
-    del l
-    return result
+        results.append(send_data(mqtt_gauges))
+        sleep_ms(10)
+    return results
