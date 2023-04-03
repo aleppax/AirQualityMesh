@@ -55,7 +55,8 @@ def sleep_ms_feeded(t):
     feed_wdt()
     
 def check_software_schedule():
-    if time() - config.cron['last_update_check'] > config.cron['update_interval']:
+    now = time()
+    if now - config.cron['last_update_check'] > config.cron['update_interval']:
         return True
     else:
         return False
@@ -63,7 +64,8 @@ def check_software_schedule():
 def check_data_schedule():
     if config.cron['data_submission_just_in_time']:
         return True
-    if time() - last_data_sent > config.cron['data_submission_interval']:
+    now = time()
+    if now - last_data_sent > config.cron['data_submission_interval']:
         return True
     else:
         return False

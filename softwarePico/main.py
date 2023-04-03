@@ -43,9 +43,11 @@ def send_values():
                 # success in submission of data, log also to mqtt and clead data
                 # pass to mqtt logger lines that have been sent
                 sent_lines = [l for l in file_lines if sent[file_lines.index(l)] == True]
-                # TODO: sent_mqtt could be used to keep records that can't be sent
+                not_sent = [l for l in file_lines if sent[file_lines.index(l)] == False]
+                # TODO: not_sent_mqtt_lines could be used to keep records that can't be sent
                 sent_mqtt = mqttlogger.send_data_list(sent_lines)
-                filelogger.clear_data(sent)
+                #not_sent_mqtt_lines = [l for l in sent_lines if sent_mqtt[sent_lines.index(l)] == False]
+                filelogger.keep_data(not_sent)
             #current data submission to servers
             done = datalogger.send_data(sensors.measures)
             if done:
