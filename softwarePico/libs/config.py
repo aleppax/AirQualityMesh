@@ -181,15 +181,15 @@ def add(dictname, key, value, do_reload=True):
                 break
     result = 0
     if new_dict:
-        #print('adding new dictionary')
+        print('adding new dictionary')
         newfilerows = _new_dict(dictname,key,value) + me
         result = _write_lines_to_file(newfilerows)    
     elif linx != -1:
-        #print('replacing row')
+        print('replacing row')
         me[linx] = newrow
         result = _write_lines_to_file(me)
     elif dict_end:
-        #print('adding new row')
+        print('adding new row')
         me.insert(dict_end,newrow)
         result = _write_lines_to_file(me)
     if do_reload:
@@ -202,6 +202,12 @@ def add(dictname, key, value, do_reload=True):
 
 def _reload():
     del sys.modules['libs.config']
+    config = None
+    # if config is imported by other modules, delete it recursively
+    for mo in sys.modules:
+        if 'config' in dir(sys.modules[mo]):
+            del sys.modules[mo].__dict__['config']
+            sys.modules[mo].__dict__['config'] = __import__('libs.config').config
     gc.collect()
     sys.modules['libs.config'] = __import__('libs.config').config
 
