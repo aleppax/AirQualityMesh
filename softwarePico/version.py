@@ -1,4 +1,4 @@
-version = 35
+version = 36
 folders = ['/', '/libs', '/html', '/logs']
 #updates or new files. this file is manually updated and can only add or modify files or add folders
 updated_files = {
