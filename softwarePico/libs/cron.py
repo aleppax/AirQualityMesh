@@ -107,30 +107,31 @@ def check_software_updates():
     # and assuming that a network connection is up,
     # downloads version.py from the root of the repository/branch
     feed_wdt()
-    if 'version.py' in os.listdir():
-        os.remove('version.py')
-    try:
-        mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
-    except:
-        logger.warning("can't communicate with update server")
-        return
-    feed_wdt()
-    if 'version.py' in os.listdir():
-        if 'version' in sys.modules:
-            del sys.modules['version']
-        import version
-        if version.version > config.cron['current_version']:
-            update_available = True
-            # if updating more than one versioning step, fetch everything.
-            if config.cron['current_version'] - version.version > 1:
-                full_update = True
-            logger.info('Going to update from version ' + str(config.cron['current_version']) + 'to version ' + str(version.version))
-        elif version.version == config.cron['current_version']:
-            update_available = False
-        tt = time()
-        config.add('cron','last_update_check',tt)
-    else:
-        logger.warning("can't check for new software versions")
+    if not update_available:
+        if 'version.py' in os.listdir():
+            os.remove('version.py')
+        try:
+            mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
+        except:
+            logger.warning("can't communicate with update server")
+            return
+        feed_wdt()
+        if 'version.py' in os.listdir():
+            if 'version' in sys.modules:
+                del sys.modules['version']
+            import version
+            if version.version > config.cron['current_version']:
+                update_available = True
+                # if updating more than one versioning step, fetch everything.
+                if config.cron['current_version'] - version.version > 1:
+                    full_update = True
+                logger.info('Going to update from version ' + str(config.cron['current_version']) + ' to version ' + str(version.version))
+            elif version.version == config.cron['current_version']:
+                update_available = False
+            tt = time()
+            config.add('cron','last_update_check',tt)
+        else:
+            logger.warning("can't check for new software versions")
 
 def update_config():
     global config
@@ -234,6 +235,12 @@ def store_latest_timestamp():
     now = time()
     config.add('cron','latest_timestamp',now)
     config.add('cron','deepsleep_reset',True)
+
+def preheat_time():
+    return config.cron['sensor_preheating_s']*1000
+
+def initialize_board():
+    return config.initialize_board()
 
 def lightsleep_wrapper(ms):
     if config.cron['use_wdt']:

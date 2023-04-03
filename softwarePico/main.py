@@ -1,4 +1,4 @@
-from libs import config, cron, datalogger, filelogger, logger, mqttlogger, sensors, wlan
+from libs import cron, datalogger, filelogger, logger, mqttlogger, sensors, wlan
 from machine import reset
 
 logger.info('booting')
@@ -7,7 +7,7 @@ sensors.check_low_power()
 # init system
 logger.check_fs_free_space()
 #init I2C and GPIO. access a port with gpio['GP2']
-i2c, gpio = config.initialize_board()
+i2c, gpio = cron.initialize_board()
 sensors.init(i2c, gpio)
 
 def updates():
@@ -19,8 +19,7 @@ def updates():
             if ntp_scheduled:
                 cron.update_ntp() # every NTPsync_interval
             if update_scheduled:
-                if not cron.update_available:
-                    cron.check_software_updates() # every update_interval
+                cron.check_software_updates() # every update_interval
                 cron.software_update()
         wlan.turn_off()
         if cron.check_ntp_schedule():
@@ -41,8 +40,10 @@ def send_values():
                 if file_lines == []:
                     break
                 sent = datalogger.send_data_list(file_lines)
-                # pass to mqtt logger the lines that have been sent by datalogger
+                # success in submission of data, log also to mqtt and clead data
+                # pass to mqtt logger lines that have been sent
                 sent_lines = [l for l in file_lines if sent[file_lines.index(l)] == True]
+                # TODO: sent_mqtt could be used to keep records that can't be sent
                 sent_mqtt = mqttlogger.send_data_list(sent_lines)
                 filelogger.clear_data(sent)
             #current data submission to servers
@@ -63,7 +64,7 @@ while True:
     if cron.do_measure:
         sensors.wakeup()
         # sleep while sensors preheat
-        cron.lightsleep_wrapper(config.cron['sensor_preheating_s']*1000)
+        cron.lightsleep_wrapper(cron.preheat_time())
         #sensors measurements with timestamp, they have been pre-heated for 30s
         sensors.measure(logger.now_DTF())
         sensors.shutdown()
