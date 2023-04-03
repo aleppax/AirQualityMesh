@@ -16,14 +16,13 @@ def send_data(d):
     try:
         # if resp takes too long to arrive,
         resp = requests.post(config.datalogger['URL'], json=d, timeout=config.board['WDT_seconds']-0.5)
+        feed_wdt()
         sleep_ms(30)
         logger.info(resp.text)
     except Exception as e:
         print(e)
     except OSError:
-        feed_wdt()
         return False
-    feed_wdt()
     isInt = True
     try:
         # converting to integer (we assume that the server replies
