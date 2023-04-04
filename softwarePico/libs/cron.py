@@ -57,10 +57,8 @@ def sleep_ms_feeded(t):
 def check_software_schedule():
     now = time()
     if now - config.cron['last_update_check'] > config.cron['update_interval']:
-        logger.log('software scheduled')
         return True
     else:
-        logger.log('software not scheduled')
         return False
 
 def check_data_schedule():
@@ -68,20 +66,16 @@ def check_data_schedule():
         return True
     now = time()
     if now - last_data_sent > config.cron['data_submission_interval']:
-        logger.log('data scheduled')
         return True
     else:
-        logger.log('data not scheduled')
         return False
 
 def check_ntp_schedule():
     feed_wdt()
     now = time()
     if now - last_NTPsync > config.cron['NTPsync_interval']:
-        logger.log('NTP scheduled')
         return True
     else:
-        logger.log('NTP not scheduled')
         return False
 
 def update_last_data_sent():
