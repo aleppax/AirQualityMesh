@@ -2,6 +2,9 @@ from libs import cron, datalogger, filelogger, logger, mqttlogger, sensors, wlan
 from machine import reset
 
 logger.info('booting')
+clock = 65000000
+machine.freq(clock)
+logger.info('Clock speed set to ' + str(machine.freq()))
 #this test works also before initializing i2c and sensors
 sensors.check_low_power()
 # init system
@@ -23,7 +26,7 @@ def updates():
                 cron.software_update()
         wlan.turn_off()
         if cron.check_ntp_schedule():
-            logger.info("An update of the clock is required, but the sistem can't do it now. Rebooting in 180s.")
+            logger.info("An update of the clock is required, but there's no connection. Rebooting.")
             cron.lightsleep_wrapper(180000)
             reset()
 
@@ -42,11 +45,10 @@ def send_values():
                 sent = datalogger.send_data_list(file_lines)
                 # success in submission of data, log also to mqtt and clead data
                 # pass to mqtt logger lines that have been sent
-                sent_lines = [l for l in file_lines if sent[file_lines.index(l)] == True]
-                not_sent = [l for l in file_lines if sent[file_lines.index(l)] == False]
-                # TODO: not_sent_mqtt_lines could be used to keep records that can't be sent
+                sent_lines = [ln for ln in file_lines if sent[file_lines.index(ln)] == True]
+                not_sent = [li for li in file_lines if sent[file_lines.index(li)] == False]
+                # TODO: sent_mqtt could be used to keep records that can't be sent
                 sent_mqtt = mqttlogger.send_data_list(sent_lines)
-                #not_sent_mqtt_lines = [l for l in sent_lines if sent_mqtt[sent_lines.index(l)] == False]
                 filelogger.keep_data(not_sent)
             #current data submission to servers
             done = datalogger.send_data(sensors.measures)
@@ -61,19 +63,16 @@ def send_values():
 
 while True:
      # check if it's time to look for NTP or software updates
-    updates()  
+    updates()
     # if a measurement is scheduled during this wake cycle, do the job
     if cron.do_measure:
         sensors.wakeup()
         # sleep while sensors preheat
         cron.lightsleep_wrapper(cron.preheat_time())
-        #sensors measurements with timestamp, they have been pre-heated for 30s
         sensors.measure(logger.now_DTF())
         sensors.shutdown()
         send_values()
-    # we need a way to exit the while cycle if power is low
+    # a way to exit the while cycle if power is low
     sensors.check_low_power()
     # otherwise work done, rest until next task
     cron.lightsleep_until_next_cycle()
-
-

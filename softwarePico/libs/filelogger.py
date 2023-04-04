@@ -1,6 +1,7 @@
 from libs import logger, config
 from os import remove, listdir
 from libs.cron import feed_wdt
+from time import sleep_ms
 
 lines = []
 
@@ -52,6 +53,7 @@ def keep_data(sent):
     except Exception as e:
         print("Could not write file: ", config.filelogger['filename'])
         print(e)
+    sleep_ms(100)
 
 def file_exists(fileURI):
     _splitted = config.filelogger['filename'].split('/')

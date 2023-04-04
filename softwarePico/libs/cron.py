@@ -71,7 +71,9 @@ def check_data_schedule():
         return False
 
 def check_ntp_schedule():
-    if time() - last_NTPsync > config.cron['NTPsync_interval']:
+    feed_wdt()
+    now = time()
+    if now - last_NTPsync > config.cron['NTPsync_interval']:
         return True
     else:
         return False
