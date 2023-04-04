@@ -2,6 +2,9 @@ from libs import cron, datalogger, filelogger, logger, mqttlogger, sensors, wlan
 from machine import reset
 
 logger.info('booting')
+clock = 65000000
+machine.freq(clock)
+logger.info('Clock speed set to ' + str(machine.freq()))
 #this test works also before initializing i2c and sensors
 sensors.check_low_power()
 # init system
@@ -42,8 +45,8 @@ def send_values():
                 sent = datalogger.send_data_list(file_lines)
                 # success in submission of data, log also to mqtt and clead data
                 # pass to mqtt logger lines that have been sent
-                sent_lines = [l for l in file_lines if sent[file_lines.index(l)] == True]
-                not_sent = [l for l in file_lines if sent[file_lines.index(l)] == False]
+                sent_lines = [ln for ln in file_lines if sent[file_lines.index(ln)] == True]
+                not_sent = [li for li in file_lines if sent[file_lines.index(li)] == False]
                 # TODO: sent_mqtt could be used to keep records that can't be sent
                 sent_mqtt = mqttlogger.send_data_list(sent_lines)
                 filelogger.keep_data(not_sent)
@@ -60,7 +63,7 @@ def send_values():
 
 while True:
      # check if it's time to look for NTP or software updates
-    updates()  
+    updates()
     # if a measurement is scheduled during this wake cycle, do the job
     if cron.do_measure:
         sensors.wakeup()
