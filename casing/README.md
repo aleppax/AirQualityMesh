@@ -6,8 +6,8 @@ The PCB design is single sided, has no SMD parts and few parts. Components are o
 Hence it is very straightforward to make it at home both with a CNC or chemicals. 
 The main purpose of the PCB is to speed up the assembly but it is better to choose 
 terminals that guarantee contact continuity over time since this is an outdoor application partially exposed to weather conditions.
-The two resistors are 20K and 30K Ohm, they are used as an external voltage divider and they are used to measure the battery voltage. 
-We decided to avoid using the internal ADC3 with its own voltage divider because this relies on the WL_GPIO2 of the wireless chip and we didn't want conflicts during wifi communication.
+The two resistors are 20K and 30K Ohm, they are used as an external voltage divider to measure the battery voltage. 
+We decided to avoid using the internal ADC3 with its own voltage divider because this relies on the WL_GPIO2 of the wireless chip and we didn't want conflicts during wifi communication. If a good precision isn't paramount it is possible to stop using the external circuit in favor of the builtin one.
 
 The connection PCB has been designed so that half of the Raspberry Pico, the part where the antenna is located, protrudes, so as to move connection wires and tracks away as far as possible from the transceiver area.
 
