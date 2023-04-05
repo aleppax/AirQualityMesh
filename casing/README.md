@@ -2,7 +2,7 @@
  
 ![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/base/casing/fatherboard_oPMs.jpg "mainboard")
 
-The PCB design is single sided, has no SMD parts and few parts. Components are on the opposite side of the copper layer. 
+The PCB design is single sided, has no SMD parts and a minimalistic BOM. Components are on the opposite side of the copper layer. 
 Hence it is very straightforward to make it at home both with a CNC or chemicals. 
 The main purpose of the PCB is to speed up the assembly but it is better to choose 
 terminals that guarantee contact continuity over time since this is an outdoor application partially exposed to weather conditions.
