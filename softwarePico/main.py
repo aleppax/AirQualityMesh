@@ -1,12 +1,8 @@
 from libs import config, cron, filelogger, logger, mqttlogger, sensors, wlan, datalogger
-from time import ticks_diff, ticks_ms
 from machine import reset
 
 logger.info('booting')
 #this test works also before initializing i2c and sensors
-# if power is low, revert to deepsleep
-# still we do not have an idea of when we are, but better than nothing
-cron.restore_latest_timestamp()
 sensors.check_low_power()
 # init system
 logger.check_fs_free_space()
@@ -47,42 +43,32 @@ def send_values():
         mqttlogger.send_data(sensors.measures)
     return done
 
+while True:
+     # check if it's time to look for NTP or software updates
+    updates()  
+    # if a measurement is scheduled during this wake cycle, do the job
+    if cron.do_measure:
+        sensors.wakeup()
+        # sleep while sensors preheat
+        cron.lightsleep_wrapper(config.cron['sensor_preheating_s']*1000)
+        #sensors measurements with timestamp, they have been pre-heated for 30s
+        sensors.measure(logger.now_DTF())
+        sensors.shutdown()
+        # check again if online, save data online, otherwise to file
+        sent = False
+        # connect to wifi only if sending data is cheduled
+        submission_scheduled = cron.check_data_schedule()
+        if submission_scheduled:
+            if wlan.initialize():
+                sent = send_values()
+            wlan.turn_off()
+        if sent:
+            cron.update_last_data_sent()
+        else:
+            filelogger.write(sensors.measures)
+    # we need a way to exit the while cycle if power is low
+    sensors.check_low_power()
+    # otherwise work done, rest until next task
+    cron.lightsleep_until_next_cycle()
 
-###########
-#rr prova rapida
-sensors.wakeup()
-sensors.measure(logger.now_DTF())
-print(sensors.measures)
-if wlan.initialize():
-    mqttlogger.send_data(sensors.measures)
-    wlan.turn_off()
-    print('published')
-###########
-
-# while True:
-#     # first thing, check if network is reachable
-#     if wlan.initialize():
-#         # check if it's time to look for NTP and software updates
-#         cron.updates()
-#         wlan.turn_off()
-#     # if a measurement is scheduled during this wake cycle, do the job
-#     if cron.do_measure:
-#         sensors.wakeup()
-#         # sleep while sensors preheat
-#         cron.lightsleep_wrapper(config.cron['sensor_preheating_s']*1000)
-#         #sensors measurements with timestamp, they have been pre-heated for 30s
-#         sensors.measure(logger.now_DTF())
-#         sensors.shutdown()
-#         # check again if online, save data online, otherwise to file
-#         sent = False
-#         if wlan.initialize():
-#             sent = send_values()
-#             wlan.turn_off()
-#         if not sent:
-#             filelogger.write(sensors.measures)
-#     # we need a way to exit the while cycle if power is low
-#     sensors.check_low_power()
-#     # otherwise work done, rest until next task
-#     cron.lightsleep_until_next_cycle()
-# 
 
