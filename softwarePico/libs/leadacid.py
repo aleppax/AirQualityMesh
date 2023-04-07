@@ -55,7 +55,7 @@ def battery_percentage(voltage):
     if voltage > voltage_full_charged:
         is_charging = True
     #convert voltage in percentage
-    # we know if battery is charging if the previous value was lower.
+    # we know whether battery is charging if the previous value was lower.
     if is_charging:
         percentage = int((voltage - safe_min_discharge) / (charging_voltage - safe_min_discharge) * 100)
     else:
