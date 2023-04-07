@@ -1,10 +1,10 @@
 from libs import cron, datalogger, filelogger, logger, mqttlogger, sensors, wlan
-from machine import reset
+from machine import reset, freq
 
 logger.info('booting')
 clock = 65000000
-machine.freq(clock)
-logger.info('Clock speed set to ' + str(machine.freq()))
+freq(clock)
+logger.info('Clock speed set to ' + str(freq()))
 #this test works also before initializing i2c and sensors
 sensors.check_low_power()
 # init system

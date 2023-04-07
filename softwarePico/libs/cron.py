@@ -250,16 +250,18 @@ def lightsleep_wrapper(ms):
     if config.cron['use_wdt']:
         logger.info('lightsleeping for ' + str(ms/1000) + ' s')
         disable_WdT()
-        sleep_ms(100)
-        lightsleep(ms - 200)
+        sleep_ms(500)
+        lightsleep(ms - 1000)
         enable_WdT()
         feed_wdt()
-        sleep_ms(100)
+        sleep_ms(500)
+        print('') # realigning REPL communication, even if not used
     else:    
         logger.info('lightsleeping for ' + str(ms/1000) + ' s, WDT unused')
-        sleep_ms(100)
-        lightsleep(ms - 200)
-        sleep_ms(100)
+        sleep_ms(500)
+        lightsleep(ms - 1000)
+        sleep_ms(500)
+        print('') #
     
 def lightsleep_until_next_cycle():
     sleepSeconds = next_cycle_s() - sensor_preheating_s

@@ -20,8 +20,8 @@ statuses = {
 }
 
 def initialize():
-    time.sleep_ms(80)
     feed_wdt()
+    time.sleep_ms(200)
     if not hasattr(config,'wlan'):
         serve_captive_portal()
     return connect(0)
@@ -78,6 +78,7 @@ def connect(wifiNumber):
                 logger.info(statuses[status])
                 prev_status = status
             if status == 3:
+                time.sleep_ms(100)
                 return True
             if status in [-3,-2,-1,0]:
                 return False 
