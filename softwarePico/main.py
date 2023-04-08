@@ -66,7 +66,9 @@ def send_values():
         
 
 while True:
-     # check if it's time to look for NTP or software updates
+    # before anything that could change the reading
+    sensors.measure_battery()
+    # check if it's time to look for NTP or software updates
     updates()
     # if a measurement is scheduled during this wake cycle, do the job
     if cron.do_measure:
