@@ -32,6 +32,7 @@ measures = OrderedDict([
     ('battery is charging',0),
     ('dew point',0)
 ])
+battery_values = ()
 
 def init(i2c, gpio):
     feed_wdt()
@@ -121,13 +122,17 @@ def reset_measures():
     for m in measures:
         measures[m] = 0
 
+def measure_battery():
+    global battery_values
+    battery_values = leadacid.levels()
+
 def measure(time_DTF):
     global measures, latest_aux_measure
     feed_wdt()
     reset_measures()
     measures['station'] = config.station['station']
     measures['datetime'] = time_DTF
-    measures['internal temperature'], measures['battery charge percentage'], measures['vsys voltage'], measures['battery is charging'] = leadacid.levels()
+    measures['internal temperature'], measures['battery charge percentage'], measures['vsys voltage'], measures['battery is charging'] = battery_values
     # averaging n measures from sensors with 1Hz frequency
     if not config.sensors['disable_sensors']:
         rtc_now = time()

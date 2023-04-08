@@ -1,9 +1,9 @@
-version = 39
+version = 40
 folders = ['/', '/libs', '/html', '/logs']
 #updates or new files. this file is manually updated and can only add or modify files or add folders
 updated_files = {
     '/'     : ['main.py'], # there is no need to include version.py
-    '/libs' : ['cron.py','wlan.py'],
+    '/libs' : ['sensors.py'],
     '/html' : [],
 }
 # full update requires a list of all files
