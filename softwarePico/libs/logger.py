@@ -3,19 +3,9 @@ import os
 from time import gmtime, mktime
 from libs import config
 
-# stores tuples of records: timestamp = <1609459286>, NTP_synced = 0 / 1, event_index;
-# 1000 log records use 16 Kb, 2 KB. RP2040 has 2MB of memory
-# indexes are deduced from this list, you can add other log events:
+# stores tuples of records: timestamp = <1609459286>, NTP_synced = 0 / 1, message;
 # usage: import logger
 #        logger.info('booting')
-events = [
-    'booting',   #0
-    'rebooting', #1
-    'unknown',   #2
-    'Connected to wifi with an IP address',
-    'No way to connect. Trying again in 20 seconds',
-    'Wrong wifi credentials',
-]
 
 logfile_name = config.logger['logfile']
 filesize_limit_byte = config.logger['filesize_limit_byte']
@@ -69,18 +59,14 @@ def critical(message):
     log(message,5)
     
 def log(message, level = 0):
-    #timestamp TODO: real test of NTP sync status
     if rtc == '':
         NTP_synced = 0
     else:
-        NTP_synced = 1
-
+        if rtc.datetime()[0] == 2021:
+            NTP_synced = 0
+        else:
+            NTP_synced = 1
     now = now_DTF()
-    # parse message
-    if str(message) in events:
-        index = events.index(str(message))
-    else:
-        index = 2 #unknown
     # print debug information
     if __debug__ & print_log:
         print(now + ' ' + str(message))
