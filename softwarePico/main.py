@@ -78,7 +78,6 @@ while True:
         # sleep while sensors preheat
         cron.lightsleep_wrapper(cron.preheat_time())
         sensors.measure(logger.now_DTF())
-        sensors.shutdown()
         send_values()
     # a way to exit the while cycle if power is low
     sensors.check_low_power()
