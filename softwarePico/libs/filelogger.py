@@ -41,15 +41,16 @@ def read():
             print(e)
     return csvdata
 
-def keep_data(sent):
+def keep_data(unsent):
     global lines
     feed_wdt()
     # write the lines that could not be sent, if any.
     try:
         with open(config.filelogger['filename'], 'w') as fw:
             # if lines is empty, it should write an empty file
-            for lain in sent:
-                fw.write(lain)
+            lines += unsent
+            for lin in lines:
+                fw.write(lin)
     except Exception as e:
         print("Could not write file: ", config.filelogger['filename'])
         print(e)
