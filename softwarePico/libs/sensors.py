@@ -112,11 +112,6 @@ def wakeup():
         if not use_aux_sensors:
             power_i2c_devices(True,'off')
 
-def shutdown():
-    if not config.sensors['disable_sensors']:
-        feed_wdt()
-        power_i2c_devices(False,'off')
-
 def reset_measures():
     global measures
     for m in measures:
@@ -160,6 +155,8 @@ def measure(time_DTF):
             measures['dew point'] =  243.12 * k / (17.62 - k)
         else:
             measures['dew point'] = 0
+        feed_wdt()
+        power_i2c_devices(False,'off')
 
 def check_low_power():
     feed_wdt()
