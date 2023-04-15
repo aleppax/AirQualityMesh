@@ -77,7 +77,7 @@ def levels():
     if vvvoltage < safe_min_discharge:
         if config.leadacid['low_power_mode'] == False:
             config.add('leadacid','low_power_mode',True)
-    if is_charging and (vvvoltage > safe_min_discharge + 0.1):
+    if (vvvoltage > safe_min_discharge + 0.1):
         if config.leadacid['low_power_mode'] == True:
             config.add('leadacid','low_power_mode',False)
     return temperature, percentage, vvvoltage, is_charging
