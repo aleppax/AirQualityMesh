@@ -39,7 +39,7 @@ def send_values():
         # connect to wifi only if sending data is scheduled
         if wlan.initialize():
             # submission of stored data to servers
-            attempts = 3
+            attempts = datalogger.attempts()
             while attempts > 0:
                 attempts -= 1
                 file_lines = filelogger.read()
@@ -61,11 +61,11 @@ def send_values():
         wlan.turn_off()
     attempts = 3
     while not done:
-        done = filelogger.write(sensors.measures)
         attempts -= 1
         if attempts == 0:
             logger.error('current measurements cannot be saved. They will be lost.')
             return
+        done = filelogger.write(sensors.measures)
 
 while True:
     # before anything that could change the reading
