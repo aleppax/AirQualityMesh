@@ -48,3 +48,9 @@ def send_data_list(l):
         results.append(send_data(gauges))
         sleep_ms(10)
     return results
+
+def attempts():
+    # twice the measurements per day takes account of failed sending attempts
+    times = config.cron['measuremens_per_day'] * 2 / ( (5 * 3600 * 24) / config.cron['data_submission_interval'])
+    # round up
+    return int(times + 1)

@@ -39,6 +39,8 @@ def read():
         except Exception as e:
             logger.error("Could not read file: " + config.filelogger['filename'])
             print(e)
+    msg_count = 'retrieved ' + str(len(csvdata)) + ' lines from ' + config.filelogger['filename'] + '. keeping aside ' + str(len(lines)) + ' lines.'
+    logger.log(msg_count)
     return csvdata
 
 def keep_data(unsent):

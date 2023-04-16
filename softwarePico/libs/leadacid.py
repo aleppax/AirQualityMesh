@@ -48,6 +48,8 @@ def average_n_measurements(n,callback, interval=0):
     return sum_measures/n
 
 def battery_percentage(voltage):
+    if voltage > max_voltage:
+        logger.error('voltage is greater than max_voltage: ' + str(voltage))
     global voltage_filter
     #detect if the battery is charging or discharging (moving average direction)
     voltage_filter.append(voltage)
@@ -76,8 +78,10 @@ def levels():
     # Restore normal power if battery is charging and level is greater than minimum safe lvl.
     if vvvoltage < safe_min_discharge:
         if config.leadacid['low_power_mode'] == False:
+            logger.info('Switching to low power mode')
             config.add('leadacid','low_power_mode',True)
     if (vvvoltage > safe_min_discharge + 0.1):
         if config.leadacid['low_power_mode'] == True:
+            logger.info('Switching back from low power')
             config.add('leadacid','low_power_mode',False)
     return temperature, percentage, vvvoltage, is_charging
