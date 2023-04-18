@@ -1,5 +1,6 @@
 # breakpoint
 import _thread
+import sys
 
 def breakpoint():
     unbreak = False

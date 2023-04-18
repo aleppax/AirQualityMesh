@@ -15,7 +15,7 @@ def write(m):
         with open(config.filelogger['filename'], 'a+') as fa:
             fa.write(csv_m)
         return True
-    except:
+    except Exception:
         logger.error("Could not write file: " + config.filelogger['filename'])
         return False
     
