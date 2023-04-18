@@ -2,7 +2,7 @@ from libs import logger, config
 from libs.cron import feed_wdt
 import urequests as requests
 from machine import unique_id
-import binascii, gc
+import binascii
 from time import sleep_ms
 from libs.sensors import measures
 gauges = measures.copy()
@@ -11,14 +11,15 @@ UID = str(int(binascii.hexlify(iam).decode('utf-8'),16))
 
 def send_data(d):
     feed_wdt()
-    gc.collect()
-    resp = None
+    msg = None
     try:
         # if resp takes too long to arrive,
         resp = requests.post(config.datalogger['URL'], json=d, timeout=config.board['WDT_seconds']-0.5)
+        msg = resp.text
+        resp.close()
         feed_wdt()
         sleep_ms(30)
-        logger.info(resp.text)
+        logger.info(msg)
     except Exception as e:
         print(e)
     except OSError:
@@ -27,7 +28,7 @@ def send_data(d):
     try:
         # converting to integer (we assume that the server replies
         # with the new record ID if the insert succeded. An error message otherwise.
-        int(resp.text)
+        int(msg)
     except (ValueError, AttributeError) as e:
         isInt = False
     return isInt
@@ -43,14 +44,14 @@ def fill_measures_dict(values):
 def send_data_list(l):
     results = []
     for di in l:
-        gc.collect()
         fill_measures_dict(di)
-        results.append(send_data(gauges))
+        result = send_data(gauges)
+        results.append(result)
         sleep_ms(10)
     return results
 
 def attempts():
     # twice the measurements per day takes account of failed sending attempts
-    times = config.cron['measuremens_per_day'] * 2 / ( (5 * 3600 * 24) / config.cron['data_submission_interval'])
+    times = config.cron['measuremens_per_day'] * 2 / ( (10 * 3600 * 24) / config.cron['data_submission_interval'])
     # round up
     return int(times + 1)
