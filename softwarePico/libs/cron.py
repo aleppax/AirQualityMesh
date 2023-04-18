@@ -1,5 +1,8 @@
 # system scheduler
-import ntptime, os, mip, sys
+import ntptime
+import os
+import mip
+import sys
 from machine import RTC, lightsleep, mem32, reset, WDT, deepsleep
 from micropython import const
 from math import fmod
@@ -85,9 +88,8 @@ def update_last_data_sent():
 def update_ntp():
     global config, last_NTPsync
     feed_wdt()
-    rtc_now = time()
     updated_NTP = False
-    # this can lead to wdt intervention, a reboot is better than not knowing for sure the actual time 
+    # this can lead to wdt intervention, a reboot is ok
     while not updated_NTP:
         feed_wdt()
         logger.info('Using NTP server ' + ntptime.host)
@@ -116,7 +118,7 @@ def check_software_updates():
             os.remove('version.py')
         try:
             mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
-        except:
+        except Exception:
             logger.warning("can't communicate with update server")
             return
         feed_wdt()

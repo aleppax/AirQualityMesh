@@ -4,8 +4,7 @@ import _thread
 def breakpoint():
     unbreak = False
     while not unbreak:
-        #sys.stdout.flush()
-        
+        sys.stdout.flush()
     print('Resuming execution')
     
     

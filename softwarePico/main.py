@@ -29,7 +29,7 @@ def updates():
                 cron.software_update()
         wlan.turn_off()
         if cron.check_ntp_schedule():
-            logger.info("An update of the clock is required, but there's no connection. Rebooting.")
+            logger.info("Failed to update the clock. Rebooting.")
             cron.lightsleep_wrapper(180000)
             reset()
 
@@ -48,10 +48,10 @@ def send_values():
                 sent = datalogger.send_data_list(file_lines)
                 # success in submission of data, log also to mqtt and clead data
                 # pass to mqtt logger lines that have been sent
-                sent_lines = [ln for ln in file_lines if sent[file_lines.index(ln)] == True]
-                not_sent = [li for li in file_lines if sent[file_lines.index(li)] == False]
+                # sent_lines = [ln for ln in file_lines if sent[file_lines.index(ln)] is True]
+                not_sent = [li for li in file_lines if sent[file_lines.index(li)] is False]
                 # TODO: sent_mqtt could be used to keep records that can't be sent
-                sent_mqtt = mqttlogger.send_data_list(sent_lines)
+                # sent_mqtt = mqttlogger.send_data_list(sent_lines)
                 filelogger.keep_data(not_sent)
             #current data submission to servers
             done = datalogger.send_data(sensors.measures)

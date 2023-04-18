@@ -77,11 +77,11 @@ def levels():
     # if battery is too low, switch to low power mode. 
     # Restore normal power if battery is charging and level is greater than minimum safe lvl.
     if vvvoltage < safe_min_discharge:
-        if config.leadacid['low_power_mode'] == False:
+        if config.leadacid['low_power_mode'] is False:
             logger.info('Switching to low power mode')
             config.add('leadacid','low_power_mode',True)
     if (vvvoltage > safe_min_discharge + 0.1):
-        if config.leadacid['low_power_mode'] == True:
+        if config.leadacid['low_power_mode'] is True:
             logger.info('Switching back from low power')
             config.add('leadacid','low_power_mode',False)
     return temperature, percentage, vvvoltage, is_charging

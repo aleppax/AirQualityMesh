@@ -1,7 +1,5 @@
 from time import sleep
 import sys
-from machine import Pin
-from libs import logger, config
 
 MASS_DENSITY_PM_TYPES = ["pm1.0", "pm2.5", "pm10"]
 MASS_DENSITY_BLOCK_SIZE = 4
