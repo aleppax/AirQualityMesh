@@ -1,6 +1,5 @@
 from libs import config, leadacid, logger
-from libs.cron import feed_wdt, deepsleep_as_long_as_you_can, lightsleep_wrapper
-from machine import Pin, reset
+from libs.cron import feed_wdt, deepsleep_as_long_as_you_can
 from math import log
 from collections import OrderedDict
 from time import ticks_ms, ticks_diff, sleep_ms, time
@@ -62,7 +61,8 @@ def init(i2c, gpio):
                 if 'power_pin_name' in t.keys():
                     t['pwr_pin'] = gpio[t['power_pin_name']]
         ### custom initialization code
-        if sensors['bmp280']['connected']: sensors['bmp280']['object'].oversample(3)
+        if sensors['bmp280']['connected']: 
+            sensors['bmp280']['object'].oversample(3)
         #
         for pin in gpio:
             gpio[pin].off()
@@ -138,12 +138,14 @@ def measure(time_DTF):
             feed_wdt()
             start_iter_time = ticks_ms()
             count -= 1
-            if not use_aux_sensors: power_i2c_devices(True,'on')
+            if not use_aux_sensors: 
+                power_i2c_devices(True,'on')
             for s in sensors.values():
                 if s['connected']:
                     if not s['is_auxiliary'] or (s['is_auxiliary'] and use_aux_sensors):
                         s['object'].add_measure_to(measures) # a function which sums one or more measured values to one or more keys of the measure dict.
-            if not use_aux_sensors: power_i2c_devices(True,'off')
+            if not use_aux_sensors: 
+                power_i2c_devices(True,'off')
             rem_iter_time_ms = config.sensors['average_measurement_interval_ms'] - ticks_diff(ticks_ms(),start_iter_time)
             if rem_iter_time_ms > 0:
                 sleep_ms(rem_iter_time_ms)
@@ -161,7 +163,7 @@ def measure(time_DTF):
 def check_low_power():
     feed_wdt()
     # checking for low power mode (battery saving)
-    if config.leadacid['low_power_mode'] == True:
+    if config.leadacid['low_power_mode'] is True:
         leadacid.levels()
-        if config.leadacid['low_power_mode'] == True:
+        if config.leadacid['low_power_mode'] is True:
             deepsleep_as_long_as_you_can()

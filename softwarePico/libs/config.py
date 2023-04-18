@@ -17,7 +17,7 @@ bmp280 = {
     'i2c_address' : '0x77',
 }
 board = {
-    'GPIO_out' : [2,3,4,5,6,7], # Even if you could, Do NOT add "LED" because it sucks (current)
+    'GPIO_out' : [2,3,4,5,6,7], # Even if you could, Do NOT use "LED"
     'GPIO_in' : [0,1],
     'I2C_BUS' : 0,
     'I2C_SDA' : 8,
@@ -37,7 +37,7 @@ cron = {
     'data_submission_just_in_time' : False,
     # if you need realtime data submission, it overrides 'data_submission_interval'
     'measuremens_per_day' : 144,
-    # 'measuremens_per_day' interval starting at 0:00. do not set too high (1440 is already very battery expensive). better using divisors of 86400
+    # 'measuremens_per_day' interval starting at 0:00. do not set too high
     'minimum_sleep_s' : 4,
     # 'minimum_sleep_s' avoid too short sleep periods leading to malfunction
     'sensor_preheating_s' : 30,
@@ -46,7 +46,7 @@ cron = {
     'current_version' : 1,
     'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
     'branch' : 'mvpRemoteUpdate',
-    #'repository' : 'http://192.168.0.88:8000/', # example of local update server (base directory should be softwarePico/)
+    #'repository' : 'http://192.168.0.88:8000/', # example of local server
     #'branch' : '',
     'latest_timestamp' : 1609459200,
     'deepsleep_reset' : False,
@@ -68,11 +68,11 @@ logger = {
 }
 leadacid = {
     'battery_voltage' : 4.0,
-    'ADC_factor1' : 0.108, # there isn't a linear correlation, with two factors we achieve a better result at values where knowing the effective voltage is critical
+    'ADC_factor1' : 0.108,
     'ADC_factor2' : 0.085,
     # =adc*0,108+1/(adc*0,085)
     'ADC_port' : 2,
-    'filter_length' : 5, # consider 'measuremens_per_day' (how frequently we take a measurement) if its span is too much reduce this number
+    'filter_length' : 5,
     'low_power_mode' : False,
 }
 mqttlogger = {
@@ -130,7 +130,7 @@ wlan = {
     'SSID_0' : 'xxx',
     'PASSW_0' : 'xxx',
     'connection_timeout' : 15,
-    # 'connection_timeout' better setting this at least 10s lower than cron.['sensor_preheating_s']
+    # at least 10s lower than cron.['sensor_preheating_s']
     'country_code' : 'IT',
 }
 
@@ -213,7 +213,7 @@ def _new_dict(dictname,key,value):
     '}\n']
 
 def _key_value_dict(key,value):
-    if type(value) == type(''):
+    if isinstance(value,str):
         return "    '" + str(key) + "' : '" + value + "',\n"
     else:
         return "    '" + str(key) + "' : " + str(value) + ",\n"
@@ -221,10 +221,10 @@ def _key_value_dict(key,value):
 def _write_lines_to_file(lines):
     try:
         with open(__file__, 'w') as f:
-            for l in lines:
-                f.write(l)
+            for line in lines:
+                f.write(line)
             return 1
-    except:
+    except Exception:
         print("Could not write file: ", __file__)
         return 0
 
@@ -233,7 +233,7 @@ def _open_file_to_lines():
     try:
         with open(__file__, 'r') as f:
             conf_lines = f.readlines()
-    except:
+    except Exception:
         print("Could not read file: ", __file__)
     return conf_lines
 

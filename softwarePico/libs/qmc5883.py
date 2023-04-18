@@ -22,19 +22,12 @@
 # - modified read function to support setting parameters 
 # Changes insired/ported from https://github.com/mprograms/QMC5883LCompass/blob/master/src/QMC5883LCompass.cpp
 
-
 import time
 import struct
 import math
-
+from micropython import const
 
 class QMC5883:
-    # probe the existence of const()
-    try:
-        _canary = const(0xfeed)
-    except:
-        const = lambda x: x
-
     # Default I2C address
     ADDR = const(0x0D)
 
@@ -156,33 +149,33 @@ class QMC5883:
 
     def set_calibration(self , x_min, x_max, y_min, y_max, z_min, z_max):
         """ Take a look at magnetometer_calibration.py to obtain valid data. basically takes max and min for each axis. 'Only' usefull if you are going to read callibrated data """
-        self.calibrationUse = True;
+        self.calibrationUse = True
 
-        self._vCalibration[0][0] = x_min;
-        self._vCalibration[0][1] = x_max;
-        self._vCalibration[1][0] = y_min;
-        self._vCalibration[1][1] = y_max;
-        self._vCalibration[2][0] = z_min;
-        self._vCalibration[2][1] = z_max;
+        self._vCalibration[0][0] = x_min
+        self._vCalibration[0][1] = x_max
+        self._vCalibration[1][0] = y_min
+        self._vCalibration[1][1] = y_max
+        self._vCalibration[2][0] = z_min
+        self._vCalibration[2][1] = z_max
     
     def _apply_callibration (self , x, y, z , t = 0):
         
         _vCalibration = self._vCalibration
-        x_offset = (_vCalibration[0][0] + _vCalibration[0][1])/2;
-        y_offset = (_vCalibration[1][0] + _vCalibration[1][1])/2;
-        z_offset = (_vCalibration[2][0] + _vCalibration[2][1])/2;
-        x_avg_delta = (_vCalibration[0][1] - _vCalibration[0][0])/2;
-        y_avg_delta = (_vCalibration[1][1] - _vCalibration[1][0])/2;
-        z_avg_delta = (_vCalibration[2][1] - _vCalibration[2][0])/2;
+        x_offset = (_vCalibration[0][0] + _vCalibration[0][1])/2
+        y_offset = (_vCalibration[1][0] + _vCalibration[1][1])/2
+        z_offset = (_vCalibration[2][0] + _vCalibration[2][1])/2
+        x_avg_delta = (_vCalibration[0][1] - _vCalibration[0][0])/2
+        y_avg_delta = (_vCalibration[1][1] - _vCalibration[1][0])/2
+        z_avg_delta = (_vCalibration[2][1] - _vCalibration[2][0])/2
 
-        avg_delta = (x_avg_delta + y_avg_delta + z_avg_delta) / 3;
+        avg_delta = (x_avg_delta + y_avg_delta + z_avg_delta) / 3
 
-        x_scale = avg_delta / x_avg_delta;
-        y_scale = avg_delta / y_avg_delta;
-        z_scale = avg_delta / z_avg_delta;
+        x_scale = avg_delta / x_avg_delta
+        y_scale = avg_delta / y_avg_delta
+        z_scale = avg_delta / z_avg_delta
 
 
-        return (x - x_offset) * x_scale , (y - y_offset) * y_scale , (z - z_offset) * z_scale;
+        return (x - x_offset) * x_scale , (y - y_offset) * y_scale , (z - z_offset) * z_scale
 
     
     def read_raw(self):

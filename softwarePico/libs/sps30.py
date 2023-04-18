@@ -11,13 +11,7 @@
 # and read this: https://github.com/dvsu/sps30/issues/1
 
 import sys
-# import threading
-from libs import logger
-import utime
 from time import sleep
-# from queue import Queue
-# from datetime import datetime
-from machine import I2C, Pin
 
 # I2C commands
 CMD_START_MEASUREMENT = [0x00, 0x10]
@@ -177,7 +171,7 @@ class SPS30:
     def sleep(self) -> None:
         self.i2c.writeto(self.addr, bytearray(CMD_SLEEP))
 
-    def wakeup(self) -> None:
+    def _wakeup(self) -> None:
         self.i2c.writeto(self.addr, bytearray(CMD_WAKEUP))
 
     def start_fan_cleaning(self) -> None:

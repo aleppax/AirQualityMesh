@@ -1,6 +1,5 @@
-import time
 import os
-from time import gmtime, mktime
+from time import localtime
 from libs import config
 
 # stores tuples of records: timestamp = <1609459286>, NTP_synced = 0 / 1, message;
@@ -80,8 +79,8 @@ def log(message, level = 0):
     try:
         with open('/logs/' + logfile, 'a+') as f:
             f.write(logrecord)
-    except:
-        print("Could not write file: /logs/" + logfile) # there's no way to log this one!
+    except Exception:
+        print("Could not write file: /logs/" + logfile)
 
 def timetuple_to_DTF(timet,timezone='UTC'):
     # W3C-DTF, a subset of ISO8601 used also for HTTP headers
@@ -100,5 +99,5 @@ def timetuple_to_DTF(timet,timezone='UTC'):
     return Tdateandtime.format(Tyear, Tmonth, Tday, Thour, Tmin, Tsec, timezone)
 
 def now_DTF():
-    now = time.localtime()
+    now = localtime()
     return timetuple_to_DTF(now)

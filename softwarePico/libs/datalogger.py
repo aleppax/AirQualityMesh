@@ -29,7 +29,7 @@ def send_data(d):
         # converting to integer (we assume that the server replies
         # with the new record ID if the insert succeded. An error message otherwise.
         int(msg)
-    except (ValueError, AttributeError) as e:
+    except (ValueError, AttributeError):
         isInt = False
     return isInt
 
@@ -41,9 +41,9 @@ def fill_measures_dict(values):
         gauges[keys[count]] = v
         count += 1
 
-def send_data_list(l):
+def send_data_list(measures_list):
     results = []
-    for di in l:
+    for di in measures_list:
         fill_measures_dict(di)
         result = send_data(gauges)
         results.append(result)

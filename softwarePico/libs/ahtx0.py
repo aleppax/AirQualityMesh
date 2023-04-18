@@ -60,7 +60,7 @@ class AHT10:
         utime.sleep_ms(20)  # 20ms delay to wake up
 
     def initialize(self):
-        """Ask the sensor to self-initialize. Returns True on success, False otherwise"""
+        """Ask the sensor to self-initialize.Returns True on success,False otherwise"""
         self._buf[0] = self.AHTX0_CMD_INITIALIZE
         self._buf[1] = 0x08
         self._buf[2] = 0x00
@@ -72,7 +72,7 @@ class AHT10:
 
     @property
     def status(self):
-        """The status byte initially returned from the sensor, see datasheet for details"""
+        """The status byte initially returned from sensor,see datasheet for details"""
         self._read_to_buffer()
         return self._buf[0]
 

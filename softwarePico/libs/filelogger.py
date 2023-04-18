@@ -1,5 +1,5 @@
 from libs import logger, config
-from os import remove, listdir
+from os import listdir
 from libs.cron import feed_wdt
 from time import sleep_ms
 
@@ -8,14 +8,14 @@ lines = []
 def write(m):
     logger.info("Saving locally to data queue.")
     feed_wdt()
-    # convert single set of measures m to csv, doesn't check the order or number of items
+    # convert to csv, doesn't check the order or number of items
     csv_m = ';'.join(str(el) for el in m.values()) + '\n'
     # write to file
     try:
         with open(config.filelogger['filename'], 'a+') as fa:
             fa.write(csv_m)
         return True
-    except:
+    except Exception:
         logger.error("Could not write file: " + config.filelogger['filename'])
         return False
     

@@ -126,7 +126,7 @@ class BMP280:
         return self._bmp_i2c.readfrom_mem(self._i2c_addr, addr, size)
 
     def _write(self, addr, b_arr):
-        if not type(b_arr) is bytearray:
+        if type(b_arr) is not bytearray:
             b_arr = bytearray([b_arr])
         return self._bmp_i2c.writeto_mem(self._i2c_addr, addr, b_arr)
 

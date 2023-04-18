@@ -1,7 +1,8 @@
-from libs import logger, config
+from libs import config
 from libs.cron import feed_wdt
 from libs.simple import MQTTClient
-import ubinascii, gc
+import ubinascii
+import gc
 import machine
 from libs.sensors import measures
 from time import sleep_ms
@@ -30,7 +31,7 @@ def send_data(d):
         feed_wdt()
         try:
             c.connect()
-        except:
+        except Exception:
             return False
         for measure_key, measure_value in d.items():
             if measure_key not in ['station','datetime']:
@@ -44,9 +45,9 @@ def send_data(d):
         return True
     return False
 
-def send_data_list(l):
+def send_data_list(mqtt_measure_list):
     results = []
-    for d in l:
+    for d in mqtt_measure_list:
         gc.collect()
         fill_measures_dict(d)
         results.append(send_data(mqtt_gauges))

@@ -48,7 +48,7 @@ def connect_from_list():
     return False
 
 def online():
-    if wlan == None:
+    if wlan is None:
         return initialize()
     if wlan.status() == 3:
         return True
@@ -67,7 +67,7 @@ def connect(wifiNumber):
         ssid, password = config.wlan[ssid], config.wlan[password]
         try:
             wlan.connect(ssid, password)
-        except:
+        except Exception:
             logger.error('Wrong wifi credentials')
         timeout = config.wlan['connection_timeout']
         prev_status = -4
@@ -95,13 +95,13 @@ def serve_captive_portal():
     passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
     global ap
     wlan = network.WLAN(network.AP_IF)
-    wlan.config(essid=ssid, password=passwd)
+    wlan.config(essid='opms', password=passwd)
     wlan.active(True)
-    while ap.active() == False:
+    while ap.active() is False:
         pass
-    ipaddress = ap.ifconfig()[0]
+    # ipaddress = ap.ifconfig()[0]
     # now wait for a connection
-    while ap.isconnected() == False:
+    while ap.isconnected() is False:
         pass
     html_portal = open('./html/portal.html')
     html_form = html_portal.read()
@@ -151,6 +151,6 @@ def serve_captive_portal():
                         wlan.disconnect()
                         machine.soft_reset()
 
-        except OSError as e:
+        except OSError:
             cl.close()
             print('connection closed')
