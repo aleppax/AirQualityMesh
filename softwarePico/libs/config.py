@@ -45,7 +45,7 @@ cron = {
     'last_update_check' : 0,
     'current_version' : 1,
     'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
-    'branch' : 'mvpRemoteUpdate',
+    'branch' : 'updates/concept',
     #'repository' : 'http://192.168.0.88:8000/', # example of local server
     #'branch' : '',
     'latest_timestamp' : 1609459200,
