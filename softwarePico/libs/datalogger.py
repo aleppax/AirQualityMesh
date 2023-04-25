@@ -34,7 +34,7 @@ def send_data(d):
     return False
 
 
-def fill_measures_dict(values):
+def fill_gauges_dict(values):
     global gauges
     keys = [k for k in gauges.keys()]
     count = 0
@@ -45,7 +45,7 @@ def fill_measures_dict(values):
 def send_data_list(measures_list):
     results = []
     for di in measures_list:
-        fill_measures_dict(di)
+        fill_gauges_dict(di)
         result = send_data(gauges)
         results.append(result)
         sleep_ms(10)

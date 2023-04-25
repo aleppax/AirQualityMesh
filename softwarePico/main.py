@@ -43,7 +43,7 @@ def send_values():
             while attempts > 0:
                 attempts -= 1
                 file_lines = filelogger.read()
-                if file_lines == []:
+                if len(file_lines) == 0:
                     break
                 sent = datalogger.send_data_list(file_lines)
                 # success in submission of data, log also to mqtt and clead data

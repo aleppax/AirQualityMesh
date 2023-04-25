@@ -43,19 +43,24 @@ def use_NTP(ntp):
     rtc = ntp
 
 def debug(message):
-    log(message,1)
+    if config.logger['loglevel'] >= 1:
+        log(message,1)
 
 def info(message):
-    log(message,2)
+    if config.logger['loglevel'] >= 2:
+        log(message,2)
     
 def warning(message):
-    log(message,3)
+    if config.logger['loglevel'] >= 3:
+        log(message,3)
     
 def error(message):
-    log(message,4)
+    if config.logger['loglevel'] >= 4:
+        log(message,4)
 
 def critical(message):
-    log(message,5)
+    if config.logger['loglevel'] >= 5:
+        log(message,5)
     
 def log(message, level = 0):
     if rtc == '':
@@ -69,18 +74,19 @@ def log(message, level = 0):
     # print debug information
     if __debug__ & print_log:
         print(now + ' ' + str(message))
-    logformat = "{},{},{},{}\n"
-    logrecord = logformat.format(now,str(level),str(NTP_synced),str(message))
-    # check file size
-    if logfile in os.listdir('/logs'):
-        if os.stat('/logs/' + logfile)[6] > filesize_limit_byte:
-            nextLogFile()
-    # write to file
-    try:
-        with open('/logs/' + logfile, 'a+') as f:
-            f.write(logrecord)
-    except Exception:
-        print("Could not write file: /logs/" + logfile)
+    if config.logger['enable_log']:
+        logformat = "{},{},{},{}\n"
+        logrecord = logformat.format(now,str(level),str(NTP_synced),str(message))
+        # check file size
+        if logfile in os.listdir('/logs'):
+            if os.stat('/logs/' + logfile)[6] > filesize_limit_byte:
+                nextLogFile()
+        # write to file
+        try:
+            with open('/logs/' + logfile, 'a+') as f:
+                f.write(logrecord)
+        except Exception:
+            print("Could not write file: /logs/" + logfile)
 
 def timetuple_to_DTF(timet,timezone='UTC'):
     # W3C-DTF, a subset of ISO8601 used also for HTTP headers
