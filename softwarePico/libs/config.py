@@ -65,6 +65,8 @@ logger = {
     'logfileCount' : 10,
     'lastlog' : 0,
     'print_log' : True,
+    'enable_log' : True,
+    'loglevel' : 4,
 }
 leadacid = {
     'battery_voltage' : 4.0,
