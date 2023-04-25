@@ -65,6 +65,9 @@ def check_software_schedule():
         return False
 
 def check_data_schedule():
+    now = rtc.datetime()
+    if config.cron['data_submission_on_daylight'] and ((now[4] < config.cron['morning']) or (now[4] > config.cron['evening'])):
+        return False
     if config.cron['data_submission_just_in_time']:
         return True
     now = time()
