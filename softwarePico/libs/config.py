@@ -36,6 +36,12 @@ cron = {
     # 'data_submission_interval' every hour
     'data_submission_just_in_time' : False,
     # if you need realtime data submission, it overrides 'data_submission_interval'
+    'data_submission_on_daylight' : True,
+    # if data is sent only from morning to evening
+    'morning' : 6,
+    # hour at which morning begins
+    'evening' : 18,
+    # hour at which evening begins
     'measuremens_per_day' : 144,
     # 'measuremens_per_day' interval starting at 0:00. do not set too high
     'minimum_sleep_s' : 4,
