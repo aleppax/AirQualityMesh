@@ -52,7 +52,7 @@ def send_data_list(measures_list):
     return results
 
 def attempts():
-    # twice the measurements per day takes account of failed sending attempts
-    times = config.cron['measuremens_per_day'] * 2 / ( (10 * 3600 * 24) / config.cron['data_submission_interval'])
+    # three times the measurements per day takes account of failed sending attempts and night break 
+    times = config.cron['measuremens_per_day'] * 3 / ( (10 * 3600 * 24) / config.cron['data_submission_interval'])
     # round up
     return int(times + 1)
