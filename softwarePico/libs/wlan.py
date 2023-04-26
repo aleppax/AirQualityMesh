@@ -140,10 +140,10 @@ def serve_captive_portal():
                             wifiNumber += 1
                             ssid = "SSID_" + str(wifiNumber)
                             exist_wifi = ssid in config.wlan
-                        config.add('wlan',"SSID_" + str(wifiNumber),newssid)
-                        config.add('wlan',"PASSW_" + str(wifiNumber),newpassword)
-                        config.add('station',"latitude",latitude)
-                        config.add('station',"longitude",longitude)
+                        config.set('wlan',"SSID_" + str(wifiNumber),newssid)
+                        config.set('wlan',"PASSW_" + str(wifiNumber),newpassword)
+                        config.set('station',"latitude",latitude)
+                        config.set('station',"longitude",longitude)
                         # now send a confirmation page, wait ten seconds and reboot
                         #TODO
                         waiting_credentials = False
