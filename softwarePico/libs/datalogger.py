@@ -16,7 +16,7 @@ def send_data(d):
     while attempts > 0:
         attempts -= 1
         try:
-            resp = requests.post(config.datalogger['URL'], json=d, timeout=config.board['WDT_seconds']-4)
+            resp = requests.post(config.datalogger['URL'], json=d, timeout=config.board['WDT_seconds']-2)
             msg = resp.text
             resp.close()
             feed_wdt()
