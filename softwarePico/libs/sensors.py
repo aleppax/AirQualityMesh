@@ -107,7 +107,7 @@ def wakeup():
                 feed_wdt()
                 logger.info('Cleaning SPS30 sensor')
                 # this has to be written to file
-                config.add('sps30','last_cleaning',rtc_now)
+                config.set('sps30','last_cleaning',rtc_now)
         ### sps30 end custom wakeup code ###
         if not use_aux_sensors:
             power_i2c_devices(True,'off')

@@ -152,7 +152,7 @@ mftsc = {
 ###  do not store collections                 ### 
 ###  usage (add or overwrite config):         ###
 ### >>>import config                          ###
-### >>>config = config.add('mftsc','I','exist')##
+### >>>config = config.set('mftsc','I','exist')##
 ###  usage (access config):                   ###
 ### >>>config.mftsc['I']                      ###
 ### 'exist'                                   ###
@@ -163,7 +163,7 @@ import machine
 from time import sleep
 from machine import Pin, I2C
 
-def add(dictname, key, value, do_reload=True):
+def set(dictname, key, value, do_reload=True):
     newrow = _key_value_dict(key,value)
     me = _open_file_to_lines()
     dict_start = -1

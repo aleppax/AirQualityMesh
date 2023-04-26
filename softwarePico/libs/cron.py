@@ -138,7 +138,7 @@ def check_software_updates():
             elif version.version == config.cron['current_version']:
                 update_available = False
             tt = time()
-            config.add('cron','last_update_check',tt)
+            config.set('cron','last_update_check',tt)
         else:
             logger.warning("can't check for new software versions")
 
@@ -157,11 +157,11 @@ def update_config():
                     feed_wdt()
                     msg = 'writing ' + str(sg_name) + ' ' + str(par) + ' ' + str(config.__dict__[sg_name][par])
                     logger.info(msg)
-                    config.add(sg_name,par,config.__dict__[sg_name][par],do_reload=False)
+                    config.set(sg_name,par,config.__dict__[sg_name][par],do_reload=False)
             else:
                 msg = 'writing ' + str(sg_name) + ' ' + str(par) + ' ' + str(sgs[sg_name][par])
                 logger.info(msg)
-                config.add(sg_name,par,sgs[sg_name][par],do_reload=False)
+                config.set(sg_name,par,sgs[sg_name][par],do_reload=False)
 
 def software_update():
     global config, update_available, full_update
@@ -198,7 +198,7 @@ def software_update():
         # now update local version number
         if success:
             feed_wdt()
-            config.add('cron','current_version',version.version)
+            config.set('cron','current_version',version.version)
             logger.info("Version upgrade done! Upgraded to version " + str(version.version))
             update_available = False
             sleep_ms(1000)
@@ -237,13 +237,13 @@ def restore_latest_timestamp():
     if config.cron['deepsleep_reset']:
         latest = gmtime(config.cron['latest_timestamp']+4294)
         rtc.datetime(timetuple_to_rtctuple(latest))
-        config.add('cron','deepsleep_reset',False)
+        config.set('cron','deepsleep_reset',False)
 
 def store_latest_timestamp():
     global config
     now = time()
-    config.add('cron','latest_timestamp',now)
-    config.add('cron','deepsleep_reset',True)
+    config.set('cron','latest_timestamp',now)
+    config.set('cron','deepsleep_reset',True)
 
 def preheat_time():
     return config.cron['sensor_preheating_s']*1000
