@@ -38,7 +38,7 @@ def read():
                     csvdata.append(raw_line)
         except Exception as e:
             logger.error("Could not read file: " + config.filelogger['filename'])
-            print(e)
+            logger.error(e)
     msg_count = 'retrieved ' + str(len(csvdata)) + ' lines from ' + config.filelogger['filename'] + '. keeping aside ' + str(len(lines)) + ' lines.'
     logger.log(msg_count)
     return csvdata
@@ -54,8 +54,8 @@ def keep_data(unsent):
             for lin in lines:
                 fw.write(lin)
     except Exception as e:
-        print("Could not write file: ", config.filelogger['filename'])
-        print(e)
+        logger.error("Could not write file: ", config.filelogger['filename'])
+        logger.error(e)
     sleep_ms(100)
 
 def file_exists(fileURI):
