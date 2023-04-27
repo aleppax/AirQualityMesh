@@ -36,6 +36,12 @@ cron = {
     # 'data_submission_interval' every hour
     'data_submission_just_in_time' : False,
     # if you need realtime data submission, it overrides 'data_submission_interval'
+    'data_submission_on_daylight' : True,
+    # if data is sent only from morning to evening
+    'morning' : 6,
+    # hour at which morning begins
+    'evening' : 18,
+    # hour at which evening begins
     'measuremens_per_day' : 144,
     # 'measuremens_per_day' interval starting at 0:00. do not set too high
     'minimum_sleep_s' : 4,
@@ -45,7 +51,7 @@ cron = {
     'last_update_check' : 0,
     'current_version' : 1,
     'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
-    'branch' : 'mvpRemoteUpdate',
+    'branch' : 'updates/concept',
     #'repository' : 'http://192.168.0.88:8000/', # example of local server
     #'branch' : '',
     'latest_timestamp' : 1609459200,
@@ -65,6 +71,8 @@ logger = {
     'logfileCount' : 10,
     'lastlog' : 0,
     'print_log' : True,
+    'enable_log' : True,
+    'loglevel' : 4,
 }
 leadacid = {
     'battery_voltage' : 4.0,
@@ -144,7 +152,7 @@ mftsc = {
 ###  do not store collections                 ### 
 ###  usage (add or overwrite config):         ###
 ### >>>import config                          ###
-### >>>config = config.add('mftsc','I','exist')##
+### >>>config = config.set('mftsc','I','exist')##
 ###  usage (access config):                   ###
 ### >>>config.mftsc['I']                      ###
 ### 'exist'                                   ###
@@ -155,7 +163,7 @@ import machine
 from time import sleep
 from machine import Pin, I2C
 
-def add(dictname, key, value, do_reload=True):
+def set(dictname, key, value, do_reload=True):
     newrow = _key_value_dict(key,value)
     me = _open_file_to_lines()
     dict_start = -1
