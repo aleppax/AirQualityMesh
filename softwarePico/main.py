@@ -34,7 +34,7 @@ def updates():
             reset()
 
 def send_values():
-    done = False # current measures sent or saved somewhere
+    done = filelogger.write(sensors.measures) # current measures sent or saved somewhere
     if cron.check_data_schedule():
         # connect to wifi only if sending data is scheduled
         if wlan.initialize():
@@ -54,18 +54,17 @@ def send_values():
                 # sent_mqtt = mqttlogger.send_data_list(sent_lines)
                 filelogger.keep_data(not_sent)
             #current data submission to servers
-            done = datalogger.send_data(sensors.measures)
+            if not done:
+                done = datalogger.send_data(sensors.measures)
             if done:
                 cron.update_last_data_sent()
                 mqttlogger.send_data(sensors.measures)
+            else:
+                done = filelogger.write(sensors.measures)
+            if not done:
+                logger.error('current measures cannot be saved.')
         wlan.turn_off()
-    attempts = 3
-    while not done:
-        attempts -= 1
-        if attempts == 0:
-            logger.error('current measurements cannot be saved. They will be lost.')
-            return
-        done = filelogger.write(sensors.measures)
+
 
 while True:
     # before anything that could change the reading

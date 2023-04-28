@@ -40,7 +40,10 @@ def read():
             logger.error("Could not read file: " + config.filelogger['filename'])
             logger.error(e)
     msg_count = 'retrieved ' + str(len(csvdata)) + ' lines from ' + config.filelogger['filename'] + '. keeping aside ' + str(len(lines)) + ' lines.'
-    logger.info(msg_count)
+    if len(csvdata) > 0:
+        logger.info(msg_count)
+    else:
+        logger.info('No more lines to be sent.')
     return csvdata
 
 def keep_data(unsent):
