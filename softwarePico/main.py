@@ -60,10 +60,10 @@ def send_values():
                 cron.update_last_data_sent()
                 mqttlogger.send_data(sensors.measures)
             else:
-                done = filelogger.write(sensors.measures)
-            if not done:
-                logger.error('current measures cannot be saved.')
+                done = filelogger.write(sensors.measures)  
         wlan.turn_off()
+    if not done:
+        logger.error('current measures cannot be saved.')
 
 
 while True:
