@@ -63,6 +63,8 @@ def send_values():
                 done = filelogger.write(sensors.measures)  
         wlan.turn_off()
     if not done:
+        done = filelogger.write(sensors.measures)
+    if not done:
         logger.error('current measures cannot be saved.')
 
 

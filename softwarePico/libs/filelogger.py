@@ -54,8 +54,12 @@ def keep_data(unsent):
         with open(config.filelogger['filename'], 'w') as fw:
             # if lines is empty, it should write an empty file
             lines += unsent
+            wrote_lines = 0
             for lin in lines:
                 fw.write(lin)
+                wrote_lines += 1
+            msg_wrote = 'wrote back ' + str(wrote_lines) + ' lines'
+            logger.info(msg_wrote)
     except Exception as e:
         logger.error("Could not write file: ", config.filelogger['filename'])
         logger.error(e)

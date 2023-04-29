@@ -110,9 +110,9 @@ class SNGCJA5:
         for n in range(times):
             self.__read_sensor_data()
             sleep(1)
-        results = self.__data
+        sngc_results = self.__data
         self.empty_measurements_queue()
-        return results
+        return sngc_results
 
     def get_measurement(self):
         if self.__data == []:

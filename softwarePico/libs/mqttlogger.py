@@ -46,10 +46,10 @@ def send_data(d):
     return False
 
 def send_data_list(mqtt_measure_list):
-    results = []
+    mqttl_results = []
     for d in mqtt_measure_list:
         gc.collect()
         fill_measures_dict(d)
-        results.append(send_data(mqtt_gauges))
+        mqttl_results.append(send_data(mqtt_gauges))
         sleep_ms(10)
-    return results
+    return mqttl_results
