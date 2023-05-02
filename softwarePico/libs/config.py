@@ -113,7 +113,7 @@ qmc5883 = {
 sensors = {
     'average_particle_measurements' : 20,
     'average_measurement_interval_ms' : 1000,
-    'disable_sensors' : False,
+    'enable_sensors' : True,
     'aux_measure_s' : 3600, # 1 hour
 }
 sps30 = {

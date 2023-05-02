@@ -36,7 +36,7 @@ battery_values = ()
 def init(i2c, gpio):
     feed_wdt()
     global sensors, latest_aux_measure, use_aux_sensors
-    if not config.sensors['disable_sensors']:
+    if config.sensors['enable_sensors']:
         latest_aux_measure = time()
         use_aux_sensors = False
         # build the list of sensors
@@ -76,15 +76,19 @@ def power_i2c_devices(only_aux_devices=True, action='on'):
                     getattr(v['pwr_pin'],action)()
             else:
                 getattr(v['pwr_pin'],action)()
-    sleep_ms(20)
+    sleep_ms(200)
 
 def startupI2CTests(i2c, gpio):
     global sensors
-    # list i2c devices, some of them are powered by the ULN2003, but not yet initialized. turn everything on for this test.
+    # list i2c devices, some of them are powered by the ULN2003, 
+    # but not yet initialized. turn everything on for this test.
     addresses = [hex(a) for a in i2c.scan()]
-    # sometimes if a device is not powered, the bus floats and shows a lot of inexistent devices, check this
+    # sometimes if a device is not powered, the bus floats and shows 
+    # a lot of inexistent devices, check this
     if len(addresses) > len(sensors):
-        logger.error("the i2c bus is connected to zombie devices, it has been compromised. Or maybe a new device has been added, in that case please update the config file.")
+        logger.error("the i2c bus is connected to zombie devices, it\
+        has been compromised. Or maybe a new device has been added, \
+        in that case please update the config file.")
     for name, s in sensors.items():
         if 'i2c_address' in s.keys():
             if s['i2c_address'] in addresses:
@@ -94,12 +98,13 @@ def startupI2CTests(i2c, gpio):
 
 def wakeup():
     global config, use_aux_sensors
-    if not config.sensors['disable_sensors']:
+    if config.sensors['enable_sensors']:
         feed_wdt()
         rtc_now = time()
         use_aux_sensors = rtc_now - config.sensors['aux_measure_s'] > latest_aux_measure
         power_i2c_devices(False, 'on')
-        ### sps30   custom wakeup code   ### TODO: still can't figure out where to place it, if not here
+        ### sps30   custom wakeup code   ### TODO: still can't 
+        # figure out where to place it, if not here
         if sensors['sps30']['connected']:
             clean = rtc_now - config.sps30['last_cleaning'] > config.sps30['cleaning_interval']
             sensors['sps30']['object'].wakeup(clean)
@@ -129,7 +134,7 @@ def measure(time_DTF):
     measures['datetime'] = time_DTF
     measures['internal temperature'], measures['battery charge percentage'], measures['vsys voltage'], measures['battery is charging'] = battery_values
     # averaging n measures from sensors with 1Hz frequency
-    if not config.sensors['disable_sensors']:
+    if config.sensors['enable_sensors']:
         rtc_now = time()
         if use_aux_sensors:
             latest_aux_measure = rtc_now       
@@ -150,7 +155,7 @@ def measure(time_DTF):
             if rem_iter_time_ms > 0:
                 sleep_ms(rem_iter_time_ms)
         feed_wdt()   
-        for measurand in ['temperature','humidity','barometric pressure','pm10','pm2.5','pm1.0','pm10_ch2','pm2.5_ch2','pm4_ch2','pm1.0_ch2']:
+        for measurand in ['temperature','humidity','barometric pressure','pm2.5','pm1.0','pm10_ch2','pm2.5_ch2','pm1.0_ch2']:
             measures[measurand] /= config.sensors['average_particle_measurements']
         if (measures['temperature'] != 0) or (measures['humidity'] != 0):
             k = log(measures['humidity'] / 100) + (17.62 * measures['temperature']) / (243.12 + measures['temperature'])
