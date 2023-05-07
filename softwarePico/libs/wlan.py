@@ -55,7 +55,7 @@ def online():
     else:
         return False
 
-def connect(wifiNumber):
+def connect(wifiNumber=0):
     feed_wdt()
     global wlan, trying
     #rp2.country(config.wlan['country_code'])

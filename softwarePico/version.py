@@ -1,9 +1,9 @@
-version = 54
+version = 57
 folders = ['/', '/libs', '/html', '/logs']
 #updates or new files. this file is manually updated and can only add or modify files or add folders
 updated_files = {
     '/'     : [], # there is no need to include version.py
-    '/libs' : ['filelogger.py'],
+    '/libs' : ['config.py','sensors.py'],
     '/html' : [],
 }
 # full update requires a list of all files

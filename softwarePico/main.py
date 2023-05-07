@@ -21,7 +21,7 @@ def updates():
     ntp_scheduled = cron.check_ntp_schedule()
     update_scheduled = cron.check_software_schedule()
     if (ntp_scheduled or update_scheduled):
-        if wlan.initialize():
+        if wlan.connect():
             if ntp_scheduled:
                 cron.update_ntp() # every NTPsync_interval
             if update_scheduled:
@@ -34,10 +34,10 @@ def updates():
             reset()
 
 def send_values():
-    done = False # current measures sent or saved somewhere
+    done = filelogger.write(sensors.measures) # current measures sent or saved somewhere
     if cron.check_data_schedule():
         # connect to wifi only if sending data is scheduled
-        if wlan.initialize():
+        if wlan.connect():
             # submission of stored data to servers
             attempts = datalogger.attempts()
             while attempts > 0:
@@ -54,18 +54,19 @@ def send_values():
                 # sent_mqtt = mqttlogger.send_data_list(sent_lines)
                 filelogger.keep_data(not_sent)
             #current data submission to servers
-            done = datalogger.send_data(sensors.measures)
+            if not done:
+                done = datalogger.send_data(sensors.measures)
             if done:
                 cron.update_last_data_sent()
                 mqttlogger.send_data(sensors.measures)
+            else:
+                done = filelogger.write(sensors.measures)  
         wlan.turn_off()
-    attempts = 3
-    while not done:
-        attempts -= 1
-        if attempts == 0:
-            logger.error('current measurements cannot be saved. They will be lost.')
-            return
+    if not done:
         done = filelogger.write(sensors.measures)
+    if not done:
+        logger.error('current measures cannot be saved.')
+
 
 while True:
     # before anything that could change the reading

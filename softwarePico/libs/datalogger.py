@@ -31,6 +31,7 @@ def send_data(d):
                 logger.warning(log_message)
         except (Exception,OSError):
             logger.warning('post request failed.')
+            # here we could try to restore network connection before proceding
     return False
 
 
@@ -43,13 +44,12 @@ def fill_gauges_dict(values):
         count += 1
 
 def send_data_list(measures_list):
-    results = []
+    dl_results = []
     for di in measures_list:
         fill_gauges_dict(di)
-        result = send_data(gauges)
-        results.append(result)
-        sleep_ms(10)
-    return results
+        dl_result = send_data(gauges)
+        dl_results.append(dl_result)
+    return dl_results
 
 def attempts():
     # three times the measurements per day takes account of failed sending attempts and night break 

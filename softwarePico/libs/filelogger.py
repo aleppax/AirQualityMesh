@@ -40,7 +40,10 @@ def read():
             logger.error("Could not read file: " + config.filelogger['filename'])
             logger.error(e)
     msg_count = 'retrieved ' + str(len(csvdata)) + ' lines from ' + config.filelogger['filename'] + '. keeping aside ' + str(len(lines)) + ' lines.'
-    logger.info(msg_count)
+    if len(csvdata) > 0:
+        logger.info(msg_count)
+    else:
+        logger.info('No more lines to be sent.')
     return csvdata
 
 def keep_data(unsent):
@@ -51,10 +54,16 @@ def keep_data(unsent):
         with open(config.filelogger['filename'], 'w') as fw:
             # if lines is empty, it should write an empty file
             lines += unsent
+            wrote_lines = 0
             for lin in lines:
-                fw.write(lin)
+                serialized_line = ';'.join(str(el) for el in lin) + '\n'
+                fw.write(serialized_line)
+                wrote_lines += 1
+            msg_wrote = 'wrote back ' + str(wrote_lines) + ' lines'
+            logger.info(msg_wrote)
     except Exception as e:
-        logger.error("Could not write file: ", config.filelogger['filename'])
+        exc_msg = "Could not write file: " + config.filelogger['filename']
+        logger.error(exc_msg)
         logger.error(e)
     sleep_ms(100)
 

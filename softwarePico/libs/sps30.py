@@ -97,28 +97,28 @@ class SPS30:
     def product_type(self) -> str:
         self.i2c.writeto(self.addr, bytearray(CMD_PRODUCT_TYPE))
         data = self.i2c.readfrom(self.addr, NBYTES_PRODUCT_TYPE)
-        result = ""
+        sps_result = ""
 
         for i in range(0, NBYTES_PRODUCT_TYPE, 3):
             if self.crc_calc(data[i:i+2]) != data[i+2]:
                 return "CRC mismatched"
 
-            result += "".join(map(chr, data[i:i+2]))
+            sps_result += "".join(map(chr, data[i:i+2]))
 
-        return result
+        return sps_result
 
     def serial_number(self) -> str:
         self.i2c.writeto(self.addr, bytearray(CMD_SERIAL_NUMBER))
         data = self.i2c.readfrom(self.addr, NBYTES_SERIAL_NUMBER)
-        result = ""
+        spss_result = ""
 
         for i in range(0, NBYTES_SERIAL_NUMBER, PACKET_SIZE):
             if self.crc_calc(data[i:i+2]) != data[i+2]:
                 return "CRC mismatched"
 
-            result += "".join(map(chr, data[i:i+2]))
+            spss_result += "".join(map(chr, data[i:i+2]))
 
-        return result
+        return spss_result
 
     def read_status_register(self) -> dict:
         self.i2c.writeto(self.addr, bytearray(CMD_READ_STATUS_REGISTER))
@@ -351,7 +351,7 @@ class SPS30:
                 self.i2c.writeto(self.addr, bytearray(CMD_READ_MEASURED_VALUES))
                 data = self.i2c.readfrom(self.addr, NBYTES_MEASURED_VALUES_FLOAT)
 
-                result = {
+                spsv_result = {
                         "mass_density": self.__mass_density_measurement(data[:24]),
                         "particle_count": self.__particle_count_measurement(data[24:54]),
                         "particle_size": self.__particle_size_measurement(data[54:]),
@@ -360,8 +360,8 @@ class SPS30:
                         "particle_size_unit": "um"
                     }
 
-                #print(f"result " + str(result))
-                self.__data = result if all(self.__valid.values()) else {}
+                #print(f"result " + str(spsv_result))
+                self.__data = spsv_result if all(self.__valid.values()) else {}
 
             except KeyboardInterrupt:
                 if self.logger:
