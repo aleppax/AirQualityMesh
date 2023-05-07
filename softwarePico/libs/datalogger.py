@@ -31,6 +31,7 @@ def send_data(d):
                 logger.warning(log_message)
         except (Exception,OSError):
             logger.warning('post request failed.')
+            # here we could try to restore network connection before proceding
     return False
 
 
@@ -48,7 +49,6 @@ def send_data_list(measures_list):
         fill_gauges_dict(di)
         dl_result = send_data(gauges)
         dl_results.append(dl_result)
-        sleep_ms(10)
     return dl_results
 
 def attempts():

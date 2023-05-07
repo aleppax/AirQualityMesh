@@ -56,12 +56,14 @@ def keep_data(unsent):
             lines += unsent
             wrote_lines = 0
             for lin in lines:
-                fw.write(lin)
+                serialized_line = ';'.join(str(el) for el in lin) + '\n'
+                fw.write(serialized_line)
                 wrote_lines += 1
             msg_wrote = 'wrote back ' + str(wrote_lines) + ' lines'
             logger.info(msg_wrote)
     except Exception as e:
-        logger.error("Could not write file: ", config.filelogger['filename'])
+        exc_msg = "Could not write file: " + config.filelogger['filename']
+        logger.error(exc_msg)
         logger.error(e)
     sleep_ms(100)
 
