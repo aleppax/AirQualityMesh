@@ -139,6 +139,8 @@ def measure(time_DTF):
         if use_aux_sensors:
             latest_aux_measure = rtc_now       
         count = config.sensors['average_particle_measurements']
+        measuring_msg = 'Measuring. Collecting ' + str(count) + ' measures'
+        logger.info(measuring_msg)
         while count > 0:
             feed_wdt()
             start_iter_time = ticks_ms()
@@ -154,7 +156,9 @@ def measure(time_DTF):
             rem_iter_time_ms = config.sensors['average_measurement_interval_ms'] - ticks_diff(ticks_ms(),start_iter_time)
             if rem_iter_time_ms > 0:
                 sleep_ms(rem_iter_time_ms)
-        feed_wdt()   
+        feed_wdt()
+        measuring_msg = 'Measuring. Averaging measures'
+        logger.info(measuring_msg)
         for measurand in ['temperature','humidity','barometric pressure','pm2.5','pm1.0','pm10_ch2','pm2.5_ch2','pm1.0_ch2']:
             measures[measurand] /= config.sensors['average_particle_measurements']
         if (measures['temperature'] != 0) or (measures['humidity'] != 0):
@@ -163,6 +167,7 @@ def measure(time_DTF):
         else:
             measures['dew point'] = 0
         feed_wdt()
+        logger.info('End of measurements. Turning off devices.')
         power_i2c_devices(False,'off')
 
 def check_low_power():
