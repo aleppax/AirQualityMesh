@@ -1,29 +1,41 @@
 from libs import logger, config
-from libs.cron import feed_wdt
+from libs.cron import feed_wdt, disable_WdT, enable_WdT
 import urequests as requests
 from machine import unique_id
 import binascii
-from time import sleep_ms
+import json
+from time import ticks_ms, ticks_diff, sleep_ms
 from libs.sensors import measures
 gauges = measures.copy()
-iam = unique_id()
-UID = str(int(binascii.hexlify(iam).decode('utf-8'),16))
 
 def send_data(d):
     feed_wdt()
+    if type(d) is type(gauges):
+        d = '[' + json.dumps(d) + ']'
     msg = None
     attempts = 2
     while attempts > 0:
         attempts -= 1
         try:
-            resp = requests.post(config.datalogger['URL'], json=d, timeout=config.board['WDT_seconds']-2)
+            start_request_time = ticks_ms()
+            # hope there will be a better way than disabling WDT
+            disable_WdT()
+            resp = requests.post(config.datalogger['URL'], data=d, timeout=config.board['WDT_seconds']-2)
             msg = resp.text
             resp.close()
+            enable_WdT()
             feed_wdt()
+            request_time = 'POST request time: ' + str(ticks_diff(ticks_ms(),start_request_time)) + ' ms'
+            feed_wdt()
+            logger.info(request_time)
             try:
                 # converting to integer (we assume that the server replies
-                # with the new record ID if the insert succeded. An error message otherwise.
-                int(msg)
+                # with the new record IDs if ALL of the inserts succeded.
+                # An error message otherwise.
+                one_reply = msg[1:].split(',')[0]
+                if ']' in one_reply:
+                    one_reply = one_reply[:-1]
+                int(one_reply)
                 logger.info(msg)
                 return True
             except (ValueError, AttributeError):
@@ -44,11 +56,13 @@ def fill_gauges_dict(values):
         count += 1
 
 def send_data_list(measures_list):
-    dl_results = []
+    json_payload = '['
     for di in measures_list:
         fill_gauges_dict(di)
-        dl_result = send_data(gauges)
-        dl_results.append(dl_result)
+        json_payload += json.dumps(gauges)
+        json_payload += ','
+    json_payload = json_payload[:-1] + ']'
+    dl_results = send_data(json_payload)
     return dl_results
 
 def attempts():

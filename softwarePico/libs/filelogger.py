@@ -46,18 +46,18 @@ def read():
         logger.info('No more lines to be sent.')
     return csvdata
 
-def keep_data(unsent):
+def write_remaining_data():
     global lines
     feed_wdt()
     # write the lines that could not be sent, if any.
     try:
         with open(config.filelogger['filename'], 'w') as fw:
             # if lines is empty, it should write an empty file
-            lines += unsent
+            #unsent = [(';'.join(str(el) for el in linunsent) + '\n') for linunsent in unsent]
+            #lines += unsent
             wrote_lines = 0
             for lin in lines:
-                serialized_line = ';'.join(str(el) for el in lin) + '\n'
-                fw.write(serialized_line)
+                fw.write(lin)
                 wrote_lines += 1
             msg_wrote = 'wrote back ' + str(wrote_lines) + ' lines'
             logger.info(msg_wrote)
