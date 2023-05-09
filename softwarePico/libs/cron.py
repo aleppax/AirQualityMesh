@@ -134,6 +134,7 @@ def check_software_updates():
                 # if updating more than one versioning step, fetch everything.
                 if config.cron['current_version'] - version.version > 1:
                     full_update = True
+                    logger.info('Updating from more than one versioning step, fetching everything.')
                 logger.info('Going to update from version ' + str(config.cron['current_version']) + ' to version ' + str(version.version))
             elif version.version == config.cron['current_version']:
                 update_available = False
