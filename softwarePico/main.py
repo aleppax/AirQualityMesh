@@ -1,6 +1,8 @@
 from libs import cron, datalogger, filelogger, logger, mqttlogger, sensors, wlan
 from machine import reset, freq, mem32
+import micropython
 
+micropython.alloc_emergency_exception_buf(100)
 reset_cause = mem32[0x40058008]
 # https://github.com/orgs/micropython/discussions/10858#discussioncomment-5504000
 # You'll get 0 for normal power on. 1 for watchdog and 2 for machine.reset.

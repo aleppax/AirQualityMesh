@@ -40,7 +40,8 @@ def send_data(d):
             except (ValueError, AttributeError):
                 log_message = 'server response: ' + msg
                 logger.warning(log_message)
-        except (Exception,OSError):
+        except (Exception,OSError) as exceptz:
+            logger.warning(exceptz)
             logger.warning('post request failed.')
             # here we could try to restore network connection before proceding
     return False
