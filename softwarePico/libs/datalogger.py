@@ -26,7 +26,6 @@ def send_data(d):
             restart_wdt()
             feed_wdt()
             request_time = 'POST request time: ' + str(ticks_diff(ticks_ms(),start_request_time)) + ' ms'
-            feed_wdt()
             logger.info(request_time)
             try:
                 # converting to integer (we assume that the server replies
