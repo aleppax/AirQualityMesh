@@ -20,7 +20,7 @@ def send_data(d):
             start_request_time = ticks_ms()
             # hope there will be a better way than disabling WDT
             disable_WdT()
-            resp = requests.post(config.datalogger['URL'], data=d, timeout=config.board['WDT_seconds']-2)
+            resp = requests.post(config.datalogger['URL'], data=d, timeout=config.board['WDT_seconds']-3)
             msg = resp.text
             resp.close()
             enable_WdT()
@@ -45,7 +45,6 @@ def send_data(d):
             logger.warning('post request failed.')
             # here we could try to restore network connection before proceding
     return False
-
 
 def fill_gauges_dict(values):
     global gauges

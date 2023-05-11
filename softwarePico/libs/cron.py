@@ -1,8 +1,8 @@
 # system scheduler
 import ntptime
 import os
-import mip
 import sys
+import urequests as requests
 from machine import RTC, lightsleep, mem32, reset, WDT, deepsleep
 from micropython import const
 from math import fmod
@@ -56,6 +56,29 @@ def sleep_ms_feeded(t):
         feed_wdt()
     sleep_ms(int(mod))
     feed_wdt()
+
+# derived from MicroPython package installer
+# MIT license; Copyright (c) 2022 Jim Mussared
+# added timeout
+def download_file(url, dest, timeout):
+    try:
+        response = requests.get(url,timeout=timeout)
+    except OSError:
+        logger.warning('update connection timed out')
+        return False
+    try:
+        if response.status_code != 200:
+            print("Error", response.status_code, "requesting", url)
+            return False
+
+        print("Copying:", dest)
+        _ensure_path_exists(dest)
+        with open(dest, "wb") as f:
+            _chunk(response.raw, f.write)
+
+        return True
+    finally:
+        response.close()
     
 def check_software_schedule():
     now = time()
@@ -120,7 +143,7 @@ def check_software_updates():
         if 'version.py' in os.listdir():
             os.remove('version.py')
         try:
-            mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
+            download_file(config.cron['repository'] + 'version.py', dest="/", timeout=config.board['WDT_seconds']-3)
         except Exception:
             logger.warning("can't communicate with update server")
             return
@@ -187,10 +210,10 @@ def software_update():
                     filemodified = os.stat(directory + '/' + f)[7]
                 else:
                     filemodified = -1
-                if (f == 'config.py') and (directory == '/libs'):
+                if (f == 'config.py') and (directory == '/libs/'):
                     os.rename('/libs/config.py','/libs/configold.py')
-                mip.install(config.cron['repository'] + directory[1:] + '/' + f, target=directory + '/', version=config.cron['branch'])
-                if (f == 'config.py') and (directory == '/libs'):
+                download_file(config.cron['repository'] + directory[1:] + f, dest=directory + '/', timeout=config.board['WDT_seconds']-2)
+                if (f == 'config.py') and (directory == '/libs/'):
                     update_config()
                 feed_wdt()
                 if filemodified == os.stat(directory + '/' + f)[7]:
