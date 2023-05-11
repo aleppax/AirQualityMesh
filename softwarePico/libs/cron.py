@@ -198,7 +198,7 @@ def update_config():
                 logger.info(msg)
                 config.set(sg_name,par,sgs[sg_name][par],do_reload=False)
 
-def software_update():
+def update_software():
     global config, update_available, full_update
     feed_wdt()
     if update_available:
@@ -223,7 +223,7 @@ def software_update():
                     filemodified = -1
                 if (f == 'config.py') and (directory == '/libs/'):
                     os.rename('/libs/config.py','/libs/configold.py')
-                download_file(config.cron['repository'] + directory[1:] + f, dest=directory + f, timeout=config.board['WDT_seconds']-2)
+                download_file(config.cron['repository'] + directory + f, dest=directory + f, timeout=config.board['WDT_seconds']-2)
                 if (f == 'config.py') and (directory == '/libs/'):
                     update_config()
                 feed_wdt()

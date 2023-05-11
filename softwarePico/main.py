@@ -25,7 +25,7 @@ def updates():
                 cron.update_ntp() # every NTPsync_interval
             if update_scheduled:
                 cron.check_software_updates() # every update_interval
-                cron.software_update()
+                cron.update_software()
         wlan.turn_off()
         if cron.check_ntp_schedule():
             logger.info("Failed to update the clock. Rebooting.")
