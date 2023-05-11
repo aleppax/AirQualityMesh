@@ -1,6 +1,7 @@
 # system scheduler
 import ntptime
 import os
+import mip
 import sys
 import urequests as requests
 from machine import RTC, lightsleep, mem32, reset, WDT, deepsleep
@@ -80,9 +81,9 @@ def download_file(url, dest, timeout):
             return False
 
         print("Copying:", dest)
-        _ensure_path_exists(dest)
+        mip._ensure_path_exists(dest)
         with open(dest, "wb") as f:
-            _chunk(response.raw, f.write)
+            mip._chunk(response.raw, f.write)
 
         return True
     finally:
