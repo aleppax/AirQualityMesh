@@ -50,7 +50,7 @@ def feed_wdt():
 
 def pause_wdt():
     if wdt_enabled:
-        disable_WdT()
+        disable_wdt()
 
 def restart_wdt():
     if config.cron['use_wdt']:
