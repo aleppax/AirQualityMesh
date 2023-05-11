@@ -77,7 +77,7 @@ def download_file(url, dest, timeout):
         return False
     try:
         if response.status_code != 200:
-            response_error_msg = "Error " + response.status_code + " requesting " + url
+            response_error_msg = "Error " + str(response.status_code) + " requesting " + url
             logger.error(response_error_msg)
             return False
 
@@ -154,7 +154,7 @@ def check_software_updates():
         if 'version.py' in os.listdir():
             os.remove('version.py')
         try:
-            download_file(config.cron['repository'] + 'version.py', dest="/", timeout=config.board['WDT_seconds']-3)
+            download_file(config.cron['repository'] + '/version.py', dest="/version.py", timeout=config.board['WDT_seconds']-3)
         except Exception:
             logger.warning("can't communicate with update server")
             return
@@ -223,7 +223,7 @@ def software_update():
                     filemodified = -1
                 if (f == 'config.py') and (directory == '/libs/'):
                     os.rename('/libs/config.py','/libs/configold.py')
-                download_file(config.cron['repository'] + directory[1:] + f, dest=directory + '/', timeout=config.board['WDT_seconds']-2)
+                download_file(config.cron['repository'] + directory[1:] + f, dest=directory + f, timeout=config.board['WDT_seconds']-2)
                 if (f == 'config.py') and (directory == '/libs/'):
                     update_config()
                 feed_wdt()
