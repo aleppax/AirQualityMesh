@@ -5,8 +5,7 @@ reset_cause = mem32[0x40058008]
 # https://github.com/orgs/micropython/discussions/10858#discussioncomment-5504000
 # You'll get 0 for normal power on. 1 for watchdog and 2 for machine.reset.
 logger.info('booting. Reset cause ' + str(reset_cause))
-clock = 65000000
-freq(clock)
+freq(65000000)
 logger.info('Clock speed set to ' + str(freq()))
 #this test works also before initializing i2c and sensors
 sensors.check_low_power()

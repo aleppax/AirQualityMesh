@@ -1,5 +1,5 @@
 from libs import logger, config
-from libs.cron import feed_wdt, disable_WdT, enable_WdT
+from libs.cron import feed_wdt, pause_wdt, restart_wdt
 import urequests as requests
 from machine import unique_id
 import binascii
@@ -19,14 +19,13 @@ def send_data(d):
         try:
             start_request_time = ticks_ms()
             # hope there will be a better way than disabling WDT
-            disable_WdT()
-            resp = requests.post(config.datalogger['URL'], data=d, timeout=config.board['WDT_seconds']-2)
+            pause_wdt()
+            resp = requests.post(config.datalogger['URL'], data=d, timeout=config.board['WDT_seconds']-3)
             msg = resp.text
             resp.close()
-            enable_WdT()
+            restart_wdt()
             feed_wdt()
             request_time = 'POST request time: ' + str(ticks_diff(ticks_ms(),start_request_time)) + ' ms'
-            feed_wdt()
             logger.info(request_time)
             try:
                 # converting to integer (we assume that the server replies
@@ -45,7 +44,6 @@ def send_data(d):
             logger.warning('post request failed.')
             # here we could try to restore network connection before proceding
     return False
-
 
 def fill_gauges_dict(values):
     global gauges
