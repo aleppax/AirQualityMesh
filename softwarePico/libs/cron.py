@@ -77,10 +77,12 @@ def download_file(url, dest, timeout):
         return False
     try:
         if response.status_code != 200:
-            print("Error", response.status_code, "requesting", url)
+            response_error_msg = "Error " + response.status_code + " requesting " + url
+            logger.error(response_error_msg)
             return False
 
-        print("Copying:", dest)
+        copying_msg = "Copying:" + dest
+        logger.info(copying_msg)
         mip._ensure_path_exists(dest)
         with open(dest, "wb") as f:
             mip._chunk(response.raw, f.write)
