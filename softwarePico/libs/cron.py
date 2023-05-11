@@ -3,6 +3,7 @@ import ntptime
 import os
 import mip
 import sys
+import urequests as requests
 from machine import RTC, lightsleep, mem32, reset, WDT, deepsleep
 from micropython import const
 from math import fmod
@@ -32,13 +33,13 @@ BASE = const(0x40058000)
 _MASK = const(0x40000000)
 
 #set
-def enable_WdT():
+def enable_wdt():
     global wdt_enabled
     mem32[BASE + 0x2000] = _MASK
     wdt_enabled = True
 
 #clear
-def disable_WdT():
+def disable_wdt():
     global wdt_enabled
     mem32[BASE + 0x3000] = _MASK
     wdt_enabled = False
@@ -47,6 +48,14 @@ def feed_wdt():
     if wdt_enabled:
         wdt.feed()
 
+def pause_wdt():
+    if wdt_enabled:
+        disable_WdT()
+
+def restart_wdt():
+    if config.cron['use_wdt']:
+        enable_wdt()
+    
 def sleep_ms_feeded(t):
     feed_wdt()
     mod = fmod(t,wdt_ms-500)
@@ -56,6 +65,31 @@ def sleep_ms_feeded(t):
         feed_wdt()
     sleep_ms(int(mod))
     feed_wdt()
+
+# derived from MicroPython package installer
+# MIT license; Copyright (c) 2022 Jim Mussared
+# added timeout
+def download_file(url, dest, timeout):
+    try:
+        response = requests.get(url,timeout=timeout)
+    except OSError:
+        logger.warning('update connection timed out')
+        return False
+    try:
+        if response.status_code != 200:
+            response_error_msg = "Error " + response.status_code + " requesting " + url
+            logger.error(response_error_msg)
+            return False
+
+        copying_msg = "Copying:" + dest
+        logger.info(copying_msg)
+        mip._ensure_path_exists(dest)
+        with open(dest, "wb") as f:
+            mip._chunk(response.raw, f.write)
+
+        return True
+    finally:
+        response.close()
     
 def check_software_schedule():
     now = time()
@@ -120,7 +154,7 @@ def check_software_updates():
         if 'version.py' in os.listdir():
             os.remove('version.py')
         try:
-            mip.install(config.cron['repository'] + 'version.py', target="/", version=config.cron['branch'])
+            download_file(config.cron['repository'] + 'version.py', dest="/", timeout=config.board['WDT_seconds']-3)
         except Exception:
             logger.warning("can't communicate with update server")
             return
@@ -187,10 +221,10 @@ def software_update():
                     filemodified = os.stat(directory + '/' + f)[7]
                 else:
                     filemodified = -1
-                if (f == 'config.py') and (directory == '/libs'):
+                if (f == 'config.py') and (directory == '/libs/'):
                     os.rename('/libs/config.py','/libs/configold.py')
-                mip.install(config.cron['repository'] + directory[1:] + '/' + f, target=directory + '/', version=config.cron['branch'])
-                if (f == 'config.py') and (directory == '/libs'):
+                download_file(config.cron['repository'] + directory[1:] + f, dest=directory + '/', timeout=config.board['WDT_seconds']-2)
+                if (f == 'config.py') and (directory == '/libs/'):
                     update_config()
                 feed_wdt()
                 if filemodified == os.stat(directory + '/' + f)[7]:
@@ -255,10 +289,10 @@ def initialize_board():
 def lightsleep_wrapper(ms):
     if config.cron['use_wdt']:
         logger.info('lightsleeping for ' + str(ms/1000) + ' s')
-        disable_WdT()
+        disable_wdt()
         sleep_ms(500)
         lightsleep(ms - 1000)
-        enable_WdT()
+        enable_wdt()
         feed_wdt()
         sleep_ms(500)
         print('') # realigning REPL communication, even if not used
@@ -278,6 +312,6 @@ def deepsleep_as_long_as_you_can():
     restore_latest_timestamp()
     store_latest_timestamp()
     logger.info('deepsleeping for 71min33s')
-    disable_WdT()
+    disable_wdt()
     sleep_ms(100)
     deepsleep(4294000)

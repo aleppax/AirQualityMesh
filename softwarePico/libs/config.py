@@ -50,10 +50,8 @@ cron = {
     # 'sensor_preheating_s' do not change, suggested by the manufacturers' datasheets
     'last_update_check' : 0,
     'current_version' : 1,
-    'repository' : 'github:aleppax/outdoorPMstation/softwarePico/',
-    'branch' : 'updates/concept',
-    #'repository' : 'http://192.168.0.88:8000/', # example of local server
-    #'branch' : '',
+    'repository' : 'https://raw.githubusercontent.com/aleppax/outdoorPMstation/updates/concept/softwarePico',
+    #'repository' : 'http://192.168.0.88:8000', # example of local server
     'latest_timestamp' : 1609459200,
     'deepsleep_reset' : False,
     'use_wdt' : True,
