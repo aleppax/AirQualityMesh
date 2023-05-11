@@ -32,13 +32,13 @@ BASE = const(0x40058000)
 _MASK = const(0x40000000)
 
 #set
-def enable_WdT():
+def enable_wdt():
     global wdt_enabled
     mem32[BASE + 0x2000] = _MASK
     wdt_enabled = True
 
 #clear
-def disable_WdT():
+def disable_wdt():
     global wdt_enabled
     mem32[BASE + 0x3000] = _MASK
     wdt_enabled = False
@@ -47,6 +47,14 @@ def feed_wdt():
     if wdt_enabled:
         wdt.feed()
 
+def pause_wdt():
+    if wdt_enabled:
+        disable_WdT()
+
+def restart_wdt():
+    if config.cron['use_wdt']:
+        enable_wdt()
+    
 def sleep_ms_feeded(t):
     feed_wdt()
     mod = fmod(t,wdt_ms-500)
@@ -278,10 +286,10 @@ def initialize_board():
 def lightsleep_wrapper(ms):
     if config.cron['use_wdt']:
         logger.info('lightsleeping for ' + str(ms/1000) + ' s')
-        disable_WdT()
+        disable_wdt()
         sleep_ms(500)
         lightsleep(ms - 1000)
-        enable_WdT()
+        enable_wdt()
         feed_wdt()
         sleep_ms(500)
         print('') # realigning REPL communication, even if not used
@@ -301,6 +309,6 @@ def deepsleep_as_long_as_you_can():
     restore_latest_timestamp()
     store_latest_timestamp()
     logger.info('deepsleeping for 71min33s')
-    disable_WdT()
+    disable_wdt()
     sleep_ms(100)
     deepsleep(4294000)

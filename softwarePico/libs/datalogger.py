@@ -19,11 +19,11 @@ def send_data(d):
         try:
             start_request_time = ticks_ms()
             # hope there will be a better way than disabling WDT
-            disable_WdT()
+            pause_wdt()
             resp = requests.post(config.datalogger['URL'], data=d, timeout=config.board['WDT_seconds']-3)
             msg = resp.text
             resp.close()
-            enable_WdT()
+            enable_wdt()
             feed_wdt()
             request_time = 'POST request time: ' + str(ticks_diff(ticks_ms(),start_request_time)) + ' ms'
             feed_wdt()
