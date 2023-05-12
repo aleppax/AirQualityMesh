@@ -50,12 +50,12 @@ def write_remaining_data():
     global lines
     feed_wdt()
     # write the lines that could not be sent, if any.
+    wrote_lines = 0
     try:
         with open(config.filelogger['filename'], 'w') as fw:
             # if lines is empty, it should write an empty file
             #unsent = [(';'.join(str(el) for el in linunsent) + '\n') for linunsent in unsent]
             #lines += unsent
-            wrote_lines = 0
             for lin in lines:
                 fw.write(lin)
                 wrote_lines += 1
@@ -65,7 +65,7 @@ def write_remaining_data():
         exc_msg = "Could not write file: " + config.filelogger['filename']
         logger.error(exc_msg)
         logger.error(e)
-    sleep_ms(100)
+    return wrote_lines
 
 def file_exists(fileURI):
     _splitted = config.filelogger['filename'].split('/')

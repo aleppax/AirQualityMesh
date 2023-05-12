@@ -44,6 +44,11 @@ def send_data(d):
             logger.warning(exceptz)
             logger.warning('post request failed.')
             # here we could try to restore network connection before proceding
+        finally:
+            try:
+                resp.close()
+            except NameError:
+                pass
     return False
 
 def fill_gauges_dict(values):
@@ -55,6 +60,8 @@ def fill_gauges_dict(values):
         count += 1
 
 def send_data_list(measures_list):
+    if len(measures_list) == 0:
+        return True
     json_payload = '['
     for di in measures_list:
         fill_gauges_dict(di)
