@@ -29,7 +29,7 @@ def read():
         try:
             with open(config.filelogger['filename'], 'r') as fr:
                 count = 10
-                for line in fr.readlines():
+                for line in fr:
                     count -= 1
                     if count < 0:
                         lines.append(line)
