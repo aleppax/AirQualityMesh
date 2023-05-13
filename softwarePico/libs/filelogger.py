@@ -1,7 +1,6 @@
 from libs import logger, config
 from os import listdir
 from libs.cron import feed_wdt
-from time import sleep_ms
 
 lines = []
 

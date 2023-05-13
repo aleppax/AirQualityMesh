@@ -1,10 +1,8 @@
 from libs import logger, config, wlan
 from libs.cron import feed_wdt, pause_wdt, restart_wdt
 import urequests as requests
-from machine import unique_id
-import binascii
 import json
-from time import ticks_ms, ticks_diff, sleep_ms
+from time import ticks_ms, ticks_diff
 from libs.sensors import measures
 gauges = measures.copy()
 
