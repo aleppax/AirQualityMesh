@@ -1,4 +1,4 @@
-from libs import logger, config
+from libs import logger, config, wlan
 from libs.cron import feed_wdt, pause_wdt, restart_wdt
 import urequests as requests
 from machine import unique_id
@@ -44,6 +44,8 @@ def send_data(d):
             logger.warning(exceptz)
             logger.warning('post request failed.')
             # here we could try to restore network connection before proceding
+            wlan.turn_off()
+            wlan.connect()
         finally:
             try:
                 resp.close()
