@@ -150,6 +150,7 @@ def measure(time_DTF):
             for s in sensors.values():
                 if s['connected']:
                     if not s['is_auxiliary'] or (s['is_auxiliary'] and use_aux_sensors):
+                        feed_wdt()
                         s['object'].add_measure_to(measures) # a function which sums one or more measured values to one or more keys of the measure dict.
             if not use_aux_sensors: 
                 power_i2c_devices(True,'off')
