@@ -29,9 +29,7 @@ def send_data(d):
                 # converting to integer (we assume that the server replies
                 # with the new record IDs if ALL of the inserts succeded.
                 # An error message otherwise.
-                one_reply = msg[1:].split(',')[0]
-                if ']' in one_reply:
-                    one_reply = one_reply[:-1]
+                one_reply = msg[1:-1].split(',')[0]
                 int(one_reply)
                 logger.info(msg)
                 return True
