@@ -4431,7 +4431,7 @@ namespace Tqdev\PhpCrudApi\Config {
             'command' => '',
             'tables' => 'all',
             'mapping' => '',
-            'middlewares' => 'cors,sslRedirect',
+            'middlewares' => 'cors',
             'controllers' => 'records,geojson,openapi,status',
             'customControllers' => '',
             'customOpenApiBuilders' => '',
