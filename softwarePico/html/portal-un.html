@@ -11,14 +11,15 @@
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
 <style>
-body{{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#333}}
-#control-01,#control-02{{padding-left:20px}}
-.well{{max-width:600px;min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,0.05);padding:9px;border-radius:3px;background-image:-webkit-linear-gradient(top, #e8e8e8 0, #f5f5f5 100%);background-image:-o-linear-gradient(top, #e8e8e8 0, #f5f5f5 100%);background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, #e8e8e8), to(#f5f5f5));background-image:linear-gradient(to bottom, #e8e8e8 0, #f5f5f5 100%);background-repeat:repeat-x;border-color:#dcdcdc;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05),0 1px 0 rgba(255,255,255,0.1)}}
-button{{display:inline-block;padding:6px 12px;font-size:16px;text-align:center;white-space:nowrap;vertical-align:middle;cursor:pointer;border-radius:4px;border-color:#3e8f3e;text-shadow:0 -1px 0 rgba(0,0,0,0.2);color:#fff;background-color:#5cb85c}}
-.rendered-form{{margin:20px}}
-.rendered-form .form-group{{margin:20px;box-sizing:border-box;display:block}}
-.rendered-form .form-control{{height:34px;display:block;width:90%;padding:6px 12px;line-height:1.42857143;border-radius:4px;color:#555;background-color:#fff;border:1px solid #ccc;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);}}
-#map {{ height: 280px; }}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#333}
+#control-01,#control-02{padding-left:20px}
+.well{max-width:600px;min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,0.05);padding:9px;border-radius:3px;background-image:-webkit-linear-gradient(top, #e8e8e8 0, #f5f5f5 100%);background-image:-o-linear-gradient(top, #e8e8e8 0, #f5f5f5 100%);background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, #e8e8e8), to(#f5f5f5));background-image:linear-gradient(to bottom, #e8e8e8 0, #f5f5f5 100%);background-repeat:repeat-x;border-color:#dcdcdc;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05),0 1px 0 rgba(255,255,255,0.1)}
+button{display:inline-block;padding:6px 12px;font-size:16px;text-align:center;white-space:nowrap;vertical-align:middle;cursor:pointer;border-radius:4px;border-color:#3e8f3e;text-shadow:0 -1px 0 rgba(0,0,0,0.2);color:#fff;background-color:#5cb85c}
+.rendered-form{margin:20px}
+.rendered-form .form-group{margin:20px;box-sizing:border-box;display:block}
+.rendered-form .form-control{height:34px;display:block;width:90%;padding:6px 12px;line-height:1.42857143;border-radius:4px;color:#555;background-color:#fff;border:1px solid #ccc;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);}
+
+#map { height: 280px; }
 </style>
 </head>
 <body>
@@ -38,7 +39,7 @@ button{{display:inline-block;padding:6px 12px;font-size:16px;text-align:center;w
         <input type="checkbox" id="show_password">
     </div>
     <div class="form-group">
-        <label for="text-position" id="mess_geolocation">Configure the location of where the device will be installed.</label>
+        <label for="text-latitude" id="mess_geolocation">Configure the location of where the device will be installed.</label>
         <button type="button" id="geolocation" onclick="getLocation()">fill geolocation fields</button>
     </div>
     <div id="map"></div>
@@ -63,39 +64,47 @@ button{{display:inline-block;padding:6px 12px;font-size:16px;text-align:center;w
 var lat = document.getElementById("text-latitude");
 var lon = document.getElementById("text-longitude");
 var message_geolocation = document.getElementById("mess_geolocation");
-var map = L.map('map').setView([44.0, 8.5], 13);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {{
+var initLoc = [44.0, 8.5]
+var map = L.map('map').setView(initLoc, 13);
+var marker = L.marker(initLoc,{draggable:'true'}).addTo(map);
+marker.on('dragend', function(event){
+    var marker = event.target;
+    var position = marker.getLatLng();
+    marker.setLatLng(new L.LatLng(position.lat, position.lng),{draggable:'true'});
+    map.panTo(new L.LatLng(position.lat, position.lng))
+  });
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}}).addTo(map);
-const pw_button = document.querySelector(".show_password");
-const input = document.querySelector(".text-password");
+}).addTo(map);
+const pw_button = document.getElementById("show_password");
+const pw_input = document.getElementById("text-password");
 // When an input is checked, or whatever...
-button.addEventListener("click", () => {{
+pw_button.addEventListener("click", () => {
   document.documentElement.classList.toggle("show_password");
-  if (oldMethodInput.getAttribute("type") === "password") {{
-    oldMethodInput.setAttribute("type", "text");
-  }} else {{
-    oldMethodInput.setAttribute("type", "password");
-  }}
-}});
+  if (pw_input.getAttribute("type") === "password") {
+    pw_input.setAttribute("type", "text");
+  } else {
+    pw_input.setAttribute("type", "password");
+  }
+});
 
-const geoloc_options = {{
+const geoloc_options = {
   enableHighAccuracy: true,
   timeout: 5000,
   maximumAge: 0
-}};
+};
 
-function getLocation() {{
-  if (navigator.geolocation) {{
+function getLocation() {
+  if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition,handleError,geoloc_options);
-  }}
-}}
+  }
+}
 
-function handleError(error) {{
+function handleError(error) {
   // Display error based on the error code.
-  const {{ code }} = error;
-  switch (code) {{
+  const { code } = error;
+  switch (code) {
     case GeolocationPositionError.TIMEOUT:
       // Handle timeout.
       message_geolocation.innerHTML = "Timeout. Geolocation is not supported by this browser.";
@@ -108,17 +117,19 @@ function handleError(error) {{
       // Position not available.
       message_geolocation.innerHTML = "Geolocation error. Geolocation is currently not available.";
       break;
-  }}
-}}
+  }
+}
 
-function updateLatLon() {{
-  map.setView([lat.value, lon.value], 13);    
-}}
+function updateLatLon() {
+  map.setView([lat.value, lon.value], 13);   
+}
 
-function showPosition(position) {{
+function showPosition(position) {
   lat.value = position.coords.latitude;
   lon.value = position.coords.longitude;
-}}
+  map.setView([position.coords.latitude, position.coords.longitude], 13);
+  marker.setLatLng([position.coords.latitude, position.coords.longitude]);
+}
 </script>
 </body>
 </html>

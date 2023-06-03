@@ -17,6 +17,10 @@ logger.check_fs_free_space()
 i2c, gpio = cron.initialize_board()
 sensors.init(i2c, gpio)
 
+#button SW1 pressed at startup: entering configuration mode
+if gpio['GP0'].value() is 1:
+    wlan.serve_captive_portal()
+
 def updates():
     # connect to wifi only if updates are required
     ntp_scheduled = cron.check_ntp_schedule()

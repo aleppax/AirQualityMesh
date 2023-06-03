@@ -93,18 +93,23 @@ def serve_captive_portal():
     global wlan
     iam = machine.unique_id()
     passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
-    global ap
     wlan = network.WLAN(network.AP_IF)
+    print(passwd)
     wlan.config(essid='opms', password=passwd)
     wlan.active(True)
-    while ap.active() is False:
+    while wlan.active() is False:
         pass
-    # ipaddress = ap.ifconfig()[0]
+    print(wlan.ifconfig()[0])
     # now wait for a connection
-    while ap.isconnected() is False:
+    while wlan.isconnected() is False:
         pass
-    html_portal = open('./html/portal.html')
+    html_portal = open('/html/portal.html')
     html_form = html_portal.read()
+    html_form = html_form.format(
+        cfg_wlan_SSID_0 = config.wlan['SSID_0'],
+        cfg_wlan_PASSW_0 = config.wlan['PASSW_0'],
+        cfg_station_latitude = config.station['latitude'],
+        cfg_station_longitude = config.station['longitude'])
     html_portal.close()
     addrinfo = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
     s = socket.socket()
@@ -116,9 +121,10 @@ def serve_captive_portal():
         feed_wdt()
         try:
             cl, addr = s.accept()
-            cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+            cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\nContent-lenght: ' + str(len(html_form)) + '\r\n\r\n')
             cl.send(html_form)
-            logger.debug('client connected from', addr)
+            
+            logger.debug('client connected from ' + str(addr))
             request = cl.recv(1024)
             request = str(request.decode('utf-8'))
             reqstrings = request.split("\r\n")
