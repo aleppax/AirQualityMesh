@@ -4,81 +4,216 @@
 <meta charset="utf-8">
 <title>Outdoor PM station configuration</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
+<link rel="icon" href="data:,">
 <style>
-body{{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#333}}
+body{{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#555}}
+#control-01{{color:#04aa6d}}
 #control-01,#control-02{{padding-left:20px}}
+#eyes{{display: inline;}}
+br, label{{margin-bottom:5px;}}
+mark{{background-color:#ace1ac}}
+#navbar{{max-width: 600px;padding:9px;border: 1px solid #e3e3e3;}}
 .well{{max-width:600px;min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0,0,0,0.05);padding:9px;border-radius:3px;background-image:-webkit-linear-gradient(top, #e8e8e8 0, #f5f5f5 100%);background-image:-o-linear-gradient(top, #e8e8e8 0, #f5f5f5 100%);background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, #e8e8e8), to(#f5f5f5));background-image:linear-gradient(to bottom, #e8e8e8 0, #f5f5f5 100%);background-repeat:repeat-x;border-color:#dcdcdc;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05),0 1px 0 rgba(255,255,255,0.1)}}
-button{{display:inline-block;padding:6px 12px;font-size:16px;text-align:center;white-space:nowrap;vertical-align:middle;cursor:pointer;border-radius:4px;border-color:#3e8f3e;text-shadow:0 -1px 0 rgba(0,0,0,0.2);color:#fff;background-color:#5cb85c}}
+button{{display:inline-block;padding:6px 12px;font-size:16px;text-align:center;white-space:nowrap;vertical-align:middle;cursor:pointer;border-radius:4px;text-shadow:0 -1px 0 rgba(0,0,0,0.2);color:#fff;background-color:#5cb85c}}
 .rendered-form{{margin:20px}}
 .rendered-form .form-group{{margin:20px;box-sizing:border-box;display:block}}
 .rendered-form .form-control{{height:34px;display:block;width:90%;padding:6px 12px;line-height:1.42857143;border-radius:4px;color:#555;background-color:#fff;border:1px solid #ccc;box-shadow:inset 0 1px 1px rgba(0,0,0,0.075);}}
-#map {{ height: 280px; }}
+.topnav{{background-color:#555;overflow:hidden}}.topnav a{{float:left;display:block;color:#f2f2f2;text-align:center;padding:14px 16px;text-decoration:none;font-size:17px}}.active{{background-color:#04AA6D;color:white}}.topnav .icon{{display:none}}@media screen and (max-width: 600px){{.dropdown .dropbtn,.topnav a:not(:first-child){{display:none}}.topnav a.icon{{float:right;display:block}}}}@media screen and (max-width: 600px){{.topnav.responsive{{position:relative}}.topnav.responsive a.icon{{position:absolute;right:0;top:0}}.topnav.responsive a{{float:none;display:block;text-align:left}}.topnav.responsive .dropdown{{float:none}}.topnav.responsive .dropdown-content{{position:relative}}.topnav.responsive .dropdown .dropbtn{{display:block;width:100%;text-align:left}}}}
+.slider-container{{width:100%;}}
+.slider{{width:100%;-webkit-appearance:none;appearance:none;height:25px;background:#d3d3d3;outline:none;}}
+.slider::-webkit-slider-thumb{{-webkit-appearance:none;appearance:none;width:25px;height:25px;background:#04AA6D;cursor:pointer}}.slider::-moz-range-thumb{{width:25px;height:25px;background:#04AA6D;cursor:pointer}}
+.hidden{{display:none !important}}
 </style>
 </head>
 <body>
+<div class="topnav" id="navbar">
+    <h1 id="control-01">Station configuration</h1>
+    <a href="#" class="navbtn active" id="basic">basic</a>
+    <a href="#" class="navbtn" id="status">status</a>
+    <a href="#" class="navbtn" id="network">network</a>
+    <a href="#" class="navbtn" id="power">power</a>
+    <a href="#" class="navbtn" id="logger">logger</a>
+    <a href="#" class="navbtn" id="advanced">advanced</a>
+    <a href="javascript:void(0);" class="icon" onclick="dropNav()">&#9776;</a>
+</div>
 <div class="well" action="portal.html" method="GET">
+<!--
+    STATUS
+-->
+<div class="cat status hidden">status dashboard</div>
+<!--
+    BASIC
+-->
 <form class="rendered-form">
-    <div class="">
-        <h1 access="false" id="control-01">outdoorPMstation configuration<br></h1></div>
-    <div class="">
-        <h2 access="false" id="control-02">WiFi credentials configuration<br></h2></div>
-    <div class="form-group">
+    <a name="basic"></a>
+    <h2 class="cat basic">Language</h2>
+    <select class="cat form-group basic" name="lang" id="language-select">
+    <option class="form-control" value="en">English</option>
+    <option class="form-control" value="cat">Italian</option>
+    </select>
+    <h2 class="cat basic">WiFi credentials</h2>
+    <div class="cat form-group basic">
         <label for="text-SSID">SSID
-        <input type="text" class="form-control" name="text-SSID" value="{cfg_wlan_SSID_0}" access="false" maxlength="24" id="text-SSID" title="enter the SSID of the network to which you want to connect the station" required="required" aria-required="true">
+        <input type="text" class="form-control" name="text-SSID" value="{cfg_wlan_SSID_0}" maxlength="24" id="text-SSID" title="enter the SSID of the network to which you want to connect the station" required="required" aria-required="true">
     </div>
-    <div class="form-group">
-        <label for="text-password">Password<span class="formbuilder-required">*</span></label>
-        <input type="password" class="form-control" name="text-password" value="{cfg_wlan_PASSW_0}" access="false" maxlength="16" id="text-password" required="required" aria-required="true">
-        <input type="checkbox" id="show_password">
+    <div class="cat form-group basic">
+        <label for="text-password">Password</label><p id="eyes"> 🧐 </p><input type="checkbox" id="show_password">
+        <input type="password" class="form-control" name="text-password" value="{cfg_wlan_PASSW_0}" maxlength="16" id="text-password" required="required" aria-required="true">
+        
     </div>
-    <div class="form-group">
-        <label for="text-position" id="mess_geolocation">Configure the location of where the device will be installed.</label>
+    <h2 class="cat basic">Geolocation</h2>
+<!--
+    <div class="cat basic"><div  id="map"></div></div>
+-->
+    <div class="cat form-group basic">
+        <label for="text-latitude" id="mess_geolocation">Configure the location of where the device will be installed.</label>
+<!--
         <button type="button" id="geolocation" onclick="getLocation()">fill geolocation fields</button>
+-->
     </div>
-    <div id="map"></div>
-    <div class="form-group">
-        <label for="text-latitude">Latitude<span class="formbuilder-required">*</span></label>
-        <input type="latitude" onfocusout="updateLatLon()" class="form-control" name="text-latitude" value="{cfg_station_latitude}" access="false" maxlength="16" id="text-latitude" required="required" aria-required="true">
+    <div class="cat form-group basic">
+        <label for="text-latitude">Latitude</label>
+        <input type="latitude" class="form-control" name="text-latitude" value="{cfg_station_latitude}" maxlength="16" id="text-latitude" required="required" aria-required="true">
     </div>
-    <div class="form-group">
-        <label for="text-longitude">Longitude<span class="formbuilder-required">*</span></label>
-        <input type="longitude" onfocusout="updateLatLon()" class="form-control" name="text-longitude" value="{cfg_station_longitude}" access="false" maxlength="16" id="text-longitude" required="required" aria-required="true">
+    <div class="cat form-group basic">
+        <label for="text-longitude">Longitude</label>
+        <input type="longitude" class="form-control" name="text-longitude" value="{cfg_station_longitude}" maxlength="16" id="text-longitude" required="required" aria-required="true">
+    </div>
+    <h2 class="cat basic power">Measurement interval</h2>
+    <div class="cat form-group basic power">
+        <label for="measures-per-day">Measurement interval: <span id="minterval"></span> minutes</label><br>
+        <label for="measures-per-day">Measures per day: <span id="mpday"></span></label>
+        <div class="slider-container"><input class="slider" id="measures-per-day" name="measures-per-day" type="range" min="2" max="720" step="2" value="{cfg_cron_measurements_per_day}"></div>
+    </div>
+    <h2 class="cat basic">Datalogger server</h2>
+    <div class="cat form-group basic">
+        <label for="datalogger-url">API server URL</label>
+        <input class="form-control datalogger-url" name="datalogger-url" id="datalogger-url" type="url" value="{cfg_datalogger_URL}">
+    </div>
+<!--
+    NETWORK
+-->
+    <h2 class="cat network hidden">NTP server URL</h2>
+    <div class="cat form-group network hidden">
+        <label for="NTP-url">Be sure to check for the existence of at least 4 numbered sub-servers. <br>As an example, if you want to use <mark>europe.pool.ntp.org</mark>, be sure that <mark>0.europe.pool.ntp.org</mark>, <mark>1.europe.pool.ntp.org</mark>, <mark>2.europe.pool.ntp.org</mark> and <mark>3.europe.pool.ntp.org</mark> exist.</label>
+        <div class="slider-container"><input class="form-control NTP-url" name="NTP-url" id="NTP-url" type="url" value="{cfg_cron_NTP_server}"></div>
+    </div>
+    <h2 class="cat network hidden">NTP sync interval</h2>
+    <div class="cat form-group network hidden">
+        <label for="NTPsync_interval">NTP polling interval in <b>hours</b>.<br>During normal operation the station polls the server at fixed intervals.<br>With the Raspberry Pico W once per day should suffice.</label>
+        <div class="slider-container"><input class="form-control NTPsync_interval" name="NTPsync_interval" id="NTPsync_interval" type="number" min="1" max="120" value="{cfg_cron_NTPsync_interval}"></div>
+    </div>
+    <h2 class="cat network hidden">Update interval</h2>
+    <div class="cat form-group network hidden">
+        <label for="update_interval">Software update interval in <b>hours</b>.<br>The station checks for software updates at fixed intervals.</label>
+        <div class="slider-container"><input class="form-control update_interval" name="update_interval" id="update_interval" type="number" min="1" max="120" value="{cfg_cron_update_interval}"></div>
+    </div>
+    <h2 class="cat network power hidden">Data submission interval</h2>
+    <div class="cat form-group network power hidden">
+        <label for="data_submission_interval">How often the collected measures are sent to the remote server.<br>In <b>minutes</b> (60 = every hour, 1440 = every day).</label>
+        <input class="form-control data_submission_interval" name="data_submission_interval" id="data_submission_interval" type="number" min="1" max="1440" value="{cfg_cron_data_submission_interval}">
+    </div>
+    <h2 class="cat network power hidden">Data submission just in time</h2>
+    <div class="cat form-group network power hidden">
+        <label for="data_submission_just_in_time">if active, it bypasses the <mark>Data submission interval</mark> setting by sending the measurements as soon as they are collected.<br>It is very battery intensive.</label>
+        <input class="form-control data_submission_just_in_time" name="data_submission_just_in_time" id="data_submission_just_in_time" type="checkbox" value="{cfg_cron_data_submission_just_in_time}">
+    </div>
+    <h2 class="cat power hidden">Data submission on daylight</h2>
+    <div class="cat form-group power hidden">
+        <label for="data_submission_on_daylight">if active, it bypasses the <mark>Data submission interval</mark> and <mark>Data submission just in time</mark> settings during night time by sending the measurements only during the day, when the battery is helped by the solar panel.<br>It helps to save battery.</label>
+        <input class="form-control data_submission_on_daylight" name="data_submission_on_daylight" id="data_submission_on_daylight" type="checkbox" value="{cfg_cron_data_submission_on_daylight}">
+    </div>
+    <h2 class="cat power hidden">Morning</h2>
+    <div class="cat form-group power hidden">
+        <label for="morning">The hour (UTC) at which on annual average the sun starts charging the solar panel.<br> This setting is used by <mark>Data submission on daylight</mark>.</label>
+        <input class="form-control number" id="morning" name="morning" type="number" min="0" max="23" value="{cfg_cron_morning}">
+    </div>
+    <h2 class="cat power hidden">Evening</h2>
+    <div class="cat form-group power hidden">
+        <label for="evening">The hour (UTC) at which on annual average the sun ends charging the solar panel.<br> This setting is used by <mark>Data submission on daylight</mark>.</label>
+        <input class="form-control number" id="evening" name="evening" type="number" min="0" max="23" value="{cfg_cron_evening}">
+    </div>
+<!--
+    POWER
+-->
+<!--
+    LOGGER
+-->
+    <h2 class="cat logger hidden">Latest log file</h2>
+    <textarea class="cat logger hidden" readonly id="latest-log" name="latest log"
+          rows="30" cols="75">
+{latest_log}
+    </textarea>
+    <h2 class="cat logger hidden">Log level</h2>
+    <div class="cat form-group logger hidden">
+        <label for="loglevel">1 FATAL, 2 ERROR, 3 WARN, 4 INFO, 5 DEBUG.</label>
+        <input class="form-control loglevel" name="loglevel" id="loglevel" type="number" min="1" max="5" value="{cfg_logger_loglevel}">
+    </div>
+    <h2 class="cat logger hidden">Log files count</h2>
+    <div class="cat form-group logger hidden">
+        <label for="logfileCount">The system saves the log messages on a certain number of files, when it fills them it starts overwriting the oldest ones.<br> Set how many log files to fill before overwriting the oldest one.</label>
+        <div class="slider-container"><input class="form-control logfileCount" name="logfileCount" id="logfileCount" type="number" min="10" max="100" value="{cfg_logger_logfileCount}"></div>
+    </div>
+    <h2 class="cat logger hidden">Print log messages</h2>
+    <div class="cat form-group logger hidden">
+        <label for="print_log">if active, it forwards log messages also to the REPL console, in real time. Useful for debugging.</label>
+        <input class="form-control print_log" name="print_log" id="print_log" type="checkbox" value="{cfg_logger_print_log}">
+    </div>
+<!--
+    ADVANCED
+-->
+    <h2 class="cat advanced hidden">Enable WDT</h2>
+    <div class="cat form-group advanced hidden">
+        <label for="use_wdt">if active, it enables the <mark>Watchdog timer</mark>. <br> The WDT is a key feature used to restart the system in case of malfunction, when the system is no more responsive.</label>
+        <input class="form-control use_wdt" name="use_wdt" id="use_wdt" type="checkbox" value="{cfg_cron_use_wdt}">
+    </div>
+    <h2 class="cat advanced hidden">Update repository URL</h2>
+    <div class="cat form-group advanced hidden">
+        <label for="repository">The URL used to update the system.<br>The official [proof of concept] repository is <mark>https://raw.githubusercontent.com/aleppax/outdoorPMstation/updates/concept/softwarePico</mark></label>
+        <input class="form-control repository" name="repository" id="repository" type="url" value="{cfg_cron_repository}">
     </div>
 
-    <div class="form-group">
+    <div class="cat form-group basic network power logger advanced">
         <button type="submit" "class="btn" name="button-submit" value="submit" id="button-submit">Submit</button>
     </div>
 </form>
 </div>
 
-<p id="text-longitude"></p>
+
 
 <script>
-var lat = document.getElementById("text-latitude");
-var lon = document.getElementById("text-longitude");
-var message_geolocation = document.getElementById("mess_geolocation");
-var map = L.map('map').setView([44.0, 8.5], 13);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {{
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}}).addTo(map);
-const pw_button = document.querySelector(".show_password");
-const input = document.querySelector(".text-password");
-// When an input is checked, or whatever...
-button.addEventListener("click", () => {{
+const pw_button = document.getElementById("show_password");
+const pw_input = document.getElementById("text-password");
+const pw_icon = document.getElementById("eyes");
+pw_button.addEventListener("click", () => {{
   document.documentElement.classList.toggle("show_password");
-  if (oldMethodInput.getAttribute("type") === "password") {{
-    oldMethodInput.setAttribute("type", "text");
+  if (pw_input.getAttribute("type") === "password") {{
+    pw_input.setAttribute("type", "text");
+    pw_icon.textContent = " 🤐 "
   }} else {{
-    oldMethodInput.setAttribute("type", "password");
+    pw_input.setAttribute("type", "password");
+    pw_icon.textContent = " 🧐 "
   }}
 }});
+document.getElementById("navbar").addEventListener("click",function(e) {{
+  if (e.target && e.target.matches("a.navbtn")) {{
+    prevBtn = document.getElementsByClassName("navbtn active").item(0);
+    prevBtn.classList.remove("active");
+    e.target.classList.add("active");
+    showID = e.target.id;
+    //display only selected fields
+    document.querySelectorAll('.cat').forEach(el => el.classList.add("hidden"));
+    document.querySelectorAll('.'+showID).forEach(el => el.classList.remove("hidden"));
+    }}
+}});
+const slider_mpday = document.getElementById("measures-per-day");
+const mpday = document.getElementById("mpday");
+const minterval = document.getElementById("minterval");
+function onSlideMpday() {{
+    mpday.textContent = slider_mpday.value;
+    minterval.textContent = (60*24/slider_mpday.value).toFixed(3);
+}}
+slider_mpday.addEventListener('input', onSlideMpday, false);
 
 const geoloc_options = {{
   enableHighAccuracy: true,
@@ -86,39 +221,19 @@ const geoloc_options = {{
   maximumAge: 0
 }};
 
-function getLocation() {{
-  if (navigator.geolocation) {{
-    navigator.geolocation.getCurrentPosition(showPosition,handleError,geoloc_options);
+/* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */
+function dropNav() {{
+  var x = document.getElementById("navbar");
+  if (x.className === "topnav") {{
+    x.className += " responsive";
+  }} else {{
+    x.className = "topnav";
   }}
 }}
 
-function handleError(error) {{
-  // Display error based on the error code.
-  const {{ code }} = error;
-  switch (code) {{
-    case GeolocationPositionError.TIMEOUT:
-      // Handle timeout.
-      message_geolocation.innerHTML = "Timeout. Geolocation is not supported by this browser.";
-      break;
-    case GeolocationPositionError.PERMISSION_DENIED:
-      // User denied the request.
-      message_geolocation.innerHTML = "Allow geolocation. Geolocation is not enabled by this browser.";
-      break;
-    case GeolocationPositionError.POSITION_UNAVAILABLE:
-      // Position not available.
-      message_geolocation.innerHTML = "Geolocation error. Geolocation is currently not available.";
-      break;
-  }}
-}}
-
-function updateLatLon() {{
-  map.setView([lat.value, lon.value], 13);    
-}}
-
-function showPosition(position) {{
-  lat.value = position.coords.latitude;
-  lon.value = position.coords.longitude;
-}}
+window.addEventListener("load", (event) => {{
+  onSlideMpday();
+}});
 </script>
 </body>
 </html>

@@ -91,6 +91,46 @@ def connect(wifiNumber=0):
 
 def serve_captive_portal():
     global wlan
+    from libs.microdot import Microdot, Response
+    app = Microdot()
+    Response.default_content_type = 'text/html'
+    @app.route('/')
+    def index(request):
+        log_lines = []
+        try:
+            with open('/logs/' + logger.logfile, 'r') as f:
+                log_lines = f.readlines()
+        except Exception as e:
+            print("Could not read file: /logs/" + logger.logfile)
+            print(e)
+        lastlog_txt = "\n".join(log_lines)
+        html_portal = open('/html/portal.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            cfg_wlan_SSID_0 = config.wlan['SSID_0'],
+            cfg_wlan_PASSW_0 = config.wlan['PASSW_0'],
+            cfg_cron_measurements_per_day = str(config.cron['measurements_per_day']),
+            cfg_datalogger_URL = config.datalogger['URL'],
+            cfg_cron_NTP_server = config.cron['NTP_server'],
+            cfg_cron_NTPsync_interval = int(config.cron['NTPsync_interval']/3600),
+            cfg_cron_update_interval = int(config.cron['update_interval']/3600),
+            cfg_cron_data_submission_interval = int(config.cron['data_submission_interval']/60),
+            cfg_cron_data_submission_just_in_time = 1 if config.cron['data_submission_just_in_time'] else 0,
+            cfg_cron_data_submission_on_daylight = 1 if config.cron['data_submission_on_daylight'] else 0,
+            cfg_cron_morning = config.cron['morning'],
+            cfg_cron_evening = config.cron['evening'],
+            latest_log = lastlog_txt,
+            cfg_logger_loglevel = config.logger['loglevel'],
+            cfg_logger_logfileCount = config.logger['logfileCount'],
+            cfg_logger_print_log = 1 if config.logger['print_log'] else 0,
+            cfg_cron_use_wdt = 1 if config.cron['use_wdt'] else 0,
+            cfg_cron_repository = config.cron['repository'],
+            cfg_station_longitude = str(config.station['longitude']),
+            cfg_station_latitude = str(config.station['latitude']),
+            cfg_station_UID = config.station['UID'],
+            cfg_station_serial = config.station['station'])
+    
     iam = machine.unique_id()
     passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
     wlan = network.WLAN(network.AP_IF)
@@ -103,60 +143,32 @@ def serve_captive_portal():
     # now wait for a connection
     while wlan.isconnected() is False:
         pass
-    html_portal = open('/html/portal.html')
-    html_form = html_portal.read()
-    html_form = html_form.format(
-        cfg_wlan_SSID_0 = config.wlan['SSID_0'],
-        cfg_wlan_PASSW_0 = config.wlan['PASSW_0'],
-        cfg_station_latitude = config.station['latitude'],
-        cfg_station_longitude = config.station['longitude'])
-    html_portal.close()
-    addrinfo = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-    s = socket.socket()
-    s.bind(addrinfo)
-    s.listen(1)
-    # Listen for connections
-    waiting_credentials = True
-    while waiting_credentials:
-        feed_wdt()
-        try:
-            cl, addr = s.accept()
-            cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\nContent-lenght: ' + str(len(html_form)) + '\r\n\r\n')
-            cl.send(html_form)
-            
-            logger.debug('client connected from ' + str(addr))
-            request = cl.recv(1024)
-            request = str(request.decode('utf-8'))
-            reqstrings = request.split("\r\n")
-            for part in reqstrings:
-                if 'GET /?' in part:
-                    subparts = part.split("&")
-                    if 'text-password=' in subparts[1]:
-                        newpassword = subparts[1].split('=')[1]
-                        newssid = subparts[0].split('=')[1]
-                    if 'text-latitude' in subparts[2]:
-                        latitude = subparts[2].split('=')[1]
-                    if 'text-longitude' in subparts[3]:
-                        longitude = subparts[3].split('=')[1]
-                        # validate field input
-                        #TODO
-                        exist_wifi = True
-                        wifiNumber = 0
-                        while exist_wifi:
-                            wifiNumber += 1
-                            ssid = "SSID_" + str(wifiNumber)
-                            exist_wifi = ssid in config.wlan
-                        config.set('wlan',"SSID_" + str(wifiNumber),newssid)
-                        config.set('wlan',"PASSW_" + str(wifiNumber),newpassword)
-                        config.set('station',"latitude",latitude)
-                        config.set('station',"longitude",longitude)
+    app.run(port=80)
+    #wlan.disconnect()
+    #machine.soft_reset()
+            # request = str(request.decode('utf-8'))
+            # reqstrings = request.split("\r\n")
+            # for part in reqstrings:
+                # if 'GET /?' in part:
+                    # subparts = part.split("&")
+                    # if 'text-password=' in subparts[1]:
+                        # newpassword = subparts[1].split('=')[1]
+                        # newssid = subparts[0].split('=')[1]
+                    # if 'text-latitude' in subparts[2]:
+                        # latitude = subparts[2].split('=')[1]
+                    # if 'text-longitude' in subparts[3]:
+                        # longitude = subparts[3].split('=')[1]
+                        # # validate field input
+                        # #TODO
+                        # exist_wifi = True
+                        # wifiNumber = 0
+                        # while exist_wifi:
+                            # wifiNumber += 1
+                            # ssid = "SSID_" + str(wifiNumber)
+                            # exist_wifi = ssid in config.wlan
+                        # config.set('wlan',"SSID_" + str(wifiNumber),newssid)
+                        # config.set('wlan',"PASSW_" + str(wifiNumber),newpassword)
+                        # config.set('station',"latitude",latitude)
+                        # config.set('station',"longitude",longitude)
                         # now send a confirmation page, wait ten seconds and reboot
                         #TODO
-                        waiting_credentials = False
-                        cl.close()
-                        wlan.disconnect()
-                        machine.soft_reset()
-
-        except OSError:
-            cl.close()
-            print('connection closed')
