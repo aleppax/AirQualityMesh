@@ -42,19 +42,19 @@ cron = {
     # hour at which morning begins
     'evening' : 18,                                     ###  power  ###
     # hour at which evening begins
-    'measurements_per_day' : 144,                        ###  basic  ###
+    'measurements_per_day' : 144,                       ###  basic  ###
     # 'measurements_per_day' interval starting at 0:00. do not set too high
     'minimum_sleep_s' : 4,
     # 'minimum_sleep_s' avoid too short sleep periods leading to malfunction
     'sensor_preheating_s' : 30,
     # 'sensor_preheating_s' do not change, suggested by the manufacturers' datasheets
-    'last_update_check' : 0,                            ###  status  ###
-    'current_version' : 1,                              ###  status  ###
+    'last_update_check' : 0,                            ### status  ###
+    'current_version' : 1,                              ### status  ###
     'repository' : 'https://raw.githubusercontent.com/aleppax/outdoorPMstation/updates/concept/softwarePico',    ###  advanced  ###
     #'repository' : 'http://192.168.0.88:8000', # example of local server
-    'latest_timestamp' : 1609459200,                    ###  status  ###
+    'latest_timestamp' : 1609459200,
     'deepsleep_reset' : False,
-    'use_wdt' : True,                                   ###  advanced  ###
+    'use_wdt' : True,                                  ### advanced ###
 }
 datalogger = {
     'URL' : 'http://example.org/opms/api.php/records/measurements/',

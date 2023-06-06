@@ -4,7 +4,7 @@ import network
 import socket
 import binascii
 import time
-from libs import logger, config
+from libs import logger, config, leadacid
 from libs.cron import feed_wdt
 
 wlan = None
@@ -91,6 +91,8 @@ def connect(wifiNumber=0):
 
 def serve_captive_portal():
     global wlan
+    from sys import version
+    from libs.sensors import sensorlist
     from libs.microdot import Microdot, Response
     app = Microdot()
     Response.default_content_type = 'text/html'
@@ -104,6 +106,7 @@ def serve_captive_portal():
             print("Could not read file: /logs/" + logger.logfile)
             print(e)
         lastlog_txt = "\n".join(log_lines)
+        leadacid_levels = leadacid.levels()
         html_portal = open('/html/portal.html')
         html_form = html_portal.read()
         html_portal.close()
@@ -125,12 +128,20 @@ def serve_captive_portal():
             cfg_logger_logfileCount = config.logger['logfileCount'],
             cfg_logger_print_log = 1 if config.logger['print_log'] else 0,
             cfg_cron_use_wdt = 1 if config.cron['use_wdt'] else 0,
+            cfg_sensors_enable_sensors = 1 if config.sensors['enable_sensors'] else 0,
             cfg_cron_repository = config.cron['repository'],
             cfg_station_longitude = str(config.station['longitude']),
             cfg_station_latitude = str(config.station['latitude']),
             cfg_station_UID = config.station['UID'],
-            cfg_station_serial = config.station['station'])
-    
+            cfg_station_serial = config.station['station'],
+            cfg_status_temperature = leadacid_levels[0],
+            cfg_status_percentage = leadacid_levels[1],
+            cfg_status_vvvoltage = leadacid_levels[2],
+            cfg_status_is_charging = leadacid_levels[3],
+            cfg_cron_current_version = str(config.cron['current_version']),
+            cfg_cron_last_update_check = str(config.cron['last_update_check']),
+            cfg_micropython_version = version,
+            sensors_list = sensorlist())
     iam = machine.unique_id()
     passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
     wlan = network.WLAN(network.AP_IF)

@@ -67,6 +67,13 @@ def init(i2c, gpio):
         for pin in gpio:
             gpio[pin].off()
         power_i2c_devices(False,'off')
+
+def sensorlist():
+    s_description = ''
+    for s,t in sensors.items():
+        feed_wdt()
+        s_description +=  s + '§t' + str(t['connected']) + '§t' + t['name'] + '§t' + t['i2c_address'] + '§t' + str(t['is_auxiliary']) + '§n'
+    return s_description
         
 def power_i2c_devices(only_aux_devices=True, action='on'):
     for v in sensors.values():
