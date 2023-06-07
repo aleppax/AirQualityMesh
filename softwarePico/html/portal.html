@@ -10,6 +10,7 @@ body{{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#555}}
 #control-01{{color:#04aa6d}}
 #control-01,#control-02{{padding-left:20px}}
 #eyes{{display: inline;}}
+#battery{background-color: #d6ffd5;border-radius:6px;padding:16px;}
 br, label{{margin-bottom:5px;}}
 mark{{background-color:#ace1ac}}
 .line-break-and-tab{{white-space: pre-wrap;}}
@@ -44,8 +45,8 @@ button{{display:inline-block;padding:6px 12px;font-size:16px;text-align:center;w
 <!--
     STATUS
 -->
-<h2 class="cat status hidden">status dashboard</h2>
-<div class="overflow">
+<h2 class="cat status hidden">status dashboard - station {cfg_station_serial}</h2>
+<div class="cat status hidden overflow">
   <table>
     <thead>
         <tr>
@@ -54,17 +55,16 @@ button{{display:inline-block;padding:6px 12px;font-size:16px;text-align:center;w
     </thead>
     <tbody id="sensor_list"></tbody>
   </table>
+<div id="battery">  
+<div class="dash-box"><h3>battery charge %</h3><h4>{cfg_status_percentage}</h4></div>
+<div class="dash-box"><h3>battery voltage</h3><h4>{cfg_status_vvvoltage}</h4></div>
+<div class="dash-box"><h3>battery is charging</h3><h4>{cfg_status_is_charging}</h4></div>
 </div>
-
-{cfg_sensors_enable_sensors}
-{cfg_station_serial}
-{cfg_status_temperature}
-{cfg_status_percentage}
-{cfg_status_vvvoltage}
-{cfg_status_is_charging}
-{cfg_cron_current_version}
-{cfg_cron_last_update_check}
-{cfg_micropython_version}
+<div class="dash-box"><h3>Temperature °C</h3><h4>{cfg_status_temperature}</h4></div>
+<div class="dash-box"><h3>current OPMS version</h3><h4>{cfg_cron_current_version}</h4></div>
+<div class="dash-box"><h3>Last update check</h3><h4>{cfg_cron_last_update_check}</h4></div>
+<div class="dash-box"><h3>Micropython version</h3><h4>{cfg_micropython_version}</h4></div>
+</div>
 <!--
     BASIC
 -->

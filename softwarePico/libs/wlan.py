@@ -139,7 +139,7 @@ def serve_captive_portal():
             cfg_status_vvvoltage = leadacid_levels[2],
             cfg_status_is_charging = leadacid_levels[3],
             cfg_cron_current_version = str(config.cron['current_version']),
-            cfg_cron_last_update_check = str(config.cron['last_update_check']),
+            cfg_cron_last_update_check = logger.timetuple_to_DTF(time.gmtime(config.cron['last_update_check'])),
             cfg_micropython_version = version,
             sensors_list = sensorlist())
     iam = machine.unique_id()
