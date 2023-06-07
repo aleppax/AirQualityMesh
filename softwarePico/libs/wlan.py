@@ -96,6 +96,9 @@ def serve_captive_portal():
     from libs.microdot import Microdot, Response
     app = Microdot()
     Response.default_content_type = 'text/html'
+    if config.station['UID'] is None:
+        iam = machine.unique_id()
+        config.set('station','UID',iam)
     @app.route('/')
     def index(request):
         log_lines = []
@@ -142,7 +145,6 @@ def serve_captive_portal():
             cfg_cron_last_update_check = logger.timetuple_to_DTF(time.gmtime(config.cron['last_update_check'])),
             cfg_micropython_version = version,
             sensors_list = sensorlist())
-    iam = machine.unique_id()
     passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
     wlan = network.WLAN(network.AP_IF)
     print(passwd)
