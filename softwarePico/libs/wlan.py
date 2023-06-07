@@ -96,9 +96,10 @@ def serve_captive_portal():
     from libs.microdot import Microdot, Response
     app = Microdot()
     Response.default_content_type = 'text/html'
+    iam = machine.unique_id()
     if config.station['UID'] is None:
-        iam = machine.unique_id()
-        config.set('station','UID',iam)
+        iutf8 = binascii.hexlify(iam).decode('utf-8')
+        config.set('station','UID', iutf8)
     @app.route('/')
     def index(request):
         log_lines = []
