@@ -35,10 +35,7 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     <h1 id="control-01">Station configuration</h1>
     <a href="#" class="navbtn active" id="basic">basic</a>
     <a href="#" class="navbtn" id="status">status</a>
-    <a href="#" class="navbtn" id="network">network</a>
-    <a href="#" class="navbtn" id="power">power</a>
-    <a href="#" class="navbtn" id="logger">logger</a>
-    <a href="#" class="navbtn" id="advanced">advanced</a>
+    <a href="#" class="navbtn" id="MQTT">MQTT</a>
     <a href="javascript:void(0);" class="icon" onclick="dropNav()">&#9776;</a>
 </div>
 <div class="well">
@@ -93,10 +90,17 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     <div class="cat form-group basic">
         <label for="cfg_wlan_PASSW_AP">AP Password</label><p id="eyes2"> 🧐 </p><input type="checkbox" id="show_password2">
         <input type="password" class="form-control" name="cfg_wlan_PASSW_AP" value="{cfg_wlan_PASSW_AP}" maxlength="16" id="cfg_wlan_PASSW_AP" required="required" aria-required="true">
-    </div>
+    </div>    
+    
     <h2 class="cat basic translate" id="Geol">Geolocation</h2>
+<!--
+    <div class="cat basic"><div  id="map"></div></div>
+-->
     <div class="cat form-group basic">
         <label for="text-latitude" id="mess_geolocation">Configure the location of where the device will be installed.</label>
+<!--
+        <button type="button" id="geolocation" onclick="getLocation()">fill geolocation fields</button>
+-->
     </div>
     <div class="cat form-group basic">
         <label for="text-latitude">Latitude</label>
@@ -118,100 +122,33 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
         <input class="form-control datalogger-url" name="datalogger-url" id="datalogger-url" type="url" value="{cfg_datalogger_URL}">
     </div>
 <!--
-    NETWORK
+    MQTT
 -->
-    <h2 class="cat network hidden translate" id="NTPs">NTP server URL</h2>
-    <div class="cat form-group network hidden">
-        <label for="NTP-url">Be sure to check for the existence of at least 4 numbered sub-servers. <br>As an example, if you want to use <mark>europe.pool.ntp.org</mark>, be sure that <mark>0.europe.pool.ntp.org</mark>, <mark>1.europe.pool.ntp.org</mark>, <mark>2.europe.pool.ntp.org</mark> and <mark>3.europe.pool.ntp.org</mark> exist.</label>
-        <div class="slider-container"><input class="form-control NTP-url" name="NTP-url" id="NTP-url" type="text" value="{cfg_cron_NTP_server}"></div>
-    </div>
-    <h2 class="cat network hidden translate" id="NTsy">NTP sync interval</h2>
-    <div class="cat form-group network hidden">
-        <label for="NTPsync_interval">NTP polling interval in <b>hours</b>.<br>During normal operation the station polls the server at fixed intervals.<br>With the Raspberry Pico W once per day should suffice.</label>
-        <div class="slider-container"><input class="form-control NTPsync_interval" name="NTPsync_interval" id="NTPsync_interval" type="number" min="1" max="120" value="{cfg_cron_NTPsync_interval}"></div>
-    </div>
-    <h2 class="cat network hidden translate" id="Upda">Update interval</h2>
-    <div class="cat form-group network hidden">
-        <label for="update_interval">Software update interval in <b>hours</b>.<br>The station checks for software updates at fixed intervals.</label>
-        <div class="slider-container"><input class="form-control update_interval" name="update_interval" id="update_interval" type="number" min="1" max="120" value="{cfg_cron_update_interval}"></div>
-    </div>
-    <h2 class="cat network power hidden translate" id="Dsin">Data submission interval</h2>
-    <div class="cat form-group network power hidden">
-        <label for="data_submission_interval">How often the collected measures are sent to the remote server.<br>In <b>minutes</b> (60 = every hour, 1440 = every day).</label>
-        <input class="form-control data_submission_interval" name="data_submission_interval" id="data_submission_interval" type="number" min="1" max="1440" value="{cfg_cron_data_submission_interval}">
-    </div>
-    <h2 class="cat network power hidden translate" id="Dsjt">Data submission just in time</h2>
-    <div class="cat form-group network power hidden">
-        <label for="data_submission_just_in_time">if active, it bypasses the <mark>Data submission interval</mark> setting by sending the measurements as soon as they are collected.<br>It is very battery intensive.</label>
-        <input class="form-control data_submission_just_in_time" name="data_submission_just_in_time" id="data_submission_just_in_time" type="checkbox" value="{cfg_cron_data_submission_just_in_time}">
-    </div>
-    <h2 class="cat power hidden translate" id="Dday">Data submission on daylight</h2>
-    <div class="cat form-group power hidden">
-        <label for="data_submission_on_daylight">if active, it bypasses the <mark>Data submission interval</mark> and <mark>Data submission just in time</mark> settings during night time by sending the measurements only during the day, when the battery is helped by the solar panel.<br>It helps to save battery.</label>
-        <input class="form-control data_submission_on_daylight" name="data_submission_on_daylight" id="data_submission_on_daylight" type="checkbox" value="{cfg_cron_data_submission_on_daylight}">
-    </div>
-    <h2 class="cat power hidden translate" id="Morg">Morning</h2>
-    <div class="cat form-group power hidden">
-        <label for="morning">The hour (UTC) at which on annual average the sun starts charging the solar panel.<br> This setting is used by <mark>Data submission on daylight</mark>.</label>
-        <input class="form-control number" id="morning" name="morning" type="number" min="0" max="23" value="{cfg_cron_morning}">
-    </div>
-    <h2 class="cat power hidden translate" id="Eveg">Evening</h2>
-    <div class="cat form-group power hidden">
-        <label for="evening">The hour (UTC) at which on annual average the sun ends charging the solar panel.<br> This setting is used by <mark>Data submission on daylight</mark>.</label>
-        <input class="form-control number" id="evening" name="evening" type="number" min="0" max="23" value="{cfg_cron_evening}">
-    </div>
-    <h2 class="cat logger hidden translate" id="Llfl">Latest log file</h2>
-    <textarea class="cat logger hidden" readonly id="latest-log" rows="30" cols="75">
-{latest_log}
-    </textarea>
-    <h2 class="cat logger hidden translate" id="Loll">Log level</h2>
-    <div class="cat form-group logger hidden">
-        <label for="loglevel">1 FATAL, 2 ERROR, 3 WARN, 4 INFO, 5 DEBUG.</label>
-        <input class="form-control loglevel" name="loglevel" id="loglevel" type="number" min="1" max="5" value="{cfg_logger_loglevel}">
-    </div>
-    <h2 class="cat logger hidden translate" id="Lont">Log files count</h2>
-    <div class="cat form-group logger hidden">
-        <label for="logfileCount">The system saves the log messages on a certain number of files, when it fills them it starts overwriting the oldest ones.<br> Set how many log files to fill before overwriting the oldest one.</label>
-        <div class="slider-container"><input class="form-control logfileCount" name="logfileCount" id="logfileCount" type="number" min="10" max="100" value="{cfg_logger_logfileCount}"></div>
-    </div>
-    <h2 class="cat logger hidden translate" id="Pres">Print log messages</h2>
-    <div class="cat form-group logger hidden">
-        <label for="print_log">if active, it forwards log messages also to the REPL console, in real time. Useful for debugging.</label>
-        <input class="form-control print_log" name="print_log" id="print_log" type="checkbox" value="{cfg_logger_print_log}">
-    </div>
-<!--
-    ADVANCED
--->
-    <h2 class="cat advanced hidden translate" id="EWDT">Enable WDT</h2>
-    <div class="cat form-group advanced hidden">
-        <label for="use_wdt">if active, it enables the <mark>Watchdog timer</mark>. <br> The WDT is a key feature used to restart the system in case of malfunction, when the system is no more responsive.</label>
-        <input class="form-control use_wdt" name="use_wdt" id="use_wdt" type="checkbox" value="{cfg_cron_use_wdt}">
-    </div>
-    <h2 class="cat advanced hidden translate" id="Eors">Enable sensors</h2>
-    <div class="cat form-group advanced hidden">
-        <label for="enable_sensors">if active, the station uses every available i2c sensors. <br>It makes sense to disable it only for debugging or testing purposes.</label>
-        <input class="form-control enable_sensors" name="enable_sensors" id="enable_sensors" type="checkbox" value="{cfg_sensors_enable_sensors}">
-    </div>
-    <h2 class="cat advanced hidden translate" id="UURL">Update repository URL</h2>
-    <div class="cat form-group advanced hidden">
-        <label for="repository">The URL used to update the system.<br>The official [proof of concept] repository is <mark>https://raw.githubusercontent.com/aleppax/outdoorPMstation/updates/concept/softwarePico</mark></label>
-        <input class="form-control repository" name="repository" id="repository" type="url" value="{cfg_cron_repository}">
-    </div>
-    <h2 class="cat advanced hidden translate" id="Sime">Sensors preheating time</h2>
-    <div class="cat form-group advanced hidden">
-        <label for="cfg_sensor_preheating_s">the time in seconds required for the sensors to start up.</label>
-        <input class="form-control number" id="cfg_sensor_preheating_s" name="cfg_sensor_preheating_s" type="number" min="0" max="120" value="{cfg_sensor_preheating_s}">
-    </div>    
-    <h2 class="cat advanced hidden translate" id="Ales">Average samples</h2>
-    <div class="cat form-group advanced hidden">
-        <label for="cfg_average_particle_measurements">the number of samplings used to calculate the average.</label>
-        <input class="form-control number" id="cfg_average_particle_measurements" name="cfg_average_particle_measurements" type="number" min="1" max="60" value="{cfg_average_particle_measurements}">
-    </div>        
-    <h2 class="cat advanced hidden translate" id="Aval">Average measurement interval</h2>
-    <div class="cat form-group advanced hidden">
-        <label for="cfg_average_measurement_interval_ms">the interval between one sampling and the next, in seconds.</label>
-        <input class="form-control number" id="cfg_average_measurement_interval_ms" name="cfg_average_measurement_interval_ms" type="number" min="1" max="10" value="{cfg_average_measurement_interval_ms}">
-    </div>
+<h2 class="cat MQTT hidden translate" id="EMQT">Enable MQTT</h2>
+<div class="cat form-group MQTT hidden">
+    <label for="mqtt_enable">if active, the station sends data also via MQTT.</label>
+    <input class="form-control mqtt_enable" name="mqtt_enable" id="mqtt_enable" type="checkbox" value="{cfg_mqtt_enable}">
+</div>
+<h2 class="cat MQTT hidden translate" id="MQUL">MQTT server URL</h2>
+<div class="cat form-group MQTT hidden">
+    <label for="cfg_mqtt_server">The URL of the MQTT Broker.</label>
+    <input class="form-control cfg_mqtt_server" name="cfg_mqtt_server" id="cfg_mqtt_server" type="text" value="{cfg_mqtt_server}">
+</div>
+<h2 class="cat MQTT hidden translate" id="MQur">MQTT user</h2>
+<div class="cat form-group MQTT hidden">
+    <label for="cfg_mqtt_user">The username for the MQTT Broker.</label>
+    <input class="form-control cfg_mqtt_user" name="cfg_mqtt_user" id="cfg_mqtt_user" type="text" value="{cfg_mqtt_user}">
+</div>
+<h2 class="cat MQTT hidden translate" id="MQpw">password</h2>
+<div class="cat form-group MQTT hidden">
+    <label for="cfg_mqtt_pass">MQTT Password</label><p id="eyes3"> 🧐 </p><input type="checkbox" id="show_password3">
+    <input type="password" class="form-control" name="cfg_mqtt_pass" value="{cfg_mqtt_pass}" maxlength="16" id="cfg_mqtt_pass" required="required" aria-required="true">
+</div>
+<h2 class="cat MQTT hidden translate" id="MQOS">MQTT QOS</h2>
+<div class="cat form-group MQTT hidden">
+    <label for="update_interval">Level 0 sends at most once, level 1 sends at least once, level 2 sends exactly once.</label>
+    <div class="slider-container"><input class="form-control update_interval" name="update_interval" id="update_interval" type="number" min="0" max="2" value="{cfg_mqtt_QOS}"></div>
+</div>
     <div class="cat form-group basic network power logger advanced">
         <button name="opms" class="translate" value="submit" id="Submit">Submit</button>
     </div>
@@ -238,6 +175,7 @@ function addPasswordHider(icon, button, input) {{
 
 addPasswordHider("eyes", "show_password", "cfg_wlan_PASSW_0")
 addPasswordHider("eyes2", "show_password2", "cfg_wlan_PASSW_AP")
+addPasswordHider("eyes3", "show_password3", "cfg_mqtt_server")
 
 document.getElementById("navbar").addEventListener("click",function(e) {{
   if (e.target && e.target.matches("a.navbtn")) {{
@@ -308,16 +246,11 @@ const translations = {{
     'Dday': 'Data submission on daylight',
     'Morg': 'Morning',
     'Eveg': 'Evening',
-    'Llfl': 'Latest log file',
-    'Loll': 'Log level',
-    'Lont': 'Log files count',
-    'Pres': 'Print log messages',
-    'EWDT': 'Enable WDT',
-    'Eors': 'Enable sensors',
-    'UURL': 'Update repository URL',
-    'Sime': 'Sensors preheating time',
-    'Ales': 'Average samples',
-    'Aval': 'Average measurement interval',
+    'EMQT': 'Enable MQTT',
+    'MQUL': 'MQTT server URL',
+    'MQur': 'MQTT user',
+    'MQpw': 'password',
+    'MQOS': 'MQTT QOS',
     'Submit': 'Submit'
   }},
   'Italian': {{
@@ -334,16 +267,11 @@ const translations = {{
     'Dday': 'Invio nelle ore diurne',
     'Morg': 'Mattino',
     'Eveg': 'Sera',
-    'Llfl': 'Registro di log più recente',
-    'Loll': 'Livello di log',
-    'Lont': 'Quantità di files di log',
-    'Pres': 'Stampa messaggi di log',
-    'EWDT': 'Abilita il WDT',
-    'Eors': 'Abilita i sensori',
-    'UURL': 'URL del repository di aggiornamento',
-    'Sime': 'Tempo di preriscaldo dei sensori',
-    'Ales': 'Campionamenti della media',
-    'Aval': 'Intervallo di cattura dei campionamenti',
+    'EMQT': 'Abilita MQTT',
+    'MQUL': 'URL del server MQTT',
+    'MQur': 'utente',
+    'MQpw': 'password',
+    'MQOS': 'MQTT QOS',
     'Submit': 'Salva'
   }}
 }};
