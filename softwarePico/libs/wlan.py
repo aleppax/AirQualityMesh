@@ -100,8 +100,18 @@ def serve_captive_portal():
     if config.station['UID'] is None:
         iutf8 = binascii.hexlify(iam).decode('utf-8')
         config.set('station','UID', iutf8)
-    @app.route('/')
-    def index(request):
+
+    @app.get('/restart')
+    def restart(request):
+        request.app.shutdown()
+        machine.reset()
+
+    @app.post('/')
+    def save_settings(request):
+        print(request.body)
+
+    @app.get('/')
+    def load_form(request):
         log_lines = []
         try:
             with open('/logs/' + logger.logfile, 'r') as f:
@@ -117,6 +127,8 @@ def serve_captive_portal():
         return html_form.format(
             cfg_wlan_SSID_0 = config.wlan['SSID_0'],
             cfg_wlan_PASSW_0 = config.wlan['PASSW_0'],
+            cfg_wlan_SSID_AP = config.wlan['AP_SSID'],
+            cfg_wlan_PASSW_AP = config.wlan['AP_PASSW'],
             cfg_cron_measurements_per_day = str(config.cron['measurements_per_day']),
             cfg_datalogger_URL = config.datalogger['URL'],
             cfg_cron_NTP_server = config.cron['NTP_server'],
@@ -142,14 +154,16 @@ def serve_captive_portal():
             cfg_status_percentage = leadacid_levels[1],
             cfg_status_vvvoltage = leadacid_levels[2],
             cfg_status_is_charging = leadacid_levels[3],
-            cfg_cron_current_version = str(config.cron['current_version']),
+            cfg_sensor_preheating_s = config.cron['sensor_preheating_s'],
+            cfg_average_particle_measurements = config.sensors['average_particle_measurements'],
+            cfg_average_measurement_interval_ms = int(config.sensors['average_measurement_interval_ms']/1000),
+            cfg_cron_current_version = config.cron['current_version'],
             cfg_cron_last_update_check = logger.timetuple_to_DTF(time.gmtime(config.cron['last_update_check'])),
             cfg_micropython_version = version,
             sensors_list = sensorlist())
-    passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
     wlan = network.WLAN(network.AP_IF)
-    print(passwd)
-    wlan.config(essid='opms', password=passwd)
+    passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
+    wlan.config(essid=config.wlan['AP_SSID'], password=config.wlan['AP_PASSW'])
     wlan.active(True)
     while wlan.active() is False:
         pass

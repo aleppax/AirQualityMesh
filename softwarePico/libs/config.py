@@ -137,6 +137,8 @@ station = {
 wlan = {
     'SSID_0' : 'xxx',                                   ###  basic  ###
     'PASSW_0' : 'xxx',                                  ###  basic  ###
+    'AP_SSID' : 'opms',                                   ###  basic  ###
+    'AP_PASSW' : 'opmsopms',                                  ###  basic  ###
     'connection_timeout' : 15,                          ### network ###
     # at least 10s lower than cron.['sensor_preheating_s']
     'country_code' : 'IT',                              ### network ###
