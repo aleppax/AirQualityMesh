@@ -57,7 +57,7 @@ cron = {
     'use_wdt' : True,                                  ### advanced ###
 }
 datalogger = {
-    'URL' : 'http://example.org/opms/api.php/records/measurements/',
+    'URL' : 'http://example.org/opms/api.php/records/',
     # use your REST server. prefer unsecure http        ###  basic  ###
     # to avoid crashes due to limitations of the implementation.
 }

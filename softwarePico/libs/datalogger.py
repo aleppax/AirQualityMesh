@@ -18,7 +18,8 @@ def send_data(d):
             start_request_time = ticks_ms()
             # hope there will be a better way than disabling WDT
             pause_wdt()
-            resp = requests.post(config.datalogger['URL'], data=d, timeout=config.board['WDT_seconds']-3)
+            durl = config.datalogger['URL'] + 'measurements/'
+            resp = requests.post(durl, data=d, timeout=config.board['WDT_seconds']-3)
             msg = resp.text
             resp.close()
             restart_wdt()

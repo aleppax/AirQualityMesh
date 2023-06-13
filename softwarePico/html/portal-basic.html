@@ -9,7 +9,7 @@
 body{{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#555}}
 #co01{{color:#04aa6d}}
 #co01{{padding-left:20px}}
-#eyes3{{display:inline;}}
+#eyes,#eyes2{{display:inline;}}
 #battery{{background-color: #d6ffd5;border-radius:6px;padding:16px;}}
 br, label{{margin-bottom:5px;}}
 mark{{background-color:#ace1ac}}
@@ -33,12 +33,12 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
 <body>
 <div class="topnav" id="navbar">
     <h1 id="co01" class="translate">Station configuration</h1>
-    <a href="/basic" class="navbtn" id="basic">basic</a>
+    <a href="/basic" class="navbtn active" id="basic">basic</a>
     <a href="/status" class="navbtn" id="status">status</a>
     <a href="/network" class="navbtn" id="network">network</a>
     <a href="/datalogger" class="navbtn" id="datalogger">datalogger</a>
     <a href="/syslogger" class="navbtn" id="syslogger">syslogger</a>
-    <a href="/mqtt" class="navbtn active" id="MQTT">MQTT</a>
+    <a href="/mqtt" class="navbtn" id="MQTT">MQTT</a>
     <a href="/advanced" class="navbtn" id="advanced">advanced</a>
     <a href="javascript:void(0);" class="icon" onclick="dropNav()">&#9776;</a>
     <h2 class="cat basic translate" id="Lang">Language</h2>
@@ -49,41 +49,53 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
 </div>
 <div class="well">
 <form class="rendered-form" id="rendered-form" action="" method="post">
-<!--
-    MQTT
--->
-<h2 class="cat MQTT translate" id="EMQT">Enable MQTT</h2>
-<div class="cat form-group MQTT">
-    <label for="mqtt_enable">if active, the station sends data also via MQTT.</label>
-    <input class="form-control mqtt_enable" name="mqtt_enable" id="mqtt_enable" type="checkbox" value="{cfg_mqtt_enable}">
-</div>
-<h2 class="cat MQTT translate" id="MQUL">MQTT server URL</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_server">The URL of the MQTT Broker.</label>
-    <input class="form-control cfg_mqtt_server" name="cfg_mqtt_server" id="cfg_mqtt_server" type="text" value="{cfg_mqtt_server}">
-</div>
-<h2 class="cat MQTT translate" id="MQur">MQTT user</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_user">The username for the MQTT Broker.</label>
-    <input class="form-control cfg_mqtt_user" name="cfg_mqtt_user" id="cfg_mqtt_user" type="text" value="{cfg_mqtt_user}">
-</div>
-<h2 class="cat MQTT translate" id="MQpw">password</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_pass">MQTT Password</label><p id="eyes3"> 🧐 </p><input type="checkbox" id="show_password3">
-    <input type="password" class="form-control" name="cfg_mqtt_pass" value="{cfg_mqtt_pass}" maxlength="16" id="cfg_mqtt_pass" required="required" aria-required="true">
-</div>
-<h2 class="cat MQTT translate" id="MQOS">MQTT QOS</h2>
-<div class="cat form-group MQTT">
-    <label for="update_interval">Level 0 sends at most once, level 1 sends at least once, level 2 sends exactly once.</label>
-    <div class="slider-container"><input class="form-control update_interval" name="update_interval" id="update_interval" type="number" min="0" max="2" value="{cfg_mqtt_QOS}"></div>
-</div>
-    <div class="cat form-group">
-        <button class="translate" value="submit" id="Submit">Submit</button>
+    <h2 class="cat basic translate" id="WiFi">WiFi credentials</h2>
+    <div class="cat form-group basic">
+        <label for="cfg_wlan_SSID_0">SSID used to connect to the internet</label>
+        <input type="text" class="form-control" name="cfg_wlan_SSID_0" value="{cfg_wlan_SSID_0}" maxlength="24" id="cfg_wlan_SSID_0" title="enter the SSID of the network to which you want to connect the station" required="required" aria-required="true">
+    </div>
+    <div class="cat form-group basic">
+        <label for="cfg_wlan_PASSW_0">Password</label><p id="eyes"> 🧐 </p><input type="checkbox" id="show_password">
+        <input type="password" class="form-control" name="cfg_wlan_PASSW_0" value="{cfg_wlan_PASSW_0}" maxlength="16" id="cfg_wlan_PASSW_0" required="required" aria-required="true">
+    </div>
+    <br>
+    <div class="cat form-group basic">
+        <label for="cfg_wlan_SSID_AP">Access Point SSID, used to connect to this configuration page.</label>
+        <input type="text" class="form-control" name="cfg_wlan_SSID_AP" value="{cfg_wlan_SSID_AP}" maxlength="24" id="cfg_wlan_SSID_AP" title="enter the SSID of the network to which you want to connect the station" required="required" aria-required="true">
+    </div>
+    <div class="cat form-group basic">
+        <label for="cfg_wlan_PASSW_AP">AP Password</label><p id="eyes2"> 🧐 </p><input type="checkbox" id="show_password2">
+        <input type="password" class="form-control" name="cfg_wlan_PASSW_AP" value="{cfg_wlan_PASSW_AP}" maxlength="16" id="cfg_wlan_PASSW_AP" required="required" aria-required="true">
+    </div>
+    <h2 class="cat basic translate" id="Geol">Geolocation</h2>
+    <div class="cat form-group basic">
+        <label for="text-latitude" id="mess_geolocation">Configure the location of where the device will be installed.</label>
+    </div>
+    <div class="cat form-group basic">
+        <label for="text-latitude">Latitude</label>
+        <input type="latitude" class="form-control" name="text-latitude" value="{cfg_station_latitude}" maxlength="16" id="text-latitude" required="required" aria-required="true">
+    </div>
+    <div class="cat form-group basic">
+        <label for="text-longitude">Longitude</label>
+        <input type="longitude" class="form-control" name="text-longitude" value="{cfg_station_longitude}" maxlength="16" id="text-longitude" required="required" aria-required="true">
+    </div>
+    <h2 class="cat basic power translate" id="Meas">Measurement interval</h2>
+    <div class="cat form-group basic power">
+        <label for="measures-per-day">Measurement interval: <span id="minterval"></span> minutes</label><br>
+        <label for="measures-per-day">Measures per day: <span id="mpday"></span></label>
+        <div class="slider-container"><input class="slider" id="measures-per-day" name="measures-per-day" type="range" min="2" max="720" step="2" value="{cfg_cron_measurements_per_day}"></div>
+    </div>
+    <h2 class="cat basic translate" id="Data">Datalogger server</h2>
+    <div class="cat form-group basic">
+        <label for="datalogger-url">API server URL</label>
+        <input class="form-control datalogger-url" name="datalogger-url" id="datalogger-url" type="url" value="{cfg_datalogger_URL}">
+    </div>
+    <div class="cat form-group basic network power logger advanced">
+        <button name="opms" class="translate" value="submit" id="Submit">Submit</button>
     </div>
 </form>
 </div>
 <script>
-
 
 function addPasswordHider(icon, button, input) {{
     let pw_button = document.getElementById(button);
@@ -101,7 +113,8 @@ function addPasswordHider(icon, button, input) {{
     }});
 }};
 
-addPasswordHider("eyes3", "show_password3", "cfg_mqtt_pass")
+addPasswordHider("eyes", "show_password", "cfg_wlan_PASSW_0")
+addPasswordHider("eyes2", "show_password2", "cfg_wlan_PASSW_AP")
 
 function dropNav() {{
   var x = document.getElementById("navbar");
@@ -112,23 +125,32 @@ function dropNav() {{
   }}
 }}
 
+const slider_mpday = document.getElementById("measures-per-day");
+const mpday = document.getElementById("mpday");
+const minterval = document.getElementById("minterval");
+function onSlideMpday() {{
+    mpday.textContent = slider_mpday.value;
+    minterval.textContent = (60*24/slider_mpday.value).toFixed(3);
+}}
+slider_mpday.addEventListener('input', onSlideMpday, false);
+
 const translations = {{
   'English': {{
     'co01': 'Station configuration',
-    'EMQT': 'Enable MQTT',
-    'MQUL': 'MQTT server URL',
-    'MQur': 'MQTT user',
-    'MQpw': 'password',
-    'MQOS': 'MQTT QOS',
+    'Lang': 'Language',
+    'WiFi': 'WiFi credentials',
+    'Geol': 'Geolocation',
+    'Meas': 'Measurement interval',
+    'Data': 'Datalogger server',
     'Submit': 'Submit'
   }},
   'Italian': {{
     'co01': 'Configurazione della stazione',
-    'EMQT': 'Abilita MQTT',
-    'MQUL': 'URL del server MQTT',
-    'MQur': 'utente',
-    'MQpw': 'password',
-    'MQOS': 'MQTT QOS',
+    'Lang': 'Lingua',
+    'WiFi': 'Credenziali WiFi',
+    'Geol': 'Geolocalizzazione',
+    'Meas': 'Intervallo di misurazione',
+    'Data': 'Server di raccolta dei dati',
     'Submit': 'Salva'
   }}
 }};
@@ -151,6 +173,10 @@ window.onbeforeunload = myConfirmation;
 
 document.getElementById("rendered-form").addEventListener("submit", function() {{
     window.onbeforeunload = null;
+}});
+
+window.addEventListener("load", (event) => {{
+  onSlideMpday();
 }});
 </script>
 </body>

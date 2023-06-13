@@ -93,7 +93,7 @@ def serve_captive_portal():
     global wlan
     from sys import version
     from libs.sensors import sensorlist
-    from libs.microdot import Microdot, Response
+    from libs.microdot import Microdot, Response, redirect
     app = Microdot()
     Response.default_content_type = 'text/html'
     iam = machine.unique_id()
@@ -109,75 +109,6 @@ def serve_captive_portal():
     @app.post('/')
     def save_settings(request):
         print(request.body)
-
-    @app.get('/')
-    def load_form(request):
-        log_lines = []
-        try:
-            with open('/logs/' + logger.logfile, 'r') as f:
-                log_lines = f.readlines()
-        except Exception as e:
-            print("Could not read file: /logs/" + logger.logfile)
-            print(e)
-        lastlog_txt = "\n".join(log_lines)
-        leadacid_levels = leadacid.levels()
-        html_portal = open('/html/portal.html')
-        html_form = html_portal.read()
-        html_portal.close()
-        return html_form.format(
-            cfg_wlan_SSID_0 = config.wlan['SSID_0'],
-            cfg_wlan_PASSW_0 = config.wlan['PASSW_0'],
-            cfg_wlan_SSID_AP = config.wlan['AP_SSID'],
-            cfg_wlan_PASSW_AP = config.wlan['AP_PASSW'],
-            cfg_cron_measurements_per_day = str(config.cron['measurements_per_day']),
-            cfg_datalogger_URL = config.datalogger['URL'],
-            cfg_cron_NTP_server = config.cron['NTP_server'],
-            cfg_cron_NTPsync_interval = int(config.cron['NTPsync_interval']/3600),
-            cfg_cron_update_interval = int(config.cron['update_interval']/3600),
-            cfg_cron_data_submission_interval = int(config.cron['data_submission_interval']/60),
-            cfg_cron_data_submission_just_in_time = 1 if config.cron['data_submission_just_in_time'] else 0,
-            cfg_cron_data_submission_on_daylight = 1 if config.cron['data_submission_on_daylight'] else 0,
-            cfg_cron_morning = config.cron['morning'],
-            cfg_cron_evening = config.cron['evening'],
-            latest_log = lastlog_txt,
-            cfg_logger_loglevel = config.logger['loglevel'],
-            cfg_logger_logfileCount = config.logger['logfileCount'],
-            cfg_logger_print_log = 1 if config.logger['print_log'] else 0,
-            cfg_cron_use_wdt = 1 if config.cron['use_wdt'] else 0,
-            cfg_sensors_enable_sensors = 1 if config.sensors['enable_sensors'] else 0,
-            cfg_cron_repository = config.cron['repository'],
-            cfg_station_longitude = str(config.station['longitude']),
-            cfg_station_latitude = str(config.station['latitude']),
-            cfg_station_UID = config.station['UID'],
-            cfg_station_serial = config.station['station'],
-            cfg_status_temperature = leadacid_levels[0],
-            cfg_status_percentage = leadacid_levels[1],
-            cfg_status_vvvoltage = leadacid_levels[2],
-            cfg_status_is_charging = leadacid_levels[3],
-            cfg_mqtt_enable = 1 if config.mqttlogger['enable'] else 0,
-            cfg_mqtt_server = config.mqttlogger['server'],
-            cfg_mqtt_topic = config.mqttlogger['topic'],
-            cfg_mqtt_user = config.mqttlogger['user'],
-            cfg_mqtt_pass = config.mqttlogger['pass'],
-            cfg_mqtt_QOS = config.mqttlogger['QOS'],
-            cfg_sensor_preheating_s = config.cron['sensor_preheating_s'],
-            cfg_average_particle_measurements = config.sensors['average_particle_measurements'],
-            cfg_average_measurement_interval_ms = int(config.sensors['average_measurement_interval_ms']/1000),
-            cfg_cron_current_version = config.cron['current_version'],
-            cfg_cron_last_update_check = logger.timetuple_to_DTF(time.gmtime(config.cron['last_update_check'])),
-            cfg_micropython_version = version,
-            sensors_list = sensorlist())
-    wlan = network.WLAN(network.AP_IF)
-    passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
-    wlan.config(essid=config.wlan['AP_SSID'], password=config.wlan['AP_PASSW'])
-    wlan.active(True)
-    while wlan.active() is False:
-        pass
-    print(wlan.ifconfig()[0])
-    # now wait for a connection
-    while wlan.isconnected() is False:
-        pass
-    app.run(port=80)
     #wlan.disconnect()
     #machine.soft_reset()
             # request = str(request.decode('utf-8'))
@@ -206,3 +137,132 @@ def serve_captive_portal():
                         # config.set('station',"longitude",longitude)
                         # now send a confirmation page, wait ten seconds and reboot
                         #TODO
+
+    @app.post('/mqtt')
+    def save_mqtt_settings(request):
+        print(request.body)
+
+    @app.get('/mqtt')
+    def load_mqtt(request):
+        html_portal = open('/html/portal-mqtt.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            cfg_mqtt_enable = 1 if config.mqttlogger['enable'] else 0,
+            cfg_mqtt_server = config.mqttlogger['server'],
+            cfg_mqtt_topic = config.mqttlogger['topic'],
+            cfg_mqtt_user = config.mqttlogger['user'],
+            cfg_mqtt_pass = config.mqttlogger['pass'],
+            cfg_mqtt_QOS = config.mqttlogger['QOS'])
+
+    @app.get('/status')
+    def load_status(request):
+        leadacid_levels = leadacid.levels()
+        html_portal = open('/html/portal-status.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            cfg_station_UID = config.station['UID'],
+            cfg_station_serial = config.station['station'],
+            cfg_status_temperature = leadacid_levels[0],
+            cfg_status_percentage = leadacid_levels[1],
+            cfg_status_vvvoltage = leadacid_levels[2],
+            cfg_status_is_charging = leadacid_levels[3],
+            cfg_cron_current_version = config.cron['current_version'],
+            cfg_cron_last_update_check = logger.timetuple_to_DTF(time.gmtime(config.cron['last_update_check'])),
+            cfg_micropython_version = version,
+            sensors_list = sensorlist())
+
+    @app.get('/network')
+    def load_network(request):
+        html_portal = open('/html/portal-network.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            cfg_wlan_SSID_0 = config.wlan['SSID_0'],
+            cfg_wlan_PASSW_0 = config.wlan['PASSW_0'],
+            cfg_wlan_SSID_AP = config.wlan['AP_SSID'],
+            cfg_wlan_PASSW_AP = config.wlan['AP_PASSW'],
+            cfg_datalogger_URL = config.datalogger['URL'],
+            cfg_cron_NTP_server = config.cron['NTP_server'],
+            cfg_cron_NTPsync_interval = int(config.cron['NTPsync_interval']/3600),
+            cfg_cron_update_interval = int(config.cron['update_interval']/3600),
+            cfg_cron_repository = config.cron['repository'])
+
+    @app.get('/datalogger')
+    def load_datalogger(request):
+        html_portal = open('/html/portal-datalogger.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            cfg_cron_measurements_per_day = str(config.cron['measurements_per_day']),
+            cfg_datalogger_URL = config.datalogger['URL'],
+            cfg_cron_data_submission_interval = int(config.cron['data_submission_interval']/60),
+            cfg_cron_data_submission_just_in_time = 1 if config.cron['data_submission_just_in_time'] else 0,
+            cfg_cron_data_submission_on_daylight = 1 if config.cron['data_submission_on_daylight'] else 0,
+            cfg_cron_morning = config.cron['morning'],
+            cfg_cron_evening = config.cron['evening'],
+            cfg_average_particle_measurements = config.sensors['average_particle_measurements'],
+            cfg_average_measurement_interval_ms = int(config.sensors['average_measurement_interval_ms']/1000))
+
+    @app.get('/syslogger')
+    def load_syslogger(request):
+        log_lines = []
+        try:
+            with open('/logs/' + logger.logfile, 'r') as f:
+                log_lines = f.readlines()
+        except Exception as e:
+            print("Could not read file: /logs/" + logger.logfile)
+            print(e)
+        lastlog_txt = "\n".join(log_lines)
+        html_portal = open('/html/portal-syslogger.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            latest_log = lastlog_txt,
+            cfg_logger_loglevel = config.logger['loglevel'],
+            cfg_logger_logfileCount = config.logger['logfileCount'],
+            cfg_logger_print_log = 1 if config.logger['print_log'] else 0)
+
+    @app.get('/advanced')
+    def load_advanced(request):
+        html_portal = open('/html/portal-advanced.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            cfg_cron_use_wdt = 1 if config.cron['use_wdt'] else 0,
+            cfg_sensors_enable_sensors = 1 if config.sensors['enable_sensors'] else 0,
+            cfg_cron_repository = config.cron['repository'],
+            cfg_sensor_preheating_s = config.cron['sensor_preheating_s'])
+
+    @app.get('/')
+    def redirect_basic(request):
+        return redirect('/basic')
+    
+    @app.get('/basic')    
+    def load_form(request):
+        html_portal = open('/html/portal-basic.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            cfg_wlan_SSID_0 = config.wlan['SSID_0'],
+            cfg_wlan_PASSW_0 = config.wlan['PASSW_0'],
+            cfg_wlan_SSID_AP = config.wlan['AP_SSID'],
+            cfg_wlan_PASSW_AP = config.wlan['AP_PASSW'],
+            cfg_cron_measurements_per_day = str(config.cron['measurements_per_day']),
+            cfg_datalogger_URL = config.datalogger['URL'],
+            cfg_station_longitude = str(config.station['longitude']),
+            cfg_station_latitude = str(config.station['latitude']))
+
+
+    wlan = network.WLAN(network.AP_IF)
+    passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
+    wlan.config(essid=config.wlan['AP_SSID'], password=config.wlan['AP_PASSW'])
+    wlan.active(True)
+    while wlan.active() is False:
+        pass
+    print(wlan.ifconfig()[0])
+    # now wait for a connection
+    while wlan.isconnected() is False:
+        pass
+    app.run(port=80)

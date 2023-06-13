@@ -38,8 +38,8 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     <a href="/network" class="navbtn" id="network">network</a>
     <a href="/datalogger" class="navbtn" id="datalogger">datalogger</a>
     <a href="/syslogger" class="navbtn" id="syslogger">syslogger</a>
-    <a href="/mqtt" class="navbtn active" id="MQTT">MQTT</a>
-    <a href="/advanced" class="navbtn" id="advanced">advanced</a>
+    <a href="/mqtt" class="navbtn" id="MQTT">MQTT</a>
+    <a href="/advanced" class="navbtn active" id="advanced">advanced</a>
     <a href="javascript:void(0);" class="icon" onclick="dropNav()">&#9776;</a>
     <h2 class="cat basic translate" id="Lang">Language</h2>
     <select class="cat form-group basic" name="lang" id="language-select">
@@ -49,60 +49,32 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
 </div>
 <div class="well">
 <form class="rendered-form" id="rendered-form" action="" method="post">
-<!--
-    MQTT
--->
-<h2 class="cat MQTT translate" id="EMQT">Enable MQTT</h2>
-<div class="cat form-group MQTT">
-    <label for="mqtt_enable">if active, the station sends data also via MQTT.</label>
-    <input class="form-control mqtt_enable" name="mqtt_enable" id="mqtt_enable" type="checkbox" value="{cfg_mqtt_enable}">
-</div>
-<h2 class="cat MQTT translate" id="MQUL">MQTT server URL</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_server">The URL of the MQTT Broker.</label>
-    <input class="form-control cfg_mqtt_server" name="cfg_mqtt_server" id="cfg_mqtt_server" type="text" value="{cfg_mqtt_server}">
-</div>
-<h2 class="cat MQTT translate" id="MQur">MQTT user</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_user">The username for the MQTT Broker.</label>
-    <input class="form-control cfg_mqtt_user" name="cfg_mqtt_user" id="cfg_mqtt_user" type="text" value="{cfg_mqtt_user}">
-</div>
-<h2 class="cat MQTT translate" id="MQpw">password</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_pass">MQTT Password</label><p id="eyes3"> 🧐 </p><input type="checkbox" id="show_password3">
-    <input type="password" class="form-control" name="cfg_mqtt_pass" value="{cfg_mqtt_pass}" maxlength="16" id="cfg_mqtt_pass" required="required" aria-required="true">
-</div>
-<h2 class="cat MQTT translate" id="MQOS">MQTT QOS</h2>
-<div class="cat form-group MQTT">
-    <label for="update_interval">Level 0 sends at most once, level 1 sends at least once, level 2 sends exactly once.</label>
-    <div class="slider-container"><input class="form-control update_interval" name="update_interval" id="update_interval" type="number" min="0" max="2" value="{cfg_mqtt_QOS}"></div>
-</div>
+    <h2 class="cat advanced translate" id="EWDT">Enable WDT</h2>
+    <div class="cat form-group advanced">
+        <label for="use_wdt">if active, it enables the <mark>Watchdog timer</mark>. <br> The WDT is a key feature used to restart the system in case of malfunction, when the system is no more responsive.</label>
+        <input class="form-control use_wdt" name="use_wdt" id="use_wdt" type="checkbox" value="{cfg_cron_use_wdt}">
+    </div>
+    <h2 class="cat advanced translate" id="Eors">Enable sensors</h2>
+    <div class="cat form-group advanced">
+        <label for="enable_sensors">if active, the station uses every available i2c sensors. <br>It makes sense to disable it only for debugging or testing purposes.</label>
+        <input class="form-control enable_sensors" name="enable_sensors" id="enable_sensors" type="checkbox" value="{cfg_sensors_enable_sensors}">
+    </div>
+    <h2 class="cat advanced translate" id="UURL">Update repository URL</h2>
+    <div class="cat form-group advanced">
+        <label for="repository">The URL used to update the system.<br>The official [proof of concept] repository is <mark>https://raw.githubusercontent.com/aleppax/outdoorPMstation/updates/concept/softwarePico</mark></label>
+        <input class="form-control repository" name="repository" id="repository" type="url" value="{cfg_cron_repository}">
+    </div>
+    <h2 class="cat advanced translate" id="Sime">Sensors preheating time</h2>
+    <div class="cat form-group advanced">
+        <label for="cfg_sensor_preheating_s">the time in seconds required for the sensors to start up.</label>
+        <input class="form-control number" id="cfg_sensor_preheating_s" name="cfg_sensor_preheating_s" type="number" min="0" max="120" value="{cfg_sensor_preheating_s}">
+    </div>    
     <div class="cat form-group">
         <button class="translate" value="submit" id="Submit">Submit</button>
     </div>
 </form>
 </div>
 <script>
-
-
-function addPasswordHider(icon, button, input) {{
-    let pw_button = document.getElementById(button);
-    let pw_input = document.getElementById(input);
-    let pw_icon = document.getElementById(icon);
-    pw_button.addEventListener("click", () => {{
-      document.documentElement.classList.toggle(button);
-      if (pw_input.getAttribute("type") === "password") {{
-        pw_input.setAttribute("type", "text");
-        pw_icon.textContent = " 🤐 "
-      }} else {{
-        pw_input.setAttribute("type", "password");
-        pw_icon.textContent = " 🧐 "
-      }}
-    }});
-}};
-
-addPasswordHider("eyes3", "show_password3", "cfg_mqtt_pass")
-
 function dropNav() {{
   var x = document.getElementById("navbar");
   if (x.className === "topnav") {{
@@ -115,20 +87,20 @@ function dropNav() {{
 const translations = {{
   'English': {{
     'co01': 'Station configuration',
-    'EMQT': 'Enable MQTT',
-    'MQUL': 'MQTT server URL',
-    'MQur': 'MQTT user',
-    'MQpw': 'password',
-    'MQOS': 'MQTT QOS',
+    'Lang': 'Language',
+    'EWDT': 'Enable WDT',
+    'Eors': 'Enable sensors',
+    'UURL': 'Update repository URL',
+    'Sime': 'Sensors preheating time',
     'Submit': 'Submit'
   }},
   'Italian': {{
     'co01': 'Configurazione della stazione',
-    'EMQT': 'Abilita MQTT',
-    'MQUL': 'URL del server MQTT',
-    'MQur': 'utente',
-    'MQpw': 'password',
-    'MQOS': 'MQTT QOS',
+    'Lang': 'Lingua',
+    'EWDT': 'Abilita il WDT',
+    'Eors': 'Abilita i sensori',
+    'UURL': 'URL del repository di aggiornamento',
+    'Sime': 'Tempo di preriscaldo dei sensori',
     'Submit': 'Salva'
   }}
 }};

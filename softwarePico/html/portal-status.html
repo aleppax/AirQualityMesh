@@ -7,9 +7,8 @@
 <link rel="icon" href="data:,">
 <style>
 body{{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#555}}
-#co01{{color:#04aa6d}}
-#co01{{padding-left:20px}}
-#eyes3{{display:inline;}}
+#control-01{{color:#04aa6d}}
+#control-01,#control-02{{padding-left:20px}}
 #battery{{background-color: #d6ffd5;border-radius:6px;padding:16px;}}
 br, label{{margin-bottom:5px;}}
 mark{{background-color:#ace1ac}}
@@ -34,11 +33,11 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
 <div class="topnav" id="navbar">
     <h1 id="co01" class="translate">Station configuration</h1>
     <a href="/basic" class="navbtn" id="basic">basic</a>
-    <a href="/status" class="navbtn" id="status">status</a>
+    <a href="/status" class="navbtn active" id="status">status</a>
     <a href="/network" class="navbtn" id="network">network</a>
     <a href="/datalogger" class="navbtn" id="datalogger">datalogger</a>
     <a href="/syslogger" class="navbtn" id="syslogger">syslogger</a>
-    <a href="/mqtt" class="navbtn active" id="MQTT">MQTT</a>
+    <a href="/mqtt" class="navbtn" id="MQTT">MQTT</a>
     <a href="/advanced" class="navbtn" id="advanced">advanced</a>
     <a href="javascript:void(0);" class="icon" onclick="dropNav()">&#9776;</a>
     <h2 class="cat basic translate" id="Lang">Language</h2>
@@ -48,61 +47,32 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     </select>
 </div>
 <div class="well">
-<form class="rendered-form" id="rendered-form" action="" method="post">
 <!--
-    MQTT
+    STATUS
 -->
-<h2 class="cat MQTT translate" id="EMQT">Enable MQTT</h2>
-<div class="cat form-group MQTT">
-    <label for="mqtt_enable">if active, the station sends data also via MQTT.</label>
-    <input class="form-control mqtt_enable" name="mqtt_enable" id="mqtt_enable" type="checkbox" value="{cfg_mqtt_enable}">
+<h2 class="cat status">status dashboard - station {cfg_station_serial}</h2>
+<div class="cat status overflow">
+<div class="dash-box"><h3>Station unique ID: {cfg_station_UID}</h3></div>
+  <table>
+    <thead>
+        <tr>
+            <th class="translate" id="snsr">sensor</th><th class="translate" id="scon">connected</th><th class="translate" id="name">name</th><th class="translate" id="i2cd">i2c address</th><th class="translate" id="isax">is auxiliary</th>
+        </tr>
+    </thead>
+    <tbody id="sensor_list"></tbody>
+  </table>
+<div id="battery">  
+<div class="dash-box"><h3>battery charge {cfg_status_percentage} %</h3></div>
+<div class="dash-box"><h3>battery voltage {cfg_status_vvvoltage} V</h3></div>
+<div class="dash-box"><h3>battery is charging {cfg_status_is_charging}</h3></div>
 </div>
-<h2 class="cat MQTT translate" id="MQUL">MQTT server URL</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_server">The URL of the MQTT Broker.</label>
-    <input class="form-control cfg_mqtt_server" name="cfg_mqtt_server" id="cfg_mqtt_server" type="text" value="{cfg_mqtt_server}">
+<div class="dash-box"><h3>Temperature °C</h3><h4>{cfg_status_temperature}</h4></div>
+<div class="dash-box"><h3>current OPMS version</h3><h4>{cfg_cron_current_version}</h4></div>
+<div class="dash-box"><h3>Last update check</h3><h4>{cfg_cron_last_update_check}</h4></div>
+<div class="dash-box"><h3>Micropython version</h3><h4>{cfg_micropython_version}</h4></div>
 </div>
-<h2 class="cat MQTT translate" id="MQur">MQTT user</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_user">The username for the MQTT Broker.</label>
-    <input class="form-control cfg_mqtt_user" name="cfg_mqtt_user" id="cfg_mqtt_user" type="text" value="{cfg_mqtt_user}">
-</div>
-<h2 class="cat MQTT translate" id="MQpw">password</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_pass">MQTT Password</label><p id="eyes3"> 🧐 </p><input type="checkbox" id="show_password3">
-    <input type="password" class="form-control" name="cfg_mqtt_pass" value="{cfg_mqtt_pass}" maxlength="16" id="cfg_mqtt_pass" required="required" aria-required="true">
-</div>
-<h2 class="cat MQTT translate" id="MQOS">MQTT QOS</h2>
-<div class="cat form-group MQTT">
-    <label for="update_interval">Level 0 sends at most once, level 1 sends at least once, level 2 sends exactly once.</label>
-    <div class="slider-container"><input class="form-control update_interval" name="update_interval" id="update_interval" type="number" min="0" max="2" value="{cfg_mqtt_QOS}"></div>
-</div>
-    <div class="cat form-group">
-        <button class="translate" value="submit" id="Submit">Submit</button>
-    </div>
-</form>
 </div>
 <script>
-
-
-function addPasswordHider(icon, button, input) {{
-    let pw_button = document.getElementById(button);
-    let pw_input = document.getElementById(input);
-    let pw_icon = document.getElementById(icon);
-    pw_button.addEventListener("click", () => {{
-      document.documentElement.classList.toggle(button);
-      if (pw_input.getAttribute("type") === "password") {{
-        pw_input.setAttribute("type", "text");
-        pw_icon.textContent = " 🤐 "
-      }} else {{
-        pw_input.setAttribute("type", "password");
-        pw_icon.textContent = " 🧐 "
-      }}
-    }});
-}};
-
-addPasswordHider("eyes3", "show_password3", "cfg_mqtt_pass")
-
 function dropNav() {{
   var x = document.getElementById("navbar");
   if (x.className === "topnav") {{
@@ -112,24 +82,40 @@ function dropNav() {{
   }}
 }}
 
+function sensorlist_to_table() {{
+    var tbody = document.getElementById("sensor_list");
+    var raw_text = "{sensors_list}";
+    let list_rows = raw_text.split('§n');
+    for (var i=0; i < list_rows.length; i++) {{
+        let spacer = tbody.insertRow();
+        spacer.classList.add("spacer-row");
+        let row = tbody.insertRow();
+        row.classList.add("filled-row");
+        let row_items = list_rows[i].split('§t');
+        for (var j=0; j < row_items.length; j++) {{
+            let cell = row.insertCell();
+            let text = document.createTextNode(row_items[j]);
+            cell.appendChild(text);
+        }}
+    }}
+}}
+
 const translations = {{
   'English': {{
-    'co01': 'Station configuration',
-    'EMQT': 'Enable MQTT',
-    'MQUL': 'MQTT server URL',
-    'MQur': 'MQTT user',
-    'MQpw': 'password',
-    'MQOS': 'MQTT QOS',
-    'Submit': 'Submit'
+    'Lang': 'Language',
+    'snsr': 'sensor',
+    'scon': 'is connected',
+    'name': 'name',
+    'i2cd': 'i2c address',
+    'isax': 'is aux'
   }},
   'Italian': {{
-    'co01': 'Configurazione della stazione',
-    'EMQT': 'Abilita MQTT',
-    'MQUL': 'URL del server MQTT',
-    'MQur': 'utente',
-    'MQpw': 'password',
-    'MQOS': 'MQTT QOS',
-    'Submit': 'Salva'
+    'Lang': 'Lingua',
+    'snsr': 'sensore',
+    'scon': 'è connesso',
+    'name': 'nome',
+    'i2cd': 'indirizzo i2c',
+    'isax': 'è di controllo'
   }}
 }};
 
@@ -143,15 +129,11 @@ lang_select.addEventListener("change",function(e) {{
     }}
 }});
 
-var submt = document.getElementById("Submit");
-function myConfirmation() {{
-    return 'Are you sure you want to leave?';
-}}
-window.onbeforeunload = myConfirmation;
-
-document.getElementById("rendered-form").addEventListener("submit", function() {{
-    window.onbeforeunload = null;
+window.addEventListener("load", (event) => {{
+  sensorlist_to_table();
 }});
+
+
 </script>
 </body>
 </html>

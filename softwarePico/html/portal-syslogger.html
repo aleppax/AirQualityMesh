@@ -37,8 +37,8 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     <a href="/status" class="navbtn" id="status">status</a>
     <a href="/network" class="navbtn" id="network">network</a>
     <a href="/datalogger" class="navbtn" id="datalogger">datalogger</a>
-    <a href="/syslogger" class="navbtn" id="syslogger">syslogger</a>
-    <a href="/mqtt" class="navbtn active" id="MQTT">MQTT</a>
+    <a href="/syslogger" class="navbtn active" id="syslogger">syslogger</a>
+    <a href="/mqtt" class="navbtn" id="MQTT">MQTT</a>
     <a href="/advanced" class="navbtn" id="advanced">advanced</a>
     <a href="javascript:void(0);" class="icon" onclick="dropNav()">&#9776;</a>
     <h2 class="cat basic translate" id="Lang">Language</h2>
@@ -49,59 +49,31 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
 </div>
 <div class="well">
 <form class="rendered-form" id="rendered-form" action="" method="post">
-<!--
-    MQTT
--->
-<h2 class="cat MQTT translate" id="EMQT">Enable MQTT</h2>
-<div class="cat form-group MQTT">
-    <label for="mqtt_enable">if active, the station sends data also via MQTT.</label>
-    <input class="form-control mqtt_enable" name="mqtt_enable" id="mqtt_enable" type="checkbox" value="{cfg_mqtt_enable}">
-</div>
-<h2 class="cat MQTT translate" id="MQUL">MQTT server URL</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_server">The URL of the MQTT Broker.</label>
-    <input class="form-control cfg_mqtt_server" name="cfg_mqtt_server" id="cfg_mqtt_server" type="text" value="{cfg_mqtt_server}">
-</div>
-<h2 class="cat MQTT translate" id="MQur">MQTT user</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_user">The username for the MQTT Broker.</label>
-    <input class="form-control cfg_mqtt_user" name="cfg_mqtt_user" id="cfg_mqtt_user" type="text" value="{cfg_mqtt_user}">
-</div>
-<h2 class="cat MQTT translate" id="MQpw">password</h2>
-<div class="cat form-group MQTT">
-    <label for="cfg_mqtt_pass">MQTT Password</label><p id="eyes3"> 🧐 </p><input type="checkbox" id="show_password3">
-    <input type="password" class="form-control" name="cfg_mqtt_pass" value="{cfg_mqtt_pass}" maxlength="16" id="cfg_mqtt_pass" required="required" aria-required="true">
-</div>
-<h2 class="cat MQTT translate" id="MQOS">MQTT QOS</h2>
-<div class="cat form-group MQTT">
-    <label for="update_interval">Level 0 sends at most once, level 1 sends at least once, level 2 sends exactly once.</label>
-    <div class="slider-container"><input class="form-control update_interval" name="update_interval" id="update_interval" type="number" min="0" max="2" value="{cfg_mqtt_QOS}"></div>
-</div>
+    <h2 class="cat logger translate" id="Llfl">Latest log file</h2>
+    <textarea class="cat logger" readonly id="latest-log" rows="30" cols="75">
+{latest_log}
+    </textarea>
+    <h2 class="cat logger translate" id="Loll">Log level</h2>
+    <div class="cat form-group logger">
+        <label for="loglevel">1 FATAL, 2 ERROR, 3 WARN, 4 INFO, 5 DEBUG.</label>
+        <input class="form-control loglevel" name="loglevel" id="loglevel" type="number" min="1" max="5" value="{cfg_logger_loglevel}">
+    </div>
+    <h2 class="cat logger translate" id="Lont">Log files count</h2>
+    <div class="cat form-group logger">
+        <label for="logfileCount">The system saves the log messages on a certain number of files, when it fills them it starts overwriting the oldest ones.<br> Set how many log files to fill before overwriting the oldest one.</label>
+        <div class="slider-container"><input class="form-control logfileCount" name="logfileCount" id="logfileCount" type="number" min="10" max="100" value="{cfg_logger_logfileCount}"></div>
+    </div>
+    <h2 class="cat logger translate" id="Pres">Print log messages</h2>
+    <div class="cat form-group logger">
+        <label for="print_log">if active, it forwards log messages also to the REPL console, in real time. Useful for debugging.</label>
+        <input class="form-control print_log" name="print_log" id="print_log" type="checkbox" value="{cfg_logger_print_log}">
+    </div>
     <div class="cat form-group">
         <button class="translate" value="submit" id="Submit">Submit</button>
     </div>
 </form>
 </div>
 <script>
-
-
-function addPasswordHider(icon, button, input) {{
-    let pw_button = document.getElementById(button);
-    let pw_input = document.getElementById(input);
-    let pw_icon = document.getElementById(icon);
-    pw_button.addEventListener("click", () => {{
-      document.documentElement.classList.toggle(button);
-      if (pw_input.getAttribute("type") === "password") {{
-        pw_input.setAttribute("type", "text");
-        pw_icon.textContent = " 🤐 "
-      }} else {{
-        pw_input.setAttribute("type", "password");
-        pw_icon.textContent = " 🧐 "
-      }}
-    }});
-}};
-
-addPasswordHider("eyes3", "show_password3", "cfg_mqtt_pass")
 
 function dropNav() {{
   var x = document.getElementById("navbar");
@@ -115,20 +87,18 @@ function dropNav() {{
 const translations = {{
   'English': {{
     'co01': 'Station configuration',
-    'EMQT': 'Enable MQTT',
-    'MQUL': 'MQTT server URL',
-    'MQur': 'MQTT user',
-    'MQpw': 'password',
-    'MQOS': 'MQTT QOS',
+    'Llfl': 'Latest log file',
+    'Loll': 'Log level',
+    'Lont': 'Log files count',
+    'Pres': 'Print log messages',
     'Submit': 'Submit'
   }},
   'Italian': {{
     'co01': 'Configurazione della stazione',
-    'EMQT': 'Abilita MQTT',
-    'MQUL': 'URL del server MQTT',
-    'MQur': 'utente',
-    'MQpw': 'password',
-    'MQOS': 'MQTT QOS',
+    'Llfl': 'Registro di log più recente',
+    'Loll': 'Livello di log',
+    'Lont': 'Quantità di files di log',
+    'Pres': 'Stampa messaggi di log',
     'Submit': 'Salva'
   }}
 }};
