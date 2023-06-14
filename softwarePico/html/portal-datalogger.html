@@ -67,12 +67,12 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     <h2 class="cat network power translate" id="Dsjt">Data submission just in time</h2>
     <div class="cat form-group network power">
         <label for="data_submission_just_in_time">if active, it bypasses the <mark>Data submission interval</mark> setting by sending the measurements as soon as they are collected.<br>It is very battery intensive.</label>
-        <input class="form-control data_submission_just_in_time" name="data_submission_just_in_time" id="data_submission_just_in_time" type="checkbox" value="{cfg_cron_data_submission_just_in_time}">
+        <input class="form-control data_submission_just_in_time" name="data_submission_just_in_time" id="data_submission_just_in_time" type="checkbox" {cfg_cron_data_submission_just_in_time}>
     </div>
     <h2 class="cat power translate" id="Dday">Data submission on daylight</h2>
     <div class="cat form-group power">
         <label for="data_submission_on_daylight">if active, it bypasses the <mark>Data submission interval</mark> and <mark>Data submission just in time</mark> settings during night time by sending the measurements only during the day, when the battery is helped by the solar panel.<br>It helps to save battery.</label>
-        <input class="form-control data_submission_on_daylight" name="data_submission_on_daylight" id="data_submission_on_daylight" type="checkbox" value="{cfg_cron_data_submission_on_daylight}">
+        <input class="form-control data_submission_on_daylight" name="data_submission_on_daylight" id="data_submission_on_daylight" type="checkbox" {cfg_cron_data_submission_on_daylight}>
     </div>
     <h2 class="cat power translate" id="Morg">Morning</h2>
     <div class="cat form-group power">
@@ -87,12 +87,12 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     <h2 class="cat advanced translate" id="Ales">Average samples</h2>
     <div class="cat form-group advanced">
         <label for="cfg_average_particle_measurements">the number of samplings used to calculate the average.</label>
-        <input class="form-control number" id="cfg_average_particle_measurements" name="cfg_average_particle_measurements" type="number" min="1" max="60" value="{cfg_average_particle_measurements}">
+        <input class="form-control number" id="cfg_average_particle_measurements" name="average_measurements" type="number" min="1" max="60" value="{average_measurements}">
     </div>        
     <h2 class="cat advanced translate" id="Aval">Average measurement interval</h2>
     <div class="cat form-group advanced">
         <label for="cfg_average_measurement_interval_ms">the interval between one sampling and the next, in seconds.</label>
-        <input class="form-control number" id="cfg_average_measurement_interval_ms" name="cfg_average_measurement_interval_ms" type="number" min="1" max="10" value="{cfg_average_measurement_interval_ms}">
+        <input class="form-control number" id="cfg_average_measurement_interval_ms" name="average_interval_ms" type="number" min="1" max="10" value="{average_interval_ms}">
     </div>
     <div class="cat form-group">
         <button class="translate" value="submit" id="Submit">Submit</button>

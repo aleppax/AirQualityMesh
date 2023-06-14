@@ -66,7 +66,7 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     <h2 class="cat logger translate" id="Pres">Print log messages</h2>
     <div class="cat form-group logger">
         <label for="print_log">if active, it forwards log messages also to the REPL console, in real time. Useful for debugging.</label>
-        <input class="form-control print_log" name="print_log" id="print_log" type="checkbox" value="{cfg_logger_print_log}">
+        <input class="form-control print_log" name="print_log" id="print_log" type="checkbox" {cfg_logger_print_log}>
     </div>
     <div class="cat form-group">
         <button class="translate" value="submit" id="Submit">Submit</button>
