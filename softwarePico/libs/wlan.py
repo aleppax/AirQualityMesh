@@ -140,7 +140,26 @@ def serve_captive_portal():
 
     @app.post('/mqtt')
     def save_mqtt_settings(request):
-        print(request.body)
+        logger.info(request.body)
+        mqtt_enable = True if request.form.get('mqtt_enable') is 'on' else False
+        cfg_mqtt_server = request.form.get('cfg_mqtt_server')
+        cfg_mqtt_topic = request.form.get('cfg_mqtt_topic').encode('utf-8')
+        cfg_mqtt_user = None if request.form.get('cfg_mqtt_user') is 'None' else request.form.get('cfg_mqtt_user')
+        cfg_mqtt_pass = None if request.form.get('cfg_mqtt_pass') is 'None' else request.form.get('cfg_mqtt_pass')
+        cfg_mqtt_QOS = int(request.form.get('cfg_mqtt_QOS'))
+        # for each setting, write to config if is changed
+        if mqtt_enable is not config.mqttlogger['enable']:
+            config.set('mqttlogger','enable', mqtt_enable)
+        if cfg_mqtt_server is not config.mqttlogger['server']:
+            config.set('mqttlogger','server', cfg_mqtt_server)
+        if cfg_mqtt_topic is not config.mqttlogger['topic']:
+            config.set('mqttlogger','topic', cfg_mqtt_topic)
+        if cfg_mqtt_user is not config.mqttlogger['user']:
+            config.set('mqttlogger','user', cfg_mqtt_user)
+        if cfg_mqtt_pass is not config.mqttlogger['pass']:
+            config.set('mqttlogger','pass', cfg_mqtt_pass)
+        if cfg_mqtt_QOS is not config.mqttlogger['QOS']:
+            config.set('mqttlogger','QOS', cfg_mqtt_QOS)
 
     @app.get('/mqtt')
     def load_mqtt(request):
@@ -148,12 +167,16 @@ def serve_captive_portal():
         html_form = html_portal.read()
         html_portal.close()
         return html_form.format(
-            cfg_mqtt_enable = 1 if config.mqttlogger['enable'] else 0,
+            cfg_mqtt_enable = 'checked' if config.mqttlogger['enable'] else '',
             cfg_mqtt_server = config.mqttlogger['server'],
-            cfg_mqtt_topic = config.mqttlogger['topic'],
+            cfg_mqtt_topic = config.mqttlogger['topic'].decode('utf-8'),
             cfg_mqtt_user = config.mqttlogger['user'],
             cfg_mqtt_pass = config.mqttlogger['pass'],
-            cfg_mqtt_QOS = config.mqttlogger['QOS'])
+            cfg_mqtt_QOS = str(config.mqttlogger['QOS']))
+
+    @app.post('/status')
+    def save_status_settings(request):
+        logger.info(request.body)
 
     @app.get('/status')
     def load_status(request):
@@ -173,6 +196,10 @@ def serve_captive_portal():
             cfg_micropython_version = version,
             sensors_list = sensorlist())
 
+    @app.post('/network')
+    def save_network_settings(request):
+        logger.info(request.body)
+
     @app.get('/network')
     def load_network(request):
         html_portal = open('/html/portal-network.html')
@@ -189,6 +216,10 @@ def serve_captive_portal():
             cfg_cron_update_interval = int(config.cron['update_interval']/3600),
             cfg_cron_repository = config.cron['repository'])
 
+    @app.post('/datalogger')
+    def save_datalogger_settings(request):
+        logger.info(request.body)
+
     @app.get('/datalogger')
     def load_datalogger(request):
         html_portal = open('/html/portal-datalogger.html')
@@ -204,6 +235,10 @@ def serve_captive_portal():
             cfg_cron_evening = config.cron['evening'],
             cfg_average_particle_measurements = config.sensors['average_particle_measurements'],
             cfg_average_measurement_interval_ms = int(config.sensors['average_measurement_interval_ms']/1000))
+
+    @app.post('/syslogger')
+    def save_syslogger_settings(request):
+        logger.info(request.body)
 
     @app.get('/syslogger')
     def load_syslogger(request):
@@ -224,6 +259,10 @@ def serve_captive_portal():
             cfg_logger_logfileCount = config.logger['logfileCount'],
             cfg_logger_print_log = 1 if config.logger['print_log'] else 0)
 
+    @app.post('/advanced')
+    def save_advanced_settings(request):
+        logger.info(request.body)
+
     @app.get('/advanced')
     def load_advanced(request):
         html_portal = open('/html/portal-advanced.html')
@@ -239,6 +278,10 @@ def serve_captive_portal():
     def redirect_basic(request):
         return redirect('/basic')
     
+    @app.post('/basic')
+    def save_basic_settings(request):
+        logger.info(request.body)
+
     @app.get('/basic')    
     def load_form(request):
         html_portal = open('/html/portal-basic.html')
