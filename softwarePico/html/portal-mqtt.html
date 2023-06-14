@@ -55,12 +55,17 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
 <h2 class="cat MQTT translate" id="EMQT">Enable MQTT</h2>
 <div class="cat form-group MQTT">
     <label for="mqtt_enable">if active, the station sends data also via MQTT.</label>
-    <input class="form-control mqtt_enable" name="mqtt_enable" id="mqtt_enable" type="checkbox" value="{cfg_mqtt_enable}">
+    <input class="form-control mqtt_enable" name="mqtt_enable" id="mqtt_enable" type="checkbox" "{cfg_mqtt_enable}">
 </div>
 <h2 class="cat MQTT translate" id="MQUL">MQTT server URL</h2>
 <div class="cat form-group MQTT">
     <label for="cfg_mqtt_server">The URL of the MQTT Broker.</label>
     <input class="form-control cfg_mqtt_server" name="cfg_mqtt_server" id="cfg_mqtt_server" type="text" value="{cfg_mqtt_server}">
+</div>
+<h2 class="cat MQTT translate" id="MQur">MQTT topic</h2>
+<div class="cat form-group MQTT">
+    <label for="cfg_mqtt_topic">The first level topic used for the MQTT Broker.</label>
+    <input class="form-control cfg_mqtt_topic" name="cfg_mqtt_topic" id="cfg_mqtt_topic" type="text" value="{cfg_mqtt_topic}">
 </div>
 <h2 class="cat MQTT translate" id="MQur">MQTT user</h2>
 <div class="cat form-group MQTT">
@@ -74,8 +79,8 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
 </div>
 <h2 class="cat MQTT translate" id="MQOS">MQTT QOS</h2>
 <div class="cat form-group MQTT">
-    <label for="update_interval">Level 0 sends at most once, level 1 sends at least once, level 2 sends exactly once.</label>
-    <div class="slider-container"><input class="form-control update_interval" name="update_interval" id="update_interval" type="number" min="0" max="2" value="{cfg_mqtt_QOS}"></div>
+    <label for="cfg_mqtt_QOS">Level 0 sends at most once, level 1 sends at least once, level 2 sends exactly once.</label>
+    <div class="slider-container"><input class="form-control cfg_mqtt_QOS" name="cfg_mqtt_QOS" id="cfg_mqtt_QOS" type="number" min="0" max="2" value="{cfg_mqtt_QOS}" autocomplete="off"></div>
 </div>
     <div class="cat form-group">
         <button class="translate" value="submit" id="Submit">Submit</button>
