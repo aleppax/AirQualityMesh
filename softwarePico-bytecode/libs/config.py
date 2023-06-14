@@ -26,52 +26,52 @@ board = {
     'WDT_seconds' : 8,
 }
 cron = {
-    'NTP_server' : 'it.pool.ntp.org',
-    'NTP_server_count' : 4,
-    'NTPsync_interval' : 3600 * 24,
-    # 'NTPsync_interval' every x hours
-    'update_interval' : 3600 * 24,
-    # 'update_interval' every x hours
-    'data_submission_interval' : 3600,
-    # 'data_submission_interval' every hour
-    'data_submission_just_in_time' : False,
+    'NTP_server' : 'it.pool.ntp.org',                   ### network ###
+    'NTP_server_count' : 4,                             ### advanced ###
+    'NTPsync_interval' : 3600 * 24,                     ### network ###
+    # 'NTPsync_interval' every x seconds
+    'update_interval' : 3600 * 24,                      ### network ###
+    # 'update_interval' every x seconds
+    'data_submission_interval' : 3600,                  ### network ###
+    # 'data_submission_interval' every x seconds
+    'data_submission_just_in_time' : False,             ### network ###
     # if you need realtime data submission, it overrides 'data_submission_interval'
-    'data_submission_on_daylight' : True,
+    'data_submission_on_daylight' : True,               ###  power  ###
     # if data is sent only from morning to evening
-    'morning' : 6,
+    'morning' : 6,                                      ###  power  ###
     # hour at which morning begins
-    'evening' : 18,
+    'evening' : 18,                                     ###  power  ###
     # hour at which evening begins
-    'measuremens_per_day' : 144,
-    # 'measuremens_per_day' interval starting at 0:00. do not set too high
+    'measurements_per_day' : 144,                       ###  basic  ###
+    # 'measurements_per_day' interval starting at 0:00. do not set too high
     'minimum_sleep_s' : 4,
     # 'minimum_sleep_s' avoid too short sleep periods leading to malfunction
     'sensor_preheating_s' : 30,
     # 'sensor_preheating_s' do not change, suggested by the manufacturers' datasheets
-    'last_update_check' : 0,
-    'current_version' : 1,
-    'repository' : 'https://raw.githubusercontent.com/aleppax/outdoorPMstation/updates/concept/softwarePico',
+    'last_update_check' : 0,                            ### status  ###
+    'current_version' : 1,                              ### status  ###
+    'repository' : 'https://raw.githubusercontent.com/aleppax/outdoorPMstation/updates/concept/softwarePico',    ###  advanced  ###
     #'repository' : 'http://192.168.0.88:8000', # example of local server
     'latest_timestamp' : 1609459200,
     'deepsleep_reset' : False,
-    'use_wdt' : True,
+    'use_wdt' : True,                                  ### advanced ###
 }
 datalogger = {
-    'URL' : 'http://example.org/opms/api.php/records/measurements/',
-    # use your REST server. prefer unsecure http 
-    # due to limitations of the implementation.
+    'URL' : 'http://example.org/opms/api.php/records/',
+    # use your REST server. prefer unsecure http        ###  basic  ###
+    # to avoid crashes due to limitations of the implementation.
 }
 filelogger = {
     'filename' : '/logs/measures.txt',
 }
 logger = {
     'logfile' : 'system.log',
-    'filesize_limit_byte' : 4000,
-    'logfileCount' : 10,
-    'lastlog' : 0,
-    'print_log' : True,
+    'filesize_limit_byte' : 6000,                       
+    'logfileCount' : 12,                                ###  logger  ###
+    'lastlog' : 0,                                      ###  shows last log content
+    'print_log' : True,                                 ###  logger  ###
     'enable_log' : True,
-    'loglevel' : 4,
+    'loglevel' : 4,                                     ###  logger  ###
 }
 leadacid = {
     'battery_voltage' : 4.0,
@@ -83,12 +83,12 @@ leadacid = {
     'low_power_mode' : False,
 }
 mqttlogger = {
-    'enable' : False,
-    'server' : '',
-    'topic' : b'opms/',
-    'user' : None,
-    'pass' : None,
-    'QOS' : 0, # default QOS is 0 and can be changed to 1
+    'enable' : False,                                   ### network ###
+    'server' : '',                                      ### network ###
+    'topic' : b'opms/',                                 ### network ###
+    'user' : None,                                      ### network ###
+    'pass' : None,                                      ### network ###
+    'QOS' : 0, # default QOS is 0 and can be changed to 1 ### network ###
 }
 picosngcja5 = {
     'name' : 'Laser Type PM Sensor SN-GCJA5',
@@ -109,11 +109,11 @@ qmc5883 = {
     'init_arguments' : {},
     'i2c_address' : '0x13',
 }
-sensors = {
-    'average_particle_measurements' : 20,
-    'average_measurement_interval_ms' : 1000,
-    'enable_sensors' : True,
-    'aux_measure_s' : 3600, # 1 hour
+sensors = {                                             ###  status  ### (shows connected I2C sensors)
+    'average_particle_measurements' : 20,               ### advanced ###
+    'average_measurement_interval_ms' : 1000,           ### advanced ###
+    'enable_sensors' : True,                            ### advanced ###
+    'aux_measure_s' : 3600, # 1 hour                    ### advanced ###
 }
 sps30 = {
     'name' : 'PM Sensor SPS30',
@@ -129,16 +129,19 @@ sps30 = {
 }
 
 station = {
-    'station' : 1, # this should be unique at least server wise.
-    'latitude' : 0.0,
-    'longitude' : 0.0,
+    'UID' : None,                                       ###  status  ###
+    'station' : None, # unique at least server wise.    ###  status  ###
+    'latitude' : 0.0,                                   ###  basic  ###
+    'longitude' : 0.0,                                  ###  basic  ###
 }
 wlan = {
-    'SSID_0' : 'xxx',
-    'PASSW_0' : 'xxx',
-    'connection_timeout' : 15,
+    'SSID_0' : 'xxx',                                   ###  basic  ###
+    'PASSW_0' : 'xxx',                                  ###  basic  ###
+    'AP_SSID' : 'opms',                                   ###  basic  ###
+    'AP_PASSW' : 'opmsopms',                                  ###  basic  ###
+    'connection_timeout' : 15,                          ### network ###
     # at least 10s lower than cron.['sensor_preheating_s']
-    'country_code' : 'IT',
+    'country_code' : 'IT',                              ### network ###
 }
 
 mftsc = {
