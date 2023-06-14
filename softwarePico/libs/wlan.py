@@ -106,37 +106,53 @@ def serve_captive_portal():
         request.app.shutdown()
         machine.reset()
 
-    @app.post('/')
-    def save_settings(request):
-        print(request.body)
-    #wlan.disconnect()
-    #machine.soft_reset()
-            # request = str(request.decode('utf-8'))
-            # reqstrings = request.split("\r\n")
-            # for part in reqstrings:
-                # if 'GET /?' in part:
-                    # subparts = part.split("&")
-                    # if 'text-password=' in subparts[1]:
-                        # newpassword = subparts[1].split('=')[1]
-                        # newssid = subparts[0].split('=')[1]
-                    # if 'text-latitude' in subparts[2]:
-                        # latitude = subparts[2].split('=')[1]
-                    # if 'text-longitude' in subparts[3]:
-                        # longitude = subparts[3].split('=')[1]
-                        # # validate field input
-                        # #TODO
-                        # exist_wifi = True
-                        # wifiNumber = 0
-                        # while exist_wifi:
-                            # wifiNumber += 1
-                            # ssid = "SSID_" + str(wifiNumber)
-                            # exist_wifi = ssid in config.wlan
-                        # config.set('wlan',"SSID_" + str(wifiNumber),newssid)
-                        # config.set('wlan',"PASSW_" + str(wifiNumber),newpassword)
-                        # config.set('station',"latitude",latitude)
-                        # config.set('station',"longitude",longitude)
-                        # now send a confirmation page, wait ten seconds and reboot
-                        #TODO
+    @app.get('/')
+    def redirect_basic(request):
+        return redirect('/basic')
+    
+    @app.post('/basic')
+    def save_basic_settings(request):
+        logger.info(request.body)
+        SSID_0 = request.form.get('cfg_wlan_SSID_0')
+        PASSW_0 = request.form.get('cfg_wlan_PASSW_0')
+        AP_SSID = request.form.get('cfg_wlan_SSID_AP')
+        AP_PASSW = request.form.get('cfg_wlan_PASSW_AP')
+        measurements_per_day = int(request.form.get('measures-per-day'))
+        URL = request.form.get('datalogger-url')
+        longitude = float(request.form.get('text-longitude'))
+        latitude = float(request.form.get('text-latitude'))
+        # for each setting, write to config if is changed
+        if SSID_0 is not config.wlan['SSID_0']:
+            config.set('wlan','SSID_0', SSID_0)
+        if PASSW_0 is not config.wlan['PASSW_0']:
+            config.set('wlan','PASSW_0', PASSW_0)
+        if AP_SSID is not config.wlan['AP_SSID']:
+            config.set('wlan','AP_SSID', AP_SSID)
+        if AP_PASSW is not config.wlan['AP_PASSW']:
+            config.set('wlan','AP_PASSW', AP_PASSW)
+        if measurements_per_day is not config.cron['measurements_per_day']:
+            config.set('cron','measurements_per_day', measurements_per_day)
+        if URL is not config.datalogger['URL']:
+            config.set('datalogger','URL', URL)
+        if longitude is not config.station['longitude']:
+            config.set('station','longitude', longitude)
+        if latitude is not config.station['latitude']:
+            config.set('station','latitude', latitude)
+
+    @app.get('/basic')
+    def load_form(request):
+        html_portal = open('/html/portal-basic.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            cfg_wlan_SSID_0 = config.wlan['SSID_0'],
+            cfg_wlan_PASSW_0 = config.wlan['PASSW_0'],
+            cfg_wlan_SSID_AP = config.wlan['AP_SSID'],
+            cfg_wlan_PASSW_AP = config.wlan['AP_PASSW'],
+            cfg_cron_measurements_per_day = str(config.cron['measurements_per_day']),
+            cfg_datalogger_URL = config.datalogger['URL'],
+            cfg_station_longitude = str(config.station['longitude']),
+            cfg_station_latitude = str(config.station['latitude']))
 
     @app.post('/mqtt')
     def save_mqtt_settings(request):
@@ -174,10 +190,6 @@ def serve_captive_portal():
             cfg_mqtt_pass = config.mqttlogger['pass'],
             cfg_mqtt_QOS = str(config.mqttlogger['QOS']))
 
-    @app.post('/status')
-    def save_status_settings(request):
-        logger.info(request.body)
-
     @app.get('/status')
     def load_status(request):
         leadacid_levels = leadacid.levels()
@@ -199,6 +211,34 @@ def serve_captive_portal():
     @app.post('/network')
     def save_network_settings(request):
         logger.info(request.body)
+        SSID_0 = request.form.get('cfg_wlan_SSID_0')
+        PASSW_0 = request.form.get('cfg_wlan_PASSW_0')
+        AP_SSID = request.form.get('cfg_wlan_SSID_AP')
+        AP_PASSW = request.form.get('cfg_wlan_PASSW_AP')
+        URL = request.form.get('datalogger-url')
+        NTP_server = request.form.get('NTP-url')
+        NTPsync_interval = int(request.form.get('NTPsync_interval'))*3600
+        update_interval = int(request.form.get('update_interval'))*3600
+        repository = request.form.get('repository')
+        # for each setting, write to config if is changed
+        if SSID_0 is not config.wlan['SSID_0']:
+            config.set('wlan','SSID_0', SSID_0)
+        if PASSW_0 is not config.wlan['PASSW_0']:
+            config.set('wlan','PASSW_0', PASSW_0)
+        if AP_SSID is not config.wlan['AP_SSID']:
+            config.set('wlan','AP_SSID', AP_SSID)
+        if AP_PASSW is not config.wlan['AP_PASSW']:
+            config.set('wlan','AP_PASSW', AP_PASSW)
+        if URL is not config.datalogger['URL']:
+            config.set('datalogger','URL', URL)
+        if NTP_server is not config.cron['NTP_server']:
+            config.set('cron','NTP_server', NTP_server)
+        if NTPsync_interval is not config.cron['NTPsync_interval']:
+            config.set('cron','NTPsync_interval', NTPsync_interval)
+        if update_interval is not config.cron['update_interval']:
+            config.set('cron','update_interval', update_interval)
+        if repository is not config.cron['repository']:
+            config.set('cron','repository', repository)
 
     @app.get('/network')
     def load_network(request):
@@ -219,6 +259,34 @@ def serve_captive_portal():
     @app.post('/datalogger')
     def save_datalogger_settings(request):
         logger.info(request.body)
+        measurements_per_day = int(request.form.get('measures-per-day'))
+        URL = request.form.get('datalogger-url')
+        data_submission_interval = int(request.form.get('data_submission_interval'))*60
+        data_submission_just_in_time = True if request.form.get('data_submission_just_in_time') is 'on' else False
+        data_submission_on_daylight = True if request.form.get('data_submission_on_daylight') is 'on' else False
+        morning = int(request.form.get('morning'))
+        evening = int(request.form.get('evening'))
+        average_measurements = int(request.form.get('average_measurements'))
+        average_measurement_interval_ms = int(request.form.get('average_interval_ms'))*1000
+        # for each setting, write to config if is changed
+        if measurements_per_day is not config.cron['measurements_per_day']:
+            config.set('cron','measurements_per_day', measurements_per_day)
+        if URL is not config.datalogger['URL']:
+            config.set('datalogger','URL', URL)
+        if data_submission_interval is not config.cron['data_submission_interval']:
+            config.set('cron','data_submission_interval', data_submission_interval)
+        if data_submission_just_in_time is not config.cron['data_submission_just_in_time']:
+            config.set('cron','data_submission_just_in_time', data_submission_just_in_time)
+        if data_submission_on_daylight is not config.cron['data_submission_on_daylight']:
+            config.set('cron','data_submission_on_daylight', data_submission_on_daylight)
+        if morning is not config.cron['morning']:
+            config.set('cron','morning', morning)
+        if evening is not config.cron['evening']:
+            config.set('cron','evening', evening)
+        if average_measurements is not config.sensors['average_particle_measurements']:
+            config.set('sensors','average_particle_measurements', average_measurements)
+        if average_measurement_interval_ms is not config.sensors['average_measurement_interval_ms']:
+            config.set('sensors','average_measurement_interval_ms', average_measurement_interval_ms)
 
     @app.get('/datalogger')
     def load_datalogger(request):
@@ -229,16 +297,26 @@ def serve_captive_portal():
             cfg_cron_measurements_per_day = str(config.cron['measurements_per_day']),
             cfg_datalogger_URL = config.datalogger['URL'],
             cfg_cron_data_submission_interval = int(config.cron['data_submission_interval']/60),
-            cfg_cron_data_submission_just_in_time = 1 if config.cron['data_submission_just_in_time'] else 0,
-            cfg_cron_data_submission_on_daylight = 1 if config.cron['data_submission_on_daylight'] else 0,
+            cfg_cron_data_submission_just_in_time = 'checked' if config.cron['data_submission_just_in_time'] else '',
+            cfg_cron_data_submission_on_daylight = 'checked' if config.cron['data_submission_on_daylight'] else '',
             cfg_cron_morning = config.cron['morning'],
             cfg_cron_evening = config.cron['evening'],
-            cfg_average_particle_measurements = config.sensors['average_particle_measurements'],
-            cfg_average_measurement_interval_ms = int(config.sensors['average_measurement_interval_ms']/1000))
+            average_measurements = config.sensors['average_particle_measurements'],
+            average_interval_ms = int(config.sensors['average_measurement_interval_ms']/1000))
 
     @app.post('/syslogger')
     def save_syslogger_settings(request):
         logger.info(request.body)
+        loglevel = int(request.form.get('loglevel'))
+        logfileCount = int(request.form.get('logfileCount'))
+        print_log = True if request.form.get('print_log') is 'on' else False
+        # for each setting, write to config if is changed
+        if loglevel is not config.logger['loglevel']:
+            config.set('logger','loglevel', loglevel)
+        if logfileCount is not config.logger['logfileCount']:
+            config.set('logger','logfileCount', logfileCount)
+        if print_log is not config.logger['print_log']:
+            config.set('logger','print_log', print_log)
 
     @app.get('/syslogger')
     def load_syslogger(request):
@@ -257,11 +335,24 @@ def serve_captive_portal():
             latest_log = lastlog_txt,
             cfg_logger_loglevel = config.logger['loglevel'],
             cfg_logger_logfileCount = config.logger['logfileCount'],
-            cfg_logger_print_log = 1 if config.logger['print_log'] else 0)
+            cfg_logger_print_log = 'checked' if config.logger['print_log'] else '')
 
     @app.post('/advanced')
     def save_advanced_settings(request):
         logger.info(request.body)
+        use_wdt = True if request.form.get('use_wdt') is 'on' else False
+        enable_sensors = True if request.form.get('enable_sensors') is 'on' else False
+        repository = request.form.get('repository')
+        sensor_preheating_s = request.form.get('sensor_preheating_s')
+        # for each setting, write to config if is changed
+        if use_wdt is not config.cron['use_wdt']:
+            config.set('cron','use_wdt', use_wdt)
+        if enable_sensors is not config.sensors['enable_sensors']:
+            config.set('sensors','enable_sensors', enable_sensors)
+        if repository is not config.cron['repository']:
+            config.set('cron','repository', repository)
+        if sensor_preheating_s is not config.cron['sensor_preheating_s']:
+            config.set('cron','sensor_preheating_s', sensor_preheating_s)
 
     @app.get('/advanced')
     def load_advanced(request):
@@ -269,35 +360,12 @@ def serve_captive_portal():
         html_form = html_portal.read()
         html_portal.close()
         return html_form.format(
-            cfg_cron_use_wdt = 1 if config.cron['use_wdt'] else 0,
-            cfg_sensors_enable_sensors = 1 if config.sensors['enable_sensors'] else 0,
+            cfg_cron_use_wdt = 'checked' if config.cron['use_wdt'] else '',
+            enable_sensors = 'checked' if config.sensors['enable_sensors'] else '',
             cfg_cron_repository = config.cron['repository'],
             cfg_sensor_preheating_s = config.cron['sensor_preheating_s'])
 
-    @app.get('/')
-    def redirect_basic(request):
-        return redirect('/basic')
-    
-    @app.post('/basic')
-    def save_basic_settings(request):
-        logger.info(request.body)
-
-    @app.get('/basic')    
-    def load_form(request):
-        html_portal = open('/html/portal-basic.html')
-        html_form = html_portal.read()
-        html_portal.close()
-        return html_form.format(
-            cfg_wlan_SSID_0 = config.wlan['SSID_0'],
-            cfg_wlan_PASSW_0 = config.wlan['PASSW_0'],
-            cfg_wlan_SSID_AP = config.wlan['AP_SSID'],
-            cfg_wlan_PASSW_AP = config.wlan['AP_PASSW'],
-            cfg_cron_measurements_per_day = str(config.cron['measurements_per_day']),
-            cfg_datalogger_URL = config.datalogger['URL'],
-            cfg_station_longitude = str(config.station['longitude']),
-            cfg_station_latitude = str(config.station['latitude']))
-
-
+    # activate wifi
     wlan = network.WLAN(network.AP_IF)
     passwd = binascii.hexlify(iam).decode('utf-8')[-8:]
     wlan.config(essid=config.wlan['AP_SSID'], password=config.wlan['AP_PASSW'])

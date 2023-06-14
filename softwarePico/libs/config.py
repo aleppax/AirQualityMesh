@@ -29,11 +29,11 @@ cron = {
     'NTP_server' : 'it.pool.ntp.org',                   ### network ###
     'NTP_server_count' : 4,                             ### advanced ###
     'NTPsync_interval' : 3600 * 24,                     ### network ###
-    # 'NTPsync_interval' every x hours
+    # 'NTPsync_interval' every x seconds
     'update_interval' : 3600 * 24,                      ### network ###
-    # 'update_interval' every x hours
+    # 'update_interval' every x seconds
     'data_submission_interval' : 3600,                  ### network ###
-    # 'data_submission_interval' every hour
+    # 'data_submission_interval' every x seconds
     'data_submission_just_in_time' : False,             ### network ###
     # if you need realtime data submission, it overrides 'data_submission_interval'
     'data_submission_on_daylight' : True,               ###  power  ###
