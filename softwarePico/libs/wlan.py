@@ -5,7 +5,7 @@ import socket
 import binascii
 import time
 from libs import logger, config, leadacid
-from libs.cron import feed_wdt
+from libs.cron import feed_wdt, pause_wdt
 
 wlan = None
 trying = False
@@ -90,6 +90,7 @@ def connect(wifiNumber=0):
         return False
 
 def serve_captive_portal():
+    pause_wdt()
     global wlan
     from sys import version
     from libs.sensors import sensorlist
