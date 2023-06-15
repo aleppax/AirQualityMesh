@@ -107,14 +107,14 @@ function dropNav() {{
   }} else {{
     x.className = "topnav";
   }}
-}}
+}};
 const slider_mpday = document.getElementById("measures-per-day");
 const mpday = document.getElementById("mpday");
 const minterval = document.getElementById("minterval");
 function onSlideMpday() {{
     mpday.textContent = slider_mpday.value;
     minterval.textContent = (60*24/slider_mpday.value).toFixed(3);
-}}
+}};
 slider_mpday.addEventListener('input', onSlideMpday, false);
 const translations = {{
   'English': {{
@@ -160,7 +160,7 @@ lang_select.addEventListener("change",function(e) {{
 var submt = document.getElementById("Submit");
 function myConfirmation() {{
     return 'Are you sure you want to leave?';
-}}
+}};
 window.onbeforeunload = myConfirmation;
 
 document.getElementById("rendered-form").addEventListener("submit", function() {{
