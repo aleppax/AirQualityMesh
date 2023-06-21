@@ -1,6 +1,6 @@
 import argparse
 import os
-import softwarePico.version as vers
+import softwarePico_src.version as vers
 
 parser = argparse.ArgumentParser(
     prog='python3 ./PYMakefile.py',
@@ -18,8 +18,8 @@ if args.bytecode:
     for fpath,fnames in vers.all_files.items():
         for fname in fnames:
             if (fname not in exclude_files) and (fname.split('.')[1] == 'py'):
-                infile = './softwarePico-src' + fpath + fname
-                outfile = './softwarePico-dist' + fpath + fname.split('.')[0] + '.mpy'
+                infile = './softwarePico_src' + fpath + fname
+                outfile = './softwarePico_dist' + fpath + fname.split('.')[0] + '.mpy'
                 print('compiling ' + infile)
                 comd = mpy_cross + ' ' + infile + ' -o ' + outfile
                 if args.verbose:

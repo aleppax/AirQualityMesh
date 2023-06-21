@@ -10,7 +10,7 @@ updated_files = {
 # full update requires a list of all files
 all_files = {
     '/'     : ['main.py','opms.py'], # there is no need to include version.py
-    '/libs/' : ['ahtx0.py','bmp280.py','config.py','cron.py','datalogger.py','filelogger.py','__init__.py','leadacid.py','logger.py','microdot.mpy','mqttlogger.py','picosngcja5.py','qmc5883.py','sensors.py','simple.py','sps30.py','wlan.py'],
+    '/libs/' : ['ahtx0.py','bmp280.py','config.py','cron.py','datalogger.py','filelogger.py','__init__.py','leadacid.py','logger.py','microdot.py','mqttlogger.py','picosngcja5.py','qmc5883.py','sensors.py','simple.py','sps30.py','wlan.py'],
     '/logs/' : [],
     '/html/' : ['portal.html', 'portal-advanced.html', 'portal-basic.html', 'portal-datalogger.html', 'portal-mqtt.html', 'portal-network.html', 'portal-status.html', 'portal-syslogger.html'], 
 }
