@@ -264,9 +264,7 @@ def serve_captive_portal():
         URL = request.form.get('datalogger-url')
         data_submission_interval = int(request.form.get('data_submission_interval'))*60
         data_submission_just_in_time = True if request.form.get('data_submission_just_in_time') is 'on' else False
-        data_submission_on_daylight = True if request.form.get('data_submission_on_daylight') is 'on' else False
-        morning = int(request.form.get('morning'))
-        evening = int(request.form.get('evening'))
+        data_submission_when_charging = True if request.form.get('data_submission_when_charging') is 'on' else False
         average_measurements = int(request.form.get('average_measurements'))
         average_measurement_interval_ms = int(request.form.get('average_interval_ms'))*1000
         # for each setting, write to config if is changed
@@ -278,12 +276,8 @@ def serve_captive_portal():
             config.set('cron','data_submission_interval', data_submission_interval)
         if data_submission_just_in_time is not config.cron['data_submission_just_in_time']:
             config.set('cron','data_submission_just_in_time', data_submission_just_in_time)
-        if data_submission_on_daylight is not config.cron['data_submission_on_daylight']:
-            config.set('cron','data_submission_on_daylight', data_submission_on_daylight)
-        if morning is not config.cron['morning']:
-            config.set('cron','morning', morning)
-        if evening is not config.cron['evening']:
-            config.set('cron','evening', evening)
+        if data_submission_when_charging is not config.cron['data_submission_when_charging']:
+            config.set('cron','data_submission_when_charging', data_submission_on_daylight)
         if average_measurements is not config.sensors['average_particle_measurements']:
             config.set('sensors','average_particle_measurements', average_measurements)
         if average_measurement_interval_ms is not config.sensors['average_measurement_interval_ms']:
@@ -299,9 +293,7 @@ def serve_captive_portal():
             cfg_datalogger_URL = config.datalogger['URL'],
             cfg_cron_data_submission_interval = int(config.cron['data_submission_interval']/60),
             cfg_cron_data_submission_just_in_time = 'checked' if config.cron['data_submission_just_in_time'] else '',
-            cfg_cron_data_submission_on_daylight = 'checked' if config.cron['data_submission_on_daylight'] else '',
-            cfg_cron_morning = config.cron['morning'],
-            cfg_cron_evening = config.cron['evening'],
+            cfg_cron_data_submission_when_charging = 'checked' if config.cron['data_submission_when_charging'] else '',
             average_measurements = config.sensors['average_particle_measurements'],
             average_interval_ms = int(config.sensors['average_measurement_interval_ms']/1000))
 

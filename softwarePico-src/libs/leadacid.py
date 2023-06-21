@@ -14,15 +14,14 @@ max_voltage = battery_voltage * 1.25 # above this value the battery will be dama
 charging_voltage = battery_voltage * 1.2375 # this is typical when topping charge, current drops until full charged
 #final_discharge_voltage = battery_voltage * 0.8 # below this lower limit the battery will be irreversibly damaged
 safe_min_discharge = battery_voltage * 0.9 # below this limit the battery life will be reduced from 700 to 150-200 cycles
-# 
+min_charging_voltage = battery_voltage * 1.05 # if cron['data_submission_when_charging'] is True, data can be sent when voltage > min_charging_voltage.
+# this value indicates that the battery is charging or enough charged to send data.
 t_m_callback = False
 adc = ADC(config.leadacid['ADC_port'])
 ADC_factor1 = config.leadacid['ADC_factor1']
 ADC_factor2 = config.leadacid['ADC_factor2']
 rp2040_temp = ADC(4)
 rp2040_temp_factor = 3.3 / (65535)
-voltage_filter = []
-filter_length = config.leadacid['filter_length'] # how many previous measurements are used to calculate the moving average
 
 def measure_RP2040_temp():
     reading = rp2040_temp.read_u16() * rp2040_temp_factor
@@ -50,17 +49,8 @@ def average_n_measurements(n,callback, interval=0):
 def battery_percentage(voltage):
     if voltage > max_voltage:
         logger.error('voltage is greater than max_voltage: ' + str(voltage))
-    global voltage_filter
-    #detect if the battery is charging or discharging (moving average direction)
-    voltage_filter.append(voltage)
-    moving_voltage = round(sum(voltage_filter)/len(voltage_filter),3)
-    if len(voltage_filter) == filter_length:
-        voltage_filter.pop(0)
-    is_charging = voltage > moving_voltage
-    if voltage > voltage_full_charged:
-        is_charging = True
-    #convert voltage in percentage
-    # we know whether battery is charging if the previous value was lower.
+    is_charging = voltage > min_charging_voltage
+    #convert voltage in percentage, uses different max values if charging or not
     if is_charging:
         percentage = int((voltage - safe_min_discharge) / (charging_voltage - safe_min_discharge) * 100)
     else:
