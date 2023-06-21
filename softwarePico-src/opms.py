@@ -40,7 +40,7 @@ def updates():
 
 def send_values():
     done = filelogger.write(sensors.measures) # current measures sent or saved somewhere
-    if cron.check_data_schedule():
+    if cron.check_data_schedule(sensors.battery_values[2],sensors.leadacid.min_charging_voltage):
         # connect to wifi only if sending data is scheduled
         if wlan.connect():
             # submission of stored data to servers

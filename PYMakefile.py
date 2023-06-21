@@ -18,8 +18,8 @@ if args.bytecode:
     for fpath,fnames in vers.all_files.items():
         for fname in fnames:
             if (fname not in exclude_files) and (fname.split('.')[1] == 'py'):
-                infile = './softwarePico' + fpath + fname
-                outfile = './softwarePico-bytecode' + fpath + fname.split('.')[0] + '.mpy'
+                infile = './softwarePico-src' + fpath + fname
+                outfile = './softwarePico-dist' + fpath + fname.split('.')[0] + '.mpy'
                 print('compiling ' + infile)
                 comd = mpy_cross + ' ' + infile + ' -o ' + outfile
                 if args.verbose:

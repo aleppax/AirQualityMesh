@@ -98,12 +98,12 @@ def check_software_schedule():
     else:
         return False
 
-def check_data_schedule():
+def check_data_schedule(current_voltage, leadacid_min_limit):
     now = rtc.datetime()
-    if config.cron['data_submission_on_daylight'] and ((now[4] < config.cron['morning']) or (now[4] > config.cron['evening'])):
-        return False
     if config.cron['data_submission_just_in_time']:
         return True
+    if config.cron['data_submission_when_charging'] and (current_voltage < leadacid_min_limit):
+        return False
     now = time()
     if now - last_data_sent > config.cron['data_submission_interval']:
         return True
@@ -267,19 +267,6 @@ def next_cycle_s():
 def timetuple_to_rtctuple(t):
     return (t[0],t[1],t[2],t[6],t[3],t[4],t[5],0)
 
-def restore_latest_timestamp():
-    global config
-    if config.cron['deepsleep_reset']:
-        latest = gmtime(config.cron['latest_timestamp']+4294)
-        rtc.datetime(timetuple_to_rtctuple(latest))
-        config.set('cron','deepsleep_reset',False)
-
-def store_latest_timestamp():
-    global config
-    now = time()
-    config.set('cron','latest_timestamp',now)
-    config.set('cron','deepsleep_reset',True)
-
 def preheat_time():
     return config.cron['sensor_preheating_s']*1000
 
@@ -302,15 +289,13 @@ def lightsleep_wrapper(ms):
         lightsleep(ms - 1000)
         sleep_ms(500)
         print('') #
-    
+
 def lightsleep_until_next_cycle():
     sleepSeconds = next_cycle_s() - sensor_preheating_s
     if sleepSeconds > minimum_sleep_s:
         lightsleep_wrapper(sleepSeconds*1000)
-    
+
 def deepsleep_as_long_as_you_can():
-    restore_latest_timestamp()
-    store_latest_timestamp()
     logger.info('deepsleeping for 71min33s')
     disable_wdt()
     sleep_ms(100)
