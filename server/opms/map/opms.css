@@ -17,3 +17,12 @@ html, body, #opms {
     max-width: 100%;
     max-height: 100%;
 }
+
+.marker1 {
+    fill-opacity: 0.7;
+    fill: #ff5ca8;
+    stroke-linejoin: bevel;
+    stroke-width: .0084341;
+    stroke: #fff;
+    opacity: .6;
+}
