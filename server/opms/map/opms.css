@@ -22,7 +22,7 @@ html, body, #opms {
     fill-opacity: 0.7;
     fill: #ff5ca8;
     stroke-linejoin: bevel;
-    stroke-width: .0084341;
-    stroke: #fff;
+    stroke-width: 1;
+    stroke: #555;
     opacity: .6;
 }
