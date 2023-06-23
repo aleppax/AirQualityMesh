@@ -1,8 +1,8 @@
-# outdoorPMstation
+
+
+# outdoor particulate matter <img alt="opms logo" src="./marker_opms.svg" width="20%"/> station
 
 current development status: [Proof of Concept.](roadmap.md)
-
-![mainboard rendering](https://github.com/aleppax/outdoorPMstation/blob/base/opms_Paradisa_Flowers.png "mainboard")
 
 IoT system monitoring outdoor air quality with multiple stations, remote data collection and analytics
 
