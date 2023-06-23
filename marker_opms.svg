@@ -32,7 +32,7 @@
      inkscape:current-layer="svg8" />
   <path
      d="m7.9033 28.05c1.7991 3.3632 3.2845 6.992 4.1269 11.353 1.2188-6.6157 4.0018-11.444 6.9668-16.178 0.99544-1.5894 1.9874-3.1779 2.7785-4.9115 0.4053-0.88813 0.86085-1.7196 1.1441-2.7143 0.27988-0.98269 0.47855-2.1674 0.44949-3.4467-0.056764-2.497-0.73346-4.4113-1.7162-6.0317-21.658 2.3052-21.208 8.1045-13.75 21.93z"
-     style="fill-opacity:1;fill:#5cffff;opacity:1;stroke-linejoin:bevel;stroke-width:1;stroke:#555555;stroke-opacity:1;stroke-dasharray:none"
+     style="fill-opacity:1;fill:#54aeff;opacity:1;stroke-linejoin:bevel;stroke-width:1;stroke:#555555;stroke-opacity:1;stroke-dasharray:none"
      id="path2" />
   <ellipse
      id="point"
@@ -42,7 +42,7 @@
      ry="5.5911374"
      clip-rule="evenodd"
      fill-rule="evenodd"
-     style="fill:#5cffff;fill-opacity:1;stroke-width:1;stroke:#333333;stroke-opacity:1;stroke-dasharray:none" />
+     style="fill:#54aeff;fill-opacity:1;stroke-width:1;stroke:#333333;stroke-opacity:1;stroke-dasharray:none" />
   <path
      d="m16.106 28.05c-1.7991 3.3632-3.2845 6.992-4.1269 11.353-1.2188-6.6157-4.0018-11.444-6.9668-16.178-0.99545-1.5894-1.9874-3.1779-2.7785-4.9115-0.4053-0.88813-0.86085-1.7196-1.1441-2.7143-0.27988-0.98269-0.47855-2.1674-0.44949-3.4467 0.056763-2.497 0.73346-4.4113 1.7162-6.0317 21.658 2.3052 21.208 8.1045 13.75 21.93z"
      style="fill-opacity:0.69999999;fill:#ffe45c;opacity:1;stroke-linejoin:bevel;stroke-width:1;stroke:#555555;stroke-opacity:1;stroke-dasharray:none"
