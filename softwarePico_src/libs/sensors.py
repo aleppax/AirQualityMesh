@@ -3,7 +3,7 @@ from libs.cron import feed_wdt, deepsleep_as_long_as_you_can
 from math import log
 from collections import OrderedDict
 from time import ticks_ms, ticks_diff, sleep_ms, time
-from machine import Pin
+from machine import Pin, UART
 
 sensors = {}
 
@@ -63,7 +63,6 @@ def init(i2c, gpio):
                         t['object'] = sensor_class(i2c, **t['init_arguments'])
                     # if serial (only pms5003 currently supported)
                     if t['driver'] == 'pms5003':
-                        from machine import UART
                         uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
                         t['object'] = sensor_class(uart,None,None,**t['init_arguments'])
                 if 'power_pin_name' in t.keys():
@@ -137,6 +136,9 @@ def wakeup():
         ### sps30 end custom wakeup code ###
         if not use_aux_sensors:
             power_i2c_devices(True,'off')
+        ### reinitialize UART if needed
+        if sensors['pms5003']['connected']:
+            uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
 
 def reset_measures():
     global measures
