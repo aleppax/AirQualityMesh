@@ -100,6 +100,12 @@ def startupTests(i2c, gpio):
         sensors['pms5003']['connected'] = True
     else:
         sensors['pms5003']['connected'] = False
+    # the same for a second PMS5003 connected
+    pin_rx_uart =  Pin(config.pms5003_ch2['serial_rx'], Pin.IN, Pin.PULL_DOWN)
+    if pin_rx_uart.value() == 1:
+        sensors['pms5003_ch2']['connected'] = True
+    else:
+        sensors['pms5003_ch2']['connected'] = False
     # list i2c devices, some of them are powered by the ULN2003, 
     # but not yet initialized. turn everything on for this test.
     addresses = [hex(a) for a in i2c.scan()]
