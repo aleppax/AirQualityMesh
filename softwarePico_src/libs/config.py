@@ -93,6 +93,17 @@ picosngcja5 = {
     'i2c_address' : '0x33',
     'power_pin_name' : 'GP6',
 }
+pms5003 = {
+    'name' : 'PM Sensor PMS5003',
+    'is_sensor' : True,
+    'is_auxiliary' : False,
+    'driver' : 'pms5003',
+    'cls' : 'PMS5003',
+    'init_arguments' : {'mode' : 'passive'},
+    'serial_tx' : 'GP16',
+    'serial_rx' : 'GP17',
+    'power_pin_name' : 'GP5',
+}
 qmc5883 = {
     'name' : 'Magnetic field sensor QMC5883',
     'is_sensor' : True,

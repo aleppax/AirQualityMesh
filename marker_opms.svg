@@ -3,7 +3,7 @@
    version="1.1"
    viewBox="0 0 24 40"
    id="svg8"
-   sodipodi:docname="marker.svg"
+   sodipodi:docname="marker_opms.svg"
    inkscape:version="1.2.2 (1:1.2.2+202305151914+b0a8486541)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -21,18 +21,18 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
-     inkscape:zoom="5.4875001"
-     inkscape:cx="-40.273348"
-     inkscape:cy="32.984054"
+     inkscape:zoom="15.520994"
+     inkscape:cx="11.403909"
+     inkscape:cy="17.58908"
      inkscape:window-width="1920"
      inkscape:window-height="1052"
-     inkscape:window-x="0"
+     inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg8" />
   <path
      d="m7.9033 28.05c1.7991 3.3632 3.2845 6.992 4.1269 11.353 1.2188-6.6157 4.0018-11.444 6.9668-16.178 0.99544-1.5894 1.9874-3.1779 2.7785-4.9115 0.4053-0.88813 0.86085-1.7196 1.1441-2.7143 0.27988-0.98269 0.47855-2.1674 0.44949-3.4467-0.056764-2.497-0.73346-4.4113-1.7162-6.0317-21.658 2.3052-21.208 8.1045-13.75 21.93z"
-     style="fill-opacity:1;fill:#54aeff;opacity:1;stroke-linejoin:bevel;stroke-width:1;stroke:#555555;stroke-opacity:1;stroke-dasharray:none"
+     style="fill-opacity:1;fill:#54aeff;opacity:1;stroke-linejoin:bevel;stroke-width:0.5;stroke:#555555;stroke-opacity:1;stroke-dasharray:none"
      id="path2" />
   <ellipse
      id="point"
@@ -45,7 +45,7 @@
      style="fill:#54aeff;fill-opacity:1;stroke-width:1;stroke:#333333;stroke-opacity:1;stroke-dasharray:none" />
   <path
      d="m16.106 28.05c-1.7991 3.3632-3.2845 6.992-4.1269 11.353-1.2188-6.6157-4.0018-11.444-6.9668-16.178-0.99545-1.5894-1.9874-3.1779-2.7785-4.9115-0.4053-0.88813-0.86085-1.7196-1.1441-2.7143-0.27988-0.98269-0.47855-2.1674-0.44949-3.4467 0.056763-2.497 0.73346-4.4113 1.7162-6.0317 21.658 2.3052 21.208 8.1045 13.75 21.93z"
-     style="fill-opacity:0.69999999;fill:#ffe45c;opacity:1;stroke-linejoin:bevel;stroke-width:1;stroke:#555555;stroke-opacity:1;stroke-dasharray:none"
+     style="fill-opacity:0.69999999;fill:#ffe45c;opacity:1;stroke-linejoin:bevel;stroke-width:0.5;stroke:#555555;stroke-opacity:1;stroke-dasharray:none"
      id="path5" />
   <path
      id="mark"

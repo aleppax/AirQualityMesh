@@ -3,6 +3,7 @@ from libs.cron import feed_wdt, deepsleep_as_long_as_you_can
 from math import log
 from collections import OrderedDict
 from time import ticks_ms, ticks_diff, sleep_ms, time
+from machine import Pin
 
 sensors = {}
 
@@ -47,7 +48,7 @@ def init(i2c, gpio):
         for pin in gpio:
             gpio[pin].on()
         sleep_ms(200)
-        startupI2CTests(i2c, gpio)
+        startupTests(i2c, gpio)
         for s,t in sensors.items():
             if t['connected']:
                 feed_wdt()
@@ -57,7 +58,14 @@ def init(i2c, gpio):
                     t['module'] = __import__('/libs/' + t['driver'])
                     # instantiate the class
                     sensor_class = t['module'].__dict__[t['cls']]
-                    t['object'] = sensor_class(i2c, **t['init_arguments'])
+                    # if i2c
+                    if 'i2c_address' in t.keys():
+                        t['object'] = sensor_class(i2c, **t['init_arguments'])
+                    # if serial (only pms5003 currently supported)
+                    if t['driver'] == 'pms5003':
+                        from machine import UART
+                        uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
+                        t['object'] = sensor_class(uart,None,None,**t['init_arguments'])
                 if 'power_pin_name' in t.keys():
                     t['pwr_pin'] = gpio[t['power_pin_name']]
         ### custom initialization code
@@ -85,14 +93,20 @@ def power_i2c_devices(only_aux_devices=True, action='on'):
                 getattr(v['pwr_pin'],action)()
     sleep_ms(200)
 
-def startupI2CTests(i2c, gpio):
+def startupTests(i2c, gpio):
     global sensors
+    #look for a PMS5003 connected to UART0
+    pin_rx_uart =  Pin(config.pms5003['serial_rx'], Pin.IN, Pin.PULL_DOWN)
+    if pin_rx_uart.value() == 1:
+        sensors['pms5003']['connected'] = True
+    else:
+        sensors['pms5003']['connected'] = False
     # list i2c devices, some of them are powered by the ULN2003, 
     # but not yet initialized. turn everything on for this test.
     addresses = [hex(a) for a in i2c.scan()]
     # sometimes if a device is not powered, the bus floats and shows 
     # a lot of inexistent devices, check this
-    if len(addresses) > len(sensors):
+    if len(addresses) > len(sensors)-1:
         logger.error("the i2c bus is connected to zombie devices, it\
         has been compromised. Or maybe a new device has been added, \
         in that case please update the config file.")
