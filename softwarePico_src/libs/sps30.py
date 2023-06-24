@@ -406,10 +406,14 @@ class SPS30:
         return self.__data
 
     # opms custom measurement wrapper
-    def add_measure_to(self, report):
+    def add_measure_to(self, report, is_aux):
         pm_0_data = self.measure()['mass_density']
-        report['pm2.5'] += pm_0_data['pm2.5']
-        report['pm1.0'] += pm_0_data['pm1.0']
+        if is_aux:
+            report['pm2.5_ch2'] += pm_0_data['pm2.5']
+            report['pm1.0_ch2'] += pm_0_data['pm1.0']            
+        else:
+            report['pm2.5'] += pm_0_data['pm2.5']
+            report['pm1.0'] += pm_0_data['pm1.0']
 
     # opms custom wakeup wrapper
     def wakeup(self, clean=False):

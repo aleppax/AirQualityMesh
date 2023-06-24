@@ -3,7 +3,7 @@ from libs.cron import feed_wdt, deepsleep_as_long_as_you_can
 from math import log
 from collections import OrderedDict
 from time import ticks_ms, ticks_diff, sleep_ms, time
-from machine import Pin
+from machine import Pin, UART
 
 sensors = {}
 
@@ -63,7 +63,6 @@ def init(i2c, gpio):
                         t['object'] = sensor_class(i2c, **t['init_arguments'])
                     # if serial (only pms5003 currently supported)
                     if t['driver'] == 'pms5003':
-                        from machine import UART
                         uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
                         t['object'] = sensor_class(uart,None,None,**t['init_arguments'])
                 if 'power_pin_name' in t.keys():
@@ -101,6 +100,12 @@ def startupTests(i2c, gpio):
         sensors['pms5003']['connected'] = True
     else:
         sensors['pms5003']['connected'] = False
+    # the same for a second PMS5003 connected
+    pin_rx_uart =  Pin(config.pms5003_ch2['serial_rx'], Pin.IN, Pin.PULL_DOWN)
+    if pin_rx_uart.value() == 1:
+        sensors['pms5003_ch2']['connected'] = True
+    else:
+        sensors['pms5003_ch2']['connected'] = False
     # list i2c devices, some of them are powered by the ULN2003, 
     # but not yet initialized. turn everything on for this test.
     addresses = [hex(a) for a in i2c.scan()]
@@ -137,6 +142,9 @@ def wakeup():
         ### sps30 end custom wakeup code ###
         if not use_aux_sensors:
             power_i2c_devices(True,'off')
+        ### reinitialize UART if needed
+        if sensors['pms5003']['connected']:
+            uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
 
 def reset_measures():
     global measures
@@ -172,7 +180,7 @@ def measure(time_DTF):
                 if s['connected']:
                     if not s['is_auxiliary'] or (s['is_auxiliary'] and use_aux_sensors):
                         feed_wdt()
-                        s['object'].add_measure_to(measures) # a function which sums one or more measured values to one or more keys of the measure dict.
+                        s['object'].add_measure_to(measures,s['is_auxiliary']) # a function which sums one or more measured values to one or more keys of the measure dict.
             if not use_aux_sensors: 
                 power_i2c_devices(True,'off')
             rem_iter_time_ms = config.sensors['average_measurement_interval_ms'] - ticks_diff(ticks_ms(),start_iter_time)

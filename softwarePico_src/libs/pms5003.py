@@ -375,7 +375,11 @@ class PMS5003():
         self._port.write(self._build_cmd_frame(PMS5003_CMD_READ))
 
     # opms custom measurement wrapper
-    def add_measure_to(self, report):
+    def add_measure_to(self, report, is_aux):
         pm_0_data = self.read()
-        report['pm2.5'] += pm_0_data.pm_ug_per_m3(2.5, atmospheric_environment=True)
-        report['pm1.0'] += pm_0_data.pm_ug_per_m3(1.0, atmospheric_environment=True)
+        if is_aux:
+            report['pm2.5_ch2'] += pm_0_data.pm_ug_per_m3(2.5, atmospheric_environment=True)
+            report['pm1.0_ch2'] += pm_0_data.pm_ug_per_m3(1.0, atmospheric_environment=True)
+        else:
+            report['pm2.5'] += pm_0_data.pm_ug_per_m3(2.5, atmospheric_environment=True)
+            report['pm1.0'] += pm_0_data.pm_ug_per_m3(1.0, atmospheric_environment=True)
