@@ -117,7 +117,7 @@ class AHT10:
         self._read_to_buffer()
     
     # opms custom measurement wrapper
-    def add_measure_to(self, report):
+    def add_measure_to(self, report, options):
         report['temperature'] += self.temperature
         report['humidity'] += self.relative_humidity
 

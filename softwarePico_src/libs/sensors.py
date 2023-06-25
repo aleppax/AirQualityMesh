@@ -185,7 +185,11 @@ def measure(time_DTF):
                 if s['connected']:
                     if not s['is_auxiliary'] or (s['is_auxiliary'] and use_aux_sensors):
                         feed_wdt()
-                        s['object'].add_measure_to(measures,s['is_auxiliary']) # a function which sums one or more measured values to one or more keys of the measure dict.
+                        options = {
+                            'is_aux' : s['is_auxiliary'] if 'is_auxiliary' in s.keys() else False,
+                            'temp_and_humi' : s['temp_and_humi'] if 'temp_and_humi' in s.keys() else False,
+                        }
+                        s['object'].add_measure_to(measures,options) # a function which sums one or more measured values to one or more keys of the measure dict.
             if not use_aux_sensors: 
                 power_i2c_devices(True,'off')
             rem_iter_time_ms = config.sensors['average_measurement_interval_ms'] - ticks_diff(ticks_ms(),start_iter_time)
