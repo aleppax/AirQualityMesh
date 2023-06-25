@@ -102,7 +102,7 @@ pms5003 = {
     'init_arguments' : {'mode' : 'passive'},
     'serial_tx' : 'GP16',
     'serial_rx' : 'GP17',
-    'power_pin_name' : 'GP5',
+    'power_pin_name' : 'GP3',
 }
 pms5003_ch2 = {
     'name' : 'PM Sensor PMS5003 (channel 2)',
@@ -111,9 +111,9 @@ pms5003_ch2 = {
     'driver' : 'pms5003',
     'cls' : 'PMS5003',
     'init_arguments' : {'mode' : 'passive'},
-    'serial_tx' : 'GP12',
-    'serial_rx' : 'GP13',
-    'power_pin_name' : 'GP4',
+    'serial_tx' : 'GP4',
+    'serial_rx' : 'GP5',
+    'power_pin_name' : 'GP2',
 }
 qmc5883 = {
     'name' : 'Magnetic field sensor QMC5883',
