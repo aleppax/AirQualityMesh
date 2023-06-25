@@ -103,6 +103,7 @@ pms5003 = {
     'serial_tx' : 'GP16',
     'serial_rx' : 'GP17',
     'power_pin_name' : 'GP3',
+    'temp_and_humi' : True, # if the sensor is PMS5003T it provides also temperature and humidity
 }
 pms5003_ch2 = {
     'name' : 'PM Sensor PMS5003 (channel 2)',
@@ -114,6 +115,7 @@ pms5003_ch2 = {
     'serial_tx' : 'GP4',
     'serial_rx' : 'GP5',
     'power_pin_name' : 'GP2',
+    'temp_and_humi' : True, # if the sensor is PMS5003T it provides also temperature and humidity
 }
 qmc5883 = {
     'name' : 'Magnetic field sensor QMC5883',

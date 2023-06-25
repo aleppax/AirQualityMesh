@@ -322,7 +322,7 @@ class BMP280:
         self._write_bits(_BMP280_REGISTER_CONTROL, p_os + (t_os << 3), 2)
 
     # opms custom measurement wrapper
-    def add_measure_to(self, report):
+    def add_measure_to(self, report, options):
         pressure = self.pressure # Pascal
         p_hPa = int(pressure/100)
         report['barometric pressure'] += p_hPa
