@@ -384,8 +384,8 @@ class PMS5003():
             report['pm2.5'] += pm_0_data.pm_ug_per_m3(2.5, atmospheric_environment=True)
             report['pm1.0'] += pm_0_data.pm_ug_per_m3(1.0, atmospheric_environment=True)
         if options['temp_and_humi']:
-            report['temperature'] += pm_0_data.pm_per_1l_air(5)
-            report['humidity'] += pm_0_data.pm_per_1l_air(10)
+            report['temperature'] += pm_0_data.pm_per_1l_air(5)/10
+            report['humidity'] += pm_0_data.pm_per_1l_air(10)/10
         
     def temp_humi(self):
         pm_0_data = self.read()
