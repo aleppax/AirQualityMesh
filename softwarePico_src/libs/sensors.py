@@ -65,6 +65,9 @@ def init(i2c, gpio):
                     if t['driver'] == 'pms5003':
                         uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
                         t['object'] = sensor_class(uart,None,None,**t['init_arguments'])
+                    if t['driver'] == 'pms5003_ch2':
+                        uart_ch2 = UART(0,baudrate=9600, tx=Pin(config.pms5003_ch2['serial_tx']), rx=Pin(config.pms5003_ch2['serial_rx']))
+                        t['object'] = sensor_class(uart,None,None,**t['init_arguments'])
                 if 'power_pin_name' in t.keys():
                     t['pwr_pin'] = gpio[t['power_pin_name']]
         ### custom initialization code
@@ -145,6 +148,8 @@ def wakeup():
         ### reinitialize UART if needed
         if sensors['pms5003']['connected']:
             uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
+        if sensors['pms5003_ch2']['connected']:
+            uart_ch2 = UART(0,baudrate=9600, tx=Pin(config.pms5003_ch2['serial_tx']), rx=Pin(config.pms5003_ch2['serial_rx']))
 
 def reset_measures():
     global measures
