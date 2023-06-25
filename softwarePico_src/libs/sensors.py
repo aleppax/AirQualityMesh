@@ -186,7 +186,7 @@ def measure(time_DTF):
                     if not s['is_auxiliary'] or (s['is_auxiliary'] and use_aux_sensors):
                         feed_wdt()
                         options = {
-                            'is_auxiliary' : s['is_auxiliary'] if 'is_auxiliary' in s.keys() else False,
+                            'is_aux' : s['is_auxiliary'] if 'is_auxiliary' in s.keys() else False,
                             'temp_and_humi' : s['temp_and_humi'] if 'temp_and_humi' in s.keys() else False,
                         }
                         s['object'].add_measure_to(measures,options) # a function which sums one or more measured values to one or more keys of the measure dict.
