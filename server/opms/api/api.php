@@ -12383,6 +12383,10 @@ namespace Tqdev\PhpCrudApi {
         'username' => 'php-crud-api',
         'password' => 'php-crud-api',
         'database' => 'php-crud-api',
+        'middlewares' => 'cors,apiKeyAuth',
+//        'middlewares' => 'cors',
+        'apiKeyAuth.header' => 'X-API-Key',
+        'apiKeyAuth.keys' => '', //comma separated keys
         'debug' => true
     ]);
     $request = RequestFactory::fromGlobals();

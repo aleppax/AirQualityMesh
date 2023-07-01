@@ -24,6 +24,7 @@ board = {
     'I2C_SCL' : 9,
     'I2C_freq' : 100000,
     'WDT_seconds' : 8,
+    'led_pin' : 22,
 }
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
@@ -52,6 +53,7 @@ cron = {
 }
 datalogger = {
     'URL' : 'http://example.org/opms/api.php/records/',
+    'apikey' : '',
     # use your REST server. prefer unsecure http
     # to avoid crashes due to limitations of the implementation.
 }
@@ -273,6 +275,21 @@ def initialize_board():
         gpio['GP'+str(pin)].off()
     for pin in board['GPIO_in']:
         gpio['GP'+str(pin)] = machine.Pin(pin, machine.Pin.IN, machine.Pin.PULL_DOWN)
-    
+    if board['led_pin'] in [1,22,26,27]:
+        board['ledpin'] = machine.Pin(board['led_pin'], machine.Pin.OUT)
+        flash_led('ok')
+    else:
+        board.ledpin = None
     return i2c, gpio
 
+def flash_led(mode):
+    if board['ledpin'] != None:
+        modes = {
+            'ok' : [1],
+            'error' : [0.5,0.5,0.5],
+        }
+        for s in modes[mode]:
+            board['ledpin'].on()
+            sleep(s)
+            board['ledpin'].off()
+            sleep(0.2)

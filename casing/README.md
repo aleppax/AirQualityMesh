@@ -9,6 +9,8 @@ terminals that guarantee contact continuity over time since this is an outdoor a
 The two resistors are 20K and 30K Ohm, they are used as an external voltage divider to measure the battery voltage. 
 We decided to avoid using the internal ADC3 with its own voltage divider because this relies on the WL_GPIO2 of the wireless chip and we didn't want conflicts during wifi communication. If a good precision isn't paramount it is possible to stop using the external circuit in favor of the builtin one.
 
+![breakout board pinout](https://github.com/aleppax/outdoorPMstation/blob/base/casing/breakout_board_pinout.jpg "breakout board")
+
 The connection PCB has been designed so that half of the Raspberry Pico, the part where the antenna is located, protrudes, so as to move connection wires and tracks away as far as possible from the transceiver area.
 
 ## Case

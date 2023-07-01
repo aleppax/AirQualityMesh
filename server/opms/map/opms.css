@@ -11,6 +11,9 @@ html, body, #opms {
     width: 100vw;
 }
 
+#opms {
+    z-index: 10;
+}
 .leaflet-container {
     height: 400px;
     width: 600px;
@@ -25,4 +28,21 @@ html, body, #opms {
     stroke-width: 1;
     stroke: #555;
     opacity: .6;
+}
+
+#cnvBox {
+    position: absolute;
+    top: 8vh;
+    left: 0; 
+    right: 0;
+    margin: auto;
+    height:80vh; 
+    width:80vw;
+    padding:10px;
+    z-index: 5;
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+}
+
+#opmsChart {
 }

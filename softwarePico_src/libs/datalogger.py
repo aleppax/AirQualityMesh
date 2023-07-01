@@ -19,7 +19,7 @@ def send_data(d):
             # hope there will be a better way than disabling WDT
             pause_wdt()
             durl = config.datalogger['URL'] + 'measurements/'
-            resp = requests.post(durl, data=d, timeout=config.board['WDT_seconds']-3)
+            resp = requests.post(durl, headers={'X-API-Key':config.datalogger['apikey'],'content-type': 'application/json'}, data=d, timeout=config.board['WDT_seconds']-3)
             msg = resp.text
             resp.close()
             restart_wdt()
