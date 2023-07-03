@@ -1,13 +1,9 @@
 const api_url = "http://opms.local/api/api.php";
 const map_center = [44.6798, 8.0362];
-var map;
+var opmsMap;
+var opmsChart;
 var stations = [];
 const jca=jscrudapi(api_url,{headers:{'X-API-Key':''}});
-const canvas = document.getElementById('opmsChart');
-const ctx = canvas.getContext("2d");
-var gradient = ctx.createLinearGradient(0, 0, 0, 400);
-gradient.addColorStop(0, 'rgba(250,74,50,0.4)');   
-gradient.addColorStop(1, 'rgba(50,174,50,0.4)');
 
 function initMap() {
     let mapOptions = {
@@ -15,15 +11,32 @@ function initMap() {
         maxZoom: 16,
         minZoom: 9
     };
-    map = L.map('opms', mapOptions).setView(map_center, 13);
+    opmsMap = L.map('opmsMap', mapOptions).setView(map_center, 13);
     const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 16,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+    }).addTo(opmsMap);
     loadStations();
-    map.on("moveend", loadStations);
-    map.on("click", chartToBackground);
+    opmsMap.on("moveend", loadStations);
+    opmsMap.on("click", chartToBackground);
 };
+
+function initChart() {
+    const data = {};
+    const config = {
+    type: 'line',
+    data: data,
+    options: {
+        responsive : true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+    }}}};
+    opmsChart = new Chart(document.getElementById('opmsChart'),
+    config
+    );
+}
 
 async function loadLatestRecord(station) {
     ltst = await jca.list('measurements', {filter:[`station,eq,${station.id}`], order:'id,desc',size:1});
@@ -33,10 +46,12 @@ async function loadLatestRecord(station) {
 
 async function loadLatestDayRecords(station_id) {
     let station = stations.filter(station => station.id == station_id)[0];
-    if ("latestDay" in station) return;
-    let yesterdayness = new Date(Date.now() - 1000*3600*24).toISOString().split('.')[0] + 'Z'
-    ltst = await jca.list('measurements', {filter:[`station,eq,${station_id}`,`datetime,gt,${yesterdayness}`], order:'datetime,asc'});
-    station.latestDay = await ltst.records;
+    if (!station.hasOwnProperty('latestDay')) {
+        let yesterdayness = new Date(Date.now() - 1000*3600*24).toISOString().split('.')[0] + 'Z'
+        ltst = await jca.list('measurements', {filter:[`station,eq,${station_id}`,`datetime,gt,${yesterdayness}`], order:'datetime,asc'});
+        station.latestDay = await ltst.records;
+    }
+    let label = station.latestDay.map(row => row.datetime.split('T')[1].slice(0,5));
     let data = [];
     if (station["pm capable ch1"]) {
         data.push({
@@ -47,7 +62,7 @@ async function loadLatestDayRecords(station_id) {
         label: 'PM2.5 ' + station["pm units ch1"],
         data: station.latestDay.map(row => row["pm2.5"]),
         borderWidth: 1,
-        backgroundColor: gradient,
+        backgroundColor: 'pink',
         fill: {
             target : 'origin',
         }
@@ -56,13 +71,27 @@ async function loadLatestDayRecords(station_id) {
     if (station["pm capable ch2"]) {
         data.push({
         label: 'PM1.0_ch2 ' + station["pm units ch2"],
-        data: station.latestDay.map(row => row["pm1.0_ch2"]),
-        borderWidth: 1
+        data: station.latestDay.map(function (row) {if (row["pm1.0_ch2"] != 0) {
+                return row["pm1.0_ch2"];
+            } else {
+                return null;
+            }}),
+        spanGaps: true,
+        borderWidth: 1,
+        backgroundColor: 'pink',
+        fill: {
+            target : 'origin',
+        }
       },{
         label: 'PM2.5_ch2 ' + station["pm units ch2"],
-        data: station.latestDay.map(row => row["pm2.5_ch2"]),
+        data: station.latestDay.map(function (row) {if (row["pm2.5_ch2"] != 0) {
+                return row["pm2.5_ch2"];
+            } else {
+                return null;
+            }}),
+        spanGaps: true,
         borderWidth: 1,
-        backgroundColor: gradient,
+        backgroundColor: 'red',
         fill: {
             target : 'origin',
         }
@@ -73,7 +102,7 @@ async function loadLatestDayRecords(station_id) {
         label: 'temperature '  + station["temperature units"],
         data: station.latestDay.map(row => row["temperature"]),
         borderWidth: 1,
-        backgroundColor: gradient,
+        backgroundColor: 'blue',
         fill: {
             target : 'origin',
         }
@@ -84,7 +113,7 @@ async function loadLatestDayRecords(station_id) {
         label: 'humidity '  + station["humidity units"],
         data: station.latestDay.map(row => row["humidity"]),
         borderWidth: 1,
-        backgroundColor: gradient,
+        backgroundColor: 'yellow',
         fill: {
             target : 'origin',
         }
@@ -96,7 +125,7 @@ async function loadLatestDayRecords(station_id) {
         yAxisID: 'y-axis-1',
         data: station.latestDay.map(row => row["barometric pressure"]),
         borderWidth: 1,
-        backgroundColor: gradient,
+        backgroundColor: 'gray',
         fill: {
             target : 'origin',
         }
@@ -107,24 +136,18 @@ async function loadLatestDayRecords(station_id) {
         yAxisID: 'y-axis-2',
         data: station.latestDay.map(row => row["vsys voltage"]),
         borderWidth: 1,
-        backgroundColor: gradient,
+        backgroundColor: 'orange',
         fill: {
             target : 'origin',
         }
       })
-    const chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: station.latestDay.map(row => row.datetime.split('T')[1].slice(0,5)),
-      datasets: data
-    },
-    options: {
-        responsive : true,
-        maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true
-        }}}});    
+    
+    opmsChart.data.labels = label;
+    opmsChart.data.datasets = data;
+    for (let i=2; i<8; i++) {
+    opmsChart.getDatasetMeta(i).hidden=true;
+    };
+    opmsChart.update();
     return;
 }
 
@@ -136,10 +159,10 @@ function plotStationData(sts) {
             return obj.id === stx.id
         });
         if (exists.length === 0) {
-            mkx = L.marker(L.latLng(stx.latitude, stx.longitude), {icon:svgIcon}).addTo(map);
+            mkx = L.marker(L.latLng(stx.latitude, stx.longitude), {icon:svgIcon}).addTo(opmsMap);
             let mkx_content = `<div class="leaflet-control-layers-base" station="${stx.id}"> <table> <tr> <td>station ID: </td><td>${stx.id}</td></tr><tr> <td>Name: </td><td>${stx.name}</td></tr><tr> <td>purpose: </td><td>${stx['station purpose']}</td></tr><tr> <td>Location: </td><td>Lat. ${stx.latitude} - Lon. ${stx.longitude}</td></tr><tr> <td>altitude msl: </td><td>${stx['altitude msl']}</td></tr><tr> <td>Height above ground: </td><td>${stx['height above ground']}cm</td></tr><tr> <td><input type="checkbox" name="PM channel 1" onclick="return false;" ${(stx['pm capable ch1']==1) ? 'checked' : ''}/> PM channel 1</td><td><input type="checkbox" name="PM channel 2" onclick="return false;" ${(stx['pm capable ch2']==1) ? 'checked' : ''}/> PM channel 2</td></tr><tr> <td><input type="checkbox" name="sound pressure" onclick="return false;" ${(stx['sound pressure capable']==1) ? 'checked' : ''}/> sound pressure</td><td><input type="checkbox" name="barometric pressure" onclick="return false;" ${(stx['barometric pressure capable']==1) ? 'checked' : ''}/> barometric pressure</td></tr><tr> <td><input type="checkbox" name="temperature" onclick="return false;" ${(stx['temperature capable']==1) ? 'checked' : ''}/> temperature</td><td><input type="checkbox" name="wind direction" onclick="return false;" ${(stx['wind direction capable']==1) ? 'checked' : ''}/> wind direction</td></tr><tr> <td><input type="checkbox" name="wind speed" onclick="return false;" ${(stx['wind speed capable']==1) ? 'checked' : ''}/> wind speed</td><td><input type="checkbox" name="humidity" onclick="return false;" ${(stx['humidity capable']==1) ? 'checked' : ''}/> humidity</td></tr><tr> <td><input type="checkbox" name="vehicle count" onclick="return false;" ${(stx['vehicle count capable']==1) ? 'checked' : ''}/> vehicle count</td><td><img class="chartIcon" src="chartIcon.svg" alt="chart" onclick="chartToForeground()"/></td></tr></table> </div><div> <a id="idw-display-close-button" class="leaflet-popup-close-button" href="#close">×</a> </div>`;
             mkx.bindPopup(mkx_content,{offset : L.point(3, -32)});
-            map.on("popupopen",function(e) {loadLatestDayRecords(e.popup._contentNode.firstChild.attributes['station'].value);});
+            opmsMap.on("popupopen",function(e) {loadLatestDayRecords(e.popup._contentNode.firstChild.attributes['station'].value);});
             stx.marker = mkx;
             loadLatestRecord(stx).then(colorizeMarker);
             stations.push(stx);
@@ -167,7 +190,7 @@ function chartToBackground() {
 }
 
 async function loadStations() {
-    let nesw = map.getBounds()
+    let nesw = opmsMap.getBounds()
     if (nesw['_northEast'].lng > nesw['_southWest'].lng) {
         var stl = jca.list('stations',{filter:[`latitude,bt,${nesw['_southWest'].lat},${nesw['_northEast'].lat}`,`longitude,bt,${nesw['_southWest'].lng},${nesw['_northEast'].lng}`]});
     } else {
@@ -185,3 +208,4 @@ const svgIcon = L.divIcon({
 });
 
 initMap();
+initChart();
