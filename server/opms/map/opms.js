@@ -30,6 +30,9 @@ function initChart() {
         responsive : true,
         maintainAspectRatio: false,
         scales: {
+            x: {
+                type: 'time',
+            },
             y: {
                 beginAtZero: true
     }}}};
@@ -51,7 +54,7 @@ async function loadLatestDayRecords(station_id) {
         ltst = await jca.list('measurements', {filter:[`station,eq,${station_id}`,`datetime,gt,${yesterdayness}`], order:'datetime,asc'});
         station.latestDay = await ltst.records;
     }
-    let label = station.latestDay.map(row => row.datetime.split('T')[1].slice(0,5));
+    let label = station.latestDay.map(row => row.datetime);
     let data = [];
     if (station["pm capable ch1"]) {
         data.push({
@@ -62,7 +65,6 @@ async function loadLatestDayRecords(station_id) {
         label: 'PM2.5 ' + station["pm units ch1"],
         data: station.latestDay.map(row => row["pm2.5"]),
         borderWidth: 1,
-        backgroundColor: 'pink',
         fill: {
             target : 'origin',
         }
@@ -78,7 +80,6 @@ async function loadLatestDayRecords(station_id) {
             }}),
         spanGaps: true,
         borderWidth: 1,
-        backgroundColor: 'pink',
         fill: {
             target : 'origin',
         }
@@ -91,7 +92,6 @@ async function loadLatestDayRecords(station_id) {
             }}),
         spanGaps: true,
         borderWidth: 1,
-        backgroundColor: 'red',
         fill: {
             target : 'origin',
         }
@@ -102,7 +102,6 @@ async function loadLatestDayRecords(station_id) {
         label: 'temperature '  + station["temperature units"],
         data: station.latestDay.map(row => row["temperature"]),
         borderWidth: 1,
-        backgroundColor: 'blue',
         fill: {
             target : 'origin',
         }
@@ -113,7 +112,6 @@ async function loadLatestDayRecords(station_id) {
         label: 'humidity '  + station["humidity units"],
         data: station.latestDay.map(row => row["humidity"]),
         borderWidth: 1,
-        backgroundColor: 'yellow',
         fill: {
             target : 'origin',
         }
@@ -125,7 +123,6 @@ async function loadLatestDayRecords(station_id) {
         yAxisID: 'y-axis-1',
         data: station.latestDay.map(row => row["barometric pressure"]),
         borderWidth: 1,
-        backgroundColor: 'gray',
         fill: {
             target : 'origin',
         }
@@ -136,7 +133,6 @@ async function loadLatestDayRecords(station_id) {
         yAxisID: 'y-axis-2',
         data: station.latestDay.map(row => row["vsys voltage"]),
         borderWidth: 1,
-        backgroundColor: 'orange',
         fill: {
             target : 'origin',
         }
