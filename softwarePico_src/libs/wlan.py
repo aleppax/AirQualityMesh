@@ -32,7 +32,7 @@ def turn_off():
     wlan.disconnect()
     wlan.active(False)
     wlan.deinit()
-    wlan = None
+    #wlan = None
     time.sleep_ms(100)
 
 def connect_from_list():
@@ -78,6 +78,7 @@ def connect(wifiNumber=0):
                 logger.info(statuses[status])
                 prev_status = status
             if status == 3:
+                config.flash_led('ok')
                 time.sleep_ms(100)
                 return True
             if status in [-3,-2,-1,0]:
