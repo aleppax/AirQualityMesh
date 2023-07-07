@@ -8,7 +8,7 @@ IoT system monitoring outdoor air quality with multiple stations, remote data co
 
 ![mainboard rendering](./casing/pictures/picture_sensors_installed.jpg "an external photo of the installed system")
 
-![mainboard rendering](./casing/pictures/picture_sensors_installer.jpg "a closeup of the installer's little helper")
+![data visualization](./online_data-map.png "online charto of data from a single station")
 
 ## Supported sensors 
 
