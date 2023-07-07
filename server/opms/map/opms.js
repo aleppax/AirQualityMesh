@@ -1,10 +1,10 @@
-const api_url = "http://opms.lettori.org/api/api.php";
+const api_url = "http://opms.local/api/api.php";
 const map_center = [44.6798, 8.0362];
 // data from server is referred to UTC time, 
 // the script should display dates with the browser's time offset.
 var opmsMap;
 var stations = [];
-const jca=jscrudapi(api_url,{headers:{'X-API-Key':'RnglFqDTBsVIw6s9-ezOyM685EctG-Qr36dSeJPB96E'}});
+const jca=jscrudapi(api_url,{headers:{'X-API-Key':''}});
 
 function initMap() {
     let mapOptions = {
