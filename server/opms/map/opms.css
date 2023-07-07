@@ -42,6 +42,8 @@ html, body, #opmsMap {
     z-index: 5;
     backdrop-filter: blur(10px);
     border-radius: 12px;
+    border-style: double;
+    border-color: darkgray;
 }
 
 #opmsChart {
