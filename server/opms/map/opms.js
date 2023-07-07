@@ -23,8 +23,8 @@ function initMap() {
 };
 
 function averagePM25(chart) {
-    var pm25chart = chart.data.datasets.filter(ds => ds.label == "PM2.5 ug/m^3");
-    if (pm25chart === []) { 
+    var pm25chart = chart.data.datasets.filter(ds => ds.label == "PM2.5 ug/m³");
+    if (pm25chart.length === 0) { 
         return 0
     } else {
         pm25data = pm25chart[0].data;
@@ -32,52 +32,54 @@ function averagePM25(chart) {
     return pm25data.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / pm25data.length;
 }
 
+const maxpm25 = {
+  type: 'line',
+  borderColor: 'gray',
+  borderDash: [6, 6],
+  borderDashOffset: 0,
+  borderWidth: 3,
+  drawTime: 'beforeDraw',
+  label: {
+      backgroundColor: 'gray',
+      position: 'start',
+      content: 'Limite OMS',
+      display: true
+  },
+  scaleID: 'y',
+  value: 15
+};
+const dailyAverage = {
+  type: 'line',
+  borderColor: (ctx) => {
+    if (averagePM25(ctx.chart) < 15) {
+        return 'green';
+    } else {
+        return 'red';
+    }
+      },
+  borderWidth: 3,
+  drawTime: 'afterDatasetsDraw',
+  label: {
+      display: true,
+      position: 'start',
+      backgroundColor: (ctx) => {
+    if (averagePM25(ctx.chart) < 15) {
+        return 'green';
+    } else {
+        return 'red';
+    }
+      },
+      content: (ctx) => {return 'Media giornaliera ' + parseInt(averagePM25(ctx.chart)) + ' ug/m\u{00B3}'},
+  },
+  scaleID: 'y',
+  value: (ctx) => {
+      return averagePM25(ctx.chart);
+      }
+};    
+    
 function initChart() {
     const data = {};
-    const maxpm25 = {
-      type: 'line',
-      borderColor: 'gray',
-      borderDash: [6, 6],
-      borderDashOffset: 0,
-      borderWidth: 3,
-      drawTime: 'beforeDraw',
-      label: {
-          backgroundColor: 'gray',
-          position: 'start',
-          content: 'Limite OMS',
-          display: true
-      },
-      scaleID: 'y',
-      value: 15
-    };
-    const dailyAverage = {
-      type: 'line',
-      borderColor: (ctx) => {
-        if (averagePM25(ctx.chart) < 15) {
-            return 'green';
-        } else {
-            return 'red';
-        }
-          },
-      borderWidth: 3,
-      drawTime: 'afterDatasetsDraw',
-      label: {
-          display: true,
-          position: 'start',
-          backgroundColor: (ctx) => {
-        if (averagePM25(ctx.chart) < 15) {
-            return 'green';
-        } else {
-            return 'red';
-        }
-          },
-          content: 'Media giornaliera',
-      },
-      scaleID: 'y',
-      value: (ctx) => {
-          return averagePM25(ctx.chart);
-          }
-    };    
+
     const config = {
     type: 'line',
     data: data,
@@ -113,14 +115,26 @@ function initChart() {
 const OPMSlegendClickHandler = function(e, legendItem, legend) {
     const index = legendItem.datasetIndex;
     const ci = legend.chart;
-    console.log(index);
     if (ci.isDatasetVisible(index)) {
         ci.hide(index);
         legendItem.hidden = true;
-    } else {
+        if (legendItem.text == "PM2.5 ug/m³") {
+            maxpm25.drawTime = null;
+            dailyAverage.drawTime = null;
+            maxpm25.value = 0;
+            dailyAverage.value = 0;
+        }
+        } else {
         ci.show(index);
         legendItem.hidden = false;
+        if (legendItem.text == "PM2.5 ug/m³") {
+            maxpm25.drawTime = 'beforeDraw';
+            dailyAverage.drawTime = 'afterDatasetsDraw';
+            maxpm25.value = 15;
+            dailyAverage.value = averagePM25(ci);
+        }
     }
+    ci.update();
 }
 
 
@@ -141,7 +155,7 @@ async function loadLatestDayRecords(station_id) {
     let data = [];
     if (station["pm capable ch2"]) {
         data.push({
-        label: 'PM1.0_ch2 ' + station["pm units ch2"],
+        label: 'aux PM1.0 ug/m³',
         data: station.latestDay.map(function (row) {if (row["pm1.0_ch2"] != 0) {
                 return row["pm1.0_ch2"];
             } else {
@@ -150,7 +164,7 @@ async function loadLatestDayRecords(station_id) {
         spanGaps: true,
         borderWidth: 1,
       },{
-        label: 'PM2.5_ch2 ' + station["pm units ch2"],
+        label: 'aux PM2.5 ug/m³',
         data: station.latestDay.map(function (row) {if (row["pm2.5_ch2"] != 0) {
                 return row["pm2.5_ch2"];
             } else {
@@ -162,14 +176,14 @@ async function loadLatestDayRecords(station_id) {
     };
     if (station["pm capable ch1"]) {
         data.push({
-        label: 'PM1.0 ' + station["pm units ch1"],
+        label: 'PM1.0 ug/m³',
         data: station.latestDay.map(row => row["pm1.0"]),
         borderWidth: 1,
         fill: {
             target : 'origin',
         }
       },{
-        label: 'PM2.5 ' + station["pm units ch1"],
+        label: 'PM2.5 ug/m³',
         data: station.latestDay.map(row => row["pm2.5"]),
         borderWidth: 1,
         fill: {
@@ -210,7 +224,7 @@ async function loadLatestDayRecords(station_id) {
     oc.data.datasets = data;
     indexes_of_datasets_to_hide = [];
     oc.data.datasets.forEach(function (val, indx) {
-        if (!(["PM2.5 ug/m^3","PM2.5_ch2 ug/m^3"].includes(val.label))) {
+        if (!(["PM2.5 ug/m³","aux PM2.5 ug/m³"].includes(val.label))) {
             indexes_of_datasets_to_hide.push(indx);
             }
         })
