@@ -1,25 +1,106 @@
-const api_url = "http://opms.local/api/api.php";
+const api_url = "http://opms.lettori.org/api/api.php";
 const map_center = [44.6798, 8.0362];
 // data from server is referred to UTC time, 
 // the script should display dates with the browser's time offset.
 var opmsMap;
 var stations = [];
-const jca=jscrudapi(api_url,{headers:{'X-API-Key':''}});
+const jca=jscrudapi(api_url,{headers:{'X-API-Key':'RnglFqDTBsVIw6s9-ezOyM685EctG-Qr36dSeJPB96E'}});
+let pm25Layer, temperatureLayer, calPm25Layer;
 
-function initMap() {
-    let mapOptions = {
+
+let pm25Gradient = {
+    0: "#e5effe",
+
+    2: "#a8cbfe",
+    4: "#81b4fe",
+    6: "#5a9cfe",
+    8: "#3485fd",
+    10: "#0d6efd",
+    
+    12: "#abdee5",
+    14: "#86cfda",
+    16: "#61c0cf",
+    18: "#3cb1c3",
+    20: "#17a2b8",
+
+    22: "#b2dfbc",
+    24: "#8fd19e",
+    26: "#6dc381",
+    28: "#4ab563",
+    30: "#28a745",
+
+    32: "#fff0a6",
+    34: "#ffea7e",
+    36: "#ffe356",
+    38: "#ffdc2f",
+    40: "#ffd607",
+
+    42: "#fed1aa",
+    44: "#febc85",
+    46: "#fea75f",
+    48: "#fd933a",
+    50: "#fd7e14",
+
+    52: "#f2b6bc",
+    54: "#ed969e",
+    56: "#e77681",
+    58: "#e25563",
+    60: "#dc3546",
+
+    62: "#f0b6e6",
+    64: "#ea95dc",
+    66: "#e374d1",
+    68: "#dd54c6",
+    70: "#d633bb",
+    
+    72: "#cbbbe9",
+    74: "#b49ddf",
+    76: "#9d7ed5",
+    78: "#8660cb",
+    80: "#6f42c1",
+    
+    82: "#6610f2"
+};
+
+let mapOptions = {
         preferCanvas: true,
-        maxZoom: 16,
+        maxZoom: 19,
         minZoom: 9
     };
-    opmsMap = L.map('opmsMap', mapOptions).setView(map_center, 13);
+
+let pm25Options = {
+        opacity: 0.5,
+        maxZoom: mapOptions.maxZoom,
+        minZoom: mapOptions.minZoom,
+        cellSize: 5,
+        exp: 2,
+        gradient: pm25Gradient,
+        dataType: 2,
+        station_range: 10,
+        minVal: 0.0,
+        maxVal: 150.0
+};
+
+//pm25IDWLayer = new L.idwLayer(airboxPoints, pm25IDWOptions);
+
+function initMap() {
+    opmsMap = L.map('opmsMap', mapOptions).setView(map_center, 14);
     const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 16,
+        maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(opmsMap);
     loadStations();
     opmsMap.on("moveend", loadStations);
     opmsMap.on("click", chartToBackground);
+    
+    if(L.Browser.mobile) {
+        
+    } else {
+        pm25Legend = new L.control.opmsLegend(pm25Gradient, {
+          position: 'bottomright',
+          unit: "μg/m³"
+        }).addTo(opmsMap);
+    };
 };
 
 function averagePM25(chart) {
@@ -255,13 +336,14 @@ function plotStationData(sts) {
 };
 
 function colorizeMarker(statn) {
-    //HSL hue from 128(best) to 0(worst), saturation 70, lightness 60
     let htlst = [...statn.marker._icon.firstChild.children];
-    //
-    let hue = Math.max(0, 128 - (statn.latest["pm2.5"] * 2.56));
+    let colorIndex = 2 * Math.round(statn.latest["pm2.5"] / 2);
+    colorIndex = Math.min(Math.max(colorIndex, 0), 82);
+    console.log(colorIndex);
+    let color = pm25Gradient[colorIndex]; 
     htlst.forEach((item) => {
         if (item.classList.value === "marker1") { 
-            item.style.fill = `hsl(${hue}, 70%, 60%)`;
+            item.style.fill = color;
     }});
 };
 
