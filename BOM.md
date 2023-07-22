@@ -5,7 +5,7 @@
 |---------|--------|------------|-------------------|
 |Raspberry Pico W|1|Raspberry Pi Ltd.|Raspberry Pi Pico W|
 |AHT20+BMP280 breakout board|1|temperature humidity sensor+pressure temperature sensor|AHT20+BMP280|
-|solar panel|1|Cellevia Power|CL-SM3P|
+|solar panel|1||5-10W depending on conditions|
 |4V 3Ah lead acid battery|1|many brands|67x75x35 mm|
 |PM sensor|1|Sensirion|SPS30|
 |PM sensor|1|Panasonic|SN-GCJA5|
