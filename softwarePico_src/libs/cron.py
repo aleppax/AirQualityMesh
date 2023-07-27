@@ -269,6 +269,9 @@ def timetuple_to_rtctuple(t):
 
 def preheat_time():
     return config.cron['sensor_preheating_s']*1000
+    
+def is_rover():
+    return config.station['rover']
 
 def initialize_board():
     return config.initialize_board()

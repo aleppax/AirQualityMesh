@@ -1,58 +1,62 @@
-from machine import Pin, UART
+from libs import MicropyGPS
 
 class NEO6M():
     
-    def __init__(self,
-             uart,
-             retries=5
-             ):
-    self._port = uart
-    self._serial = type(uart) is machine.UART
-    self.buff = bytearray(255)
+    def __init__(self,uart):
+        self.gps_module = uart
+        self.gps = MicropyGPS.MicropyGPS(location_formatting='dd')
 
-    self._attempts = retries + 1 if retries else 1
+    def _read(self):
+        length = self.gps_module.any()
+        if length > 0:
+            return self.gps_module.read(length)
+    
+    def update(self):
+        data = self._read()
+        for byte in data:
+            message = self.gps.update(chr(byte))        
 
-    self.TIMEOUT = False
-    self.FIX_STATUS = False
+    def printLatLon(self):
+        print(self.gps.latitude)
+        print(self.gps.longitude)
+
+    def to_bytes(self,x):
+        return bytes((x & 0xff, (x >> 8) & 0xff))
     
-    self.latitude = ""
-    self.longitude = ""
-    self.satellites = ""
-    self.GPStime = ""
-    
-    def getGPS(self,gpsModule):
-        global self.FIX_STATUS, self.TIMEOUT, self.latitude, self.longitude, self.satellites, self.GPStime
-        timeout = time.time() + 8 
-        while True:
-            self._port.readline()
-            self.buff = str(self._port.readline())
-            parts = self.buff.split(',')
+    def calc_checksum(self,content):
+        """
+        Calculate checksum using 8-bit Fletcher's algorithm.
+        :param bytes content: message content, excluding header and checksum bytes
+        :return: checksum
+        :rtype: bytes
+        """
+        check_a = 0
+        check_b = 0
+        for char in content:
+            check_a += char
+            check_a &= 0xFF
+            check_b += check_a
+            check_b &= 0xFF
+        return bytes((check_a, check_b))
+
+    def poll_settings(self,clsId,payload=b''):
+        payloadlength = self.to_bytes(len(payload))
+        msg = b'\xB5\x62' + clsId + payloadlength + payload + self.calc_checksum(clsId + payloadlength + payload)
+        print(msg)
+        print(self.gps_module.write(msg))
+        self.gps_module.flush()
+        return self.gps_module.readline()
         
-            if (parts[0] == "b'$GPGGA" and len(parts) == 15):
-                if(parts[1] and parts[2] and parts[3] and parts[4] and parts[5] and parts[6] and parts[7]):
-                    print(self.buff)
-                    
-                    self.latitude = self.convertToDegree(parts[2])
-                    if (parts[3] == 'S'):
-                        self.latitude = -self.latitude
-                    self.longitude = self.convertToDegree(parts[4])
-                    if (parts[5] == 'W'):
-                        self.longitude = -self.longitude
-                    self.satellites = parts[7]
-                    self.GPStime = parts[1][0:2] + ":" + parts[1][2:4] + ":" + parts[1][4:6]
-                    self.FIX_STATUS = True
-                    break
-                    
-            if (time.time() > timeout):
-                self.TIMEOUT = True
-                break
-            utime.sleep_ms(500)
-            
-    def convertToDegree(self,RawDegrees):
-        RawAsFloat = float(RawDegrees)
-        firstdigits = int(RawAsFloat/100) 
-        nexttwodigits = RawAsFloat - float(firstdigits*100) 
+    def poll_navEngine(self):
+        msg = self.poll_settings(b'\x06\x24')
+        print(msg)
         
-        Converted = float(firstdigits + nexttwodigits/60.0)
-        Converted = '{0:.6f}'.format(Converted) 
-        return str(Converted)
+    def pollSwHwVersion(self):
+        msg = self.poll_settings(b'\x0A\x04')
+        print(msg)
+
+    # opms custom measurement wrapper
+    def add_measure_to(self, report, options):
+        self.update()
+        report['latitude'] += self.gps.latitude
+        report['longitude'] += self.gps.longitude

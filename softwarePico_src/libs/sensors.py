@@ -68,7 +68,7 @@ def init(i2c, gpio):
                         t['object'] = sensor_class(uart,None,None,**t['init_arguments'])
                     if t['driver'] == 'neo6m':
                         uart = UART(0,baudrate=9600, tx=Pin(config.neo6m['serial_tx']), rx=Pin(config.neo6m['serial_rx']))
-                        t['object'] = sensor_class(uart,None,None,**t['init_arguments'])                    
+                        t['object'] = sensor_class(uart,**t['init_arguments'])                    
                     if t['driver'] == 'pms5003_ch2':
                         uart_ch2 = UART(1,baudrate=9600, tx=Pin(config.pms5003_ch2['serial_tx']), rx=Pin(config.pms5003_ch2['serial_rx']))
                         t['object'] = sensor_class(uart,None,None,**t['init_arguments'])
@@ -159,6 +159,8 @@ def wakeup():
         ### reinitialize UART if needed
         if sensors['pms5003']['connected']:
             uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
+        if sensors['neo6m']['connected']:
+            uart = UART(0,baudrate=9600, tx=Pin(config.neo6m['serial_tx']), rx=Pin(config.neo6m['serial_rx']))
         if sensors['pms5003_ch2']['connected']:
             uart_ch2 = UART(1,baudrate=9600, tx=Pin(config.pms5003_ch2['serial_tx']), rx=Pin(config.pms5003_ch2['serial_rx']))
 

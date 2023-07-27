@@ -67,19 +67,33 @@ def send_values():
         logger.error('current measures cannot be saved.')
 
 
-while True:
-    # before anything that could change the reading
-    sensors.measure_battery()
-    # check if it's time to look for NTP or software updates
-    updates()
-    # if a measurement is scheduled during this wake cycle, do the job
-    if cron.do_measure:
-        sensors.wakeup()
-        # sleep while sensors preheat
-        cron.lightsleep_wrapper(cron.preheat_time())
-        sensors.measure(logger.now_DTF())
-        send_values()
-    # a way to exit the while cycle if power is low
-    sensors.check_low_power()
-    # otherwise work done, rest until next task
-    cron.lightsleep_until_next_cycle()
+if cron.is_rover():
+    while True:
+        # if action switch is off: continue
+        # set roving to True (rover can start/continue his path)
+        # locate GNSS position and refine
+            # if no fix: infer
+            # if fix: store lat lon
+        # compare position with latest record
+            # if distance < interval distance: wait, goto locate GNSS
+            # if distance > interval distance: continue
+        # set roving to False (rover should stop in a safe spot)
+        # measure serie, average and store/send
+        pass
+else:
+    while True:
+        # before anything that could change the reading
+        sensors.measure_battery()
+        # check if it's time to look for NTP or software updates
+        updates()
+        # if a measurement is scheduled during this wake cycle, do the job
+        if cron.do_measure:
+            sensors.wakeup()
+            # sleep while sensors preheat
+            cron.lightsleep_wrapper(cron.preheat_time())
+            sensors.measure(logger.now_DTF())
+            send_values()
+        # a way to exit the while cycle if power is low
+        sensors.check_low_power()
+        # otherwise work done, rest until next task
+        cron.lightsleep_until_next_cycle()   
