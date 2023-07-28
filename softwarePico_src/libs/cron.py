@@ -273,6 +273,14 @@ def preheat_time():
 def is_rover():
     return config.station['rover']
 
+def enable_roving():
+    if config.station['rover_status_channel'] == 'GPIO22':
+        config.gpio['GPIO22'].on()
+
+def disable_roving():
+    if config.station['rover_status_channel'] == 'GPIO22':
+        config.gpio['GPIO22'].off()
+
 def initialize_board():
     return config.initialize_board()
 

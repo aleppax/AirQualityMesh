@@ -24,7 +24,7 @@ board = {
     'I2C_SCL' : 9,
     'I2C_freq' : 100000,
     'WDT_seconds' : 8,
-    'led_pin' : 22,
+    'led_pin' : 22,  ## choose one between [22,26,27]
 }
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
@@ -163,6 +163,7 @@ station = {
     'latitude' : 0.0,
     'longitude' : 0.0,
     'rover' : False, # single configuration switch to enable neo6m receiver on pins 16,17 ans GPS localization before each measurement. Requires a NEO-6M GPS module
+    'rover_status_channel' : 'GPIO22' # choose between 'GPIO22', and nothing else for now
 }
 wlan = {
     'SSID_0' : 'xxx',

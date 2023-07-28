@@ -2,6 +2,7 @@ from libs import cron, datalogger, filelogger, logger, mqttlogger, sensors, wlan
 from machine import reset, freq, mem32
 import micropython
 
+# cron could also be named 'core'
 micropython.alloc_emergency_exception_buf(100)
 reset_cause = mem32[0x40058008]
 # https://github.com/orgs/micropython/discussions/10858#discussioncomment-5504000
@@ -38,6 +39,18 @@ def updates():
             cron.lightsleep_wrapper(180000)
             reset()
 
+def updates_rover():
+    # fetch datetime from GNSS, do not attempt any software update
+    if sensors.update_gnss_time():
+        return
+    logger.info("Failed to update the clock via satellite. Trying via mobile hotspot and NTP.")
+    if wlan.connect():
+        cron.update_ntp()
+    if cron.check_ntp_schedule():
+        logger.info("Failed to update the clock. Rebooting.")
+        cron.lightsleep_wrapper(20000)
+        reset()
+
 def send_values():
     done = filelogger.write(sensors.measures) # current measures sent or saved somewhere
     if cron.check_data_schedule(sensors.battery_values[2],sensors.leadacid.min_charging_voltage):
@@ -68,9 +81,17 @@ def send_values():
 
 
 if cron.is_rover():
+    sensors.measure_battery()
+    sensors.wakeup()
+    updates_rover()
+    cron.lightsleep_wrapper(cron.preheat_time())
     while True:
-        # if action switch is off: continue
-        # set roving to True (rover can start/continue his path)
+        # uses GP1 as digital input. Bistable switch, enables moving and recording
+        if not gpio['GP1'].value():
+            cron.lightsleep_wrapper(10000)
+            continue
+        # set roving to True (either digital pin or communicate status, rover can start/continue his path)
+        cron.enable_roving()
         # locate GNSS position and refine
             # if no fix: infer
             # if fix: store lat lon
@@ -78,8 +99,11 @@ if cron.is_rover():
             # if distance < interval distance: wait, goto locate GNSS
             # if distance > interval distance: continue
         # set roving to False (rover should stop in a safe spot)
+        cron.disable_roving()
         # measure serie, average and store/send
-        pass
+        sensors.measure(logger.now_DTF())
+        send_values()
+        sensors.check_low_power()
 else:
     while True:
         # before anything that could change the reading

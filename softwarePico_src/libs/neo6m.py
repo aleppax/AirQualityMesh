@@ -1,10 +1,10 @@
-from libs import MicropyGPS
+from libs import micropyGPS
 
 class NEO6M():
     
     def __init__(self,uart):
         self.gps_module = uart
-        self.gps = MicropyGPS.MicropyGPS(location_formatting='dd')
+        self.gps = micropyGPS.MicropyGPS(location_formatting='dd')
 
     def _read(self):
         length = self.gps_module.any()
@@ -60,3 +60,15 @@ class NEO6M():
         self.update()
         report['latitude'] += self.gps.latitude
         report['longitude'] += self.gps.longitude
+
+    def datetime(self):
+        self.update()
+        year = self.gps.date[2]+2000
+        month = self.gps.date[1]
+        day = self.gps.date[0]
+        h = self.gps.timestamp[0]
+        m = self.gps.timestamp[1]
+        s = int(self.gps.timestamp[2])
+        us = self.gps.timestamp[2]%1
+        return (year, month, day, 0, h, m, s, us)
+

@@ -1,10 +1,11 @@
 from libs import config, leadacid, logger
-from libs.cron import feed_wdt, deepsleep_as_long_as_you_can
+from libs.cron import feed_wdt, deepsleep_as_long_as_you_can, rtc, sleep_ms_feeded
 from math import log
 from collections import OrderedDict
 from time import ticks_ms, ticks_diff, sleep_ms, time
 from machine import Pin, UART
 
+last_GNSStimeSync = 0
 sensors = {}
 
 measures = OrderedDict([
@@ -135,6 +136,29 @@ def startupTests(i2c, gpio):
                 s['connected'] = True
             else:
                 s['connected'] = False
+
+def update_gnss_time():
+    global config
+    feed_wdt()
+    updated_NTP = False
+    # this can lead to wdt intervention, a reboot is ok
+    while not updated_NTP:
+        feed_wdt()
+        logger.info('Reading GNSS datetime')
+        try:
+            gnssNow = sensors['neo6m']['object'].datetime()
+            if gnssNow[0] == 2000:
+                logger.info('Failed GNSS time acquisition. Retrying time update in 1 second')
+                sleep_ms_feeded(1000)
+                continue
+            rtc.datetime(gnssNow)
+            return True
+        except OverflowError as error:
+            logger.error(error)
+        except Exception as exception:
+            logger.warning(exception)
+            logger.info('Error. Retrying time update in 1 second')
+            sleep_ms_feeded(1000)
 
 def wakeup():
     global config, use_aux_sensors
