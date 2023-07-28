@@ -4,7 +4,8 @@
 
 current development status: [Proof of Concept.](roadmap.md)
 
-IoT system monitoring outdoor air quality with multiple stations, remote data collection and analytics
+IoT system monitoring outdoor air quality with multiple stations, remote data collection and analytics.
+It can work both as a stationary or a roving unit, logging datetime, position and sensor data.
 
 ![mainboard rendering](./casing/pictures/picture_sensors_installed.jpg "an external photo of the installed system")
 
