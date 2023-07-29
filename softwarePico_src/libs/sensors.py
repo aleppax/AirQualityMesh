@@ -204,6 +204,8 @@ def measure(time_DTF):
     measures['station'] = config.station['station']
     measures['datetime'] = time_DTF
     measures['internal temperature'], measures['battery charge percentage'], measures['vsys voltage'], measures['battery is charging'] = battery_values
+    if config.station['rover']:
+        sensors['neo6m']['object'].add_measure_to(measures)
     # averaging n measures from sensors with 1Hz frequency
     if config.sensors['enable_sensors']:
         rtc_now = time()

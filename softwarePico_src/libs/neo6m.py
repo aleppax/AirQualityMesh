@@ -56,10 +56,10 @@ class NEO6M():
         print(msg)
 
     # opms custom measurement wrapper
-    def add_measure_to(self, report, options):
+    def add_measure_to(self, report):
         self.update()
-        report['latitude'] += self.gps.latitude
-        report['longitude'] += self.gps.longitude
+        report['latitude'] = self.gps.latitude
+        report['longitude'] = self.gps.longitude
 
     def datetime(self):
         self.update()
