@@ -24,7 +24,7 @@ board = {
     'I2C_SCL' : 9,
     'I2C_freq' : 100000,
     'WDT_seconds' : 8,
-    'led_pin' : 22,
+    'led_pin' : 22,  ## choose one between [22,26,27]
 }
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
@@ -84,6 +84,16 @@ mqttlogger = {
     'user' : None,
     'pass' : None,
     'QOS' : 0, # default QOS is 0 and can be changed to 1
+}
+neo6m = {
+    'name' : 'NEO-6M GPS Module',
+    'is_sensor' : True,
+    'is_auxiliary' : False,
+    'driver' : 'neo6m',
+    'cls' : 'NEO6M',
+    'init_arguments' : {},
+    'serial_tx' : 'GP16',
+    'serial_rx' : 'GP17',
 }
 picosngcja5 = {
     'name' : 'Laser Type PM Sensor SN-GCJA5',
@@ -152,6 +162,8 @@ station = {
     'station' : None, # unique at least server wise.
     'latitude' : 0.0,
     'longitude' : 0.0,
+    'rover' : False, # single configuration switch to enable neo6m receiver on pins 16,17 ans GPS localization before each measurement. Requires a NEO-6M GPS module
+    'rover_status_channel' : 'GPIO22' # choose between 'GPIO22', and nothing else for now
 }
 wlan = {
     'SSID_0' : 'xxx',
