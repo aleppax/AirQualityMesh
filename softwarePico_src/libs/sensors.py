@@ -1,10 +1,11 @@
 from libs import config, leadacid, logger
-from libs.cron import feed_wdt, deepsleep_as_long_as_you_can
+from libs.cron import feed_wdt, deepsleep_as_long_as_you_can, rtc, sleep_ms_feeded
 from math import log
 from collections import OrderedDict
 from time import ticks_ms, ticks_diff, sleep_ms, time
 from machine import Pin, UART
 
+last_GNSStimeSync = 0
 sensors = {}
 
 measures = OrderedDict([
@@ -30,7 +31,9 @@ measures = OrderedDict([
     ('wind direction',0), # not implemented yet
     ('wind speed',0), # not implemented yet
     ('battery is charging',0),
-    ('dew point',0)
+    ('dew point',0),
+    ('latitude',0),
+    ('longitude',0)
 ])
 battery_values = ()
 
@@ -61,10 +64,12 @@ def init(i2c, gpio):
                     # if i2c
                     if 'i2c_address' in t.keys():
                         t['object'] = sensor_class(i2c, **t['init_arguments'])
-                    # if serial (only pms5003 currently supported)
                     if t['driver'] == 'pms5003':
                         uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
                         t['object'] = sensor_class(uart,None,None,**t['init_arguments'])
+                    if t['driver'] == 'neo6m':
+                        uart = UART(0,baudrate=9600, tx=Pin(config.neo6m['serial_tx']), rx=Pin(config.neo6m['serial_rx']))
+                        t['object'] = sensor_class(uart,**t['init_arguments'])                    
                     if t['driver'] == 'pms5003_ch2':
                         uart_ch2 = UART(1,baudrate=9600, tx=Pin(config.pms5003_ch2['serial_tx']), rx=Pin(config.pms5003_ch2['serial_rx']))
                         t['object'] = sensor_class(uart,None,None,**t['init_arguments'])
@@ -100,8 +105,15 @@ def startupTests(i2c, gpio):
     #look for a PMS5003 connected to UART0
     pin_rx_uart =  Pin(config.pms5003['serial_rx'], Pin.IN, Pin.PULL_DOWN)
     if pin_rx_uart.value() == 1:
-        sensors['pms5003']['connected'] = True
+        # check which of the two sensors is connected
+        if config.station['rover']:
+            sensors['neo6m']['connected'] = True
+            sensors['pms5003']['connected'] = False
+        else:
+            sensors['neo6m']['connected'] = False
+            sensors['pms5003']['connected'] = True
     else:
+        sensors['neo6m']['connected'] = False
         sensors['pms5003']['connected'] = False
     # the same for a second PMS5003 connected
     pin_rx_uart =  Pin(config.pms5003_ch2['serial_rx'], Pin.IN, Pin.PULL_DOWN)
@@ -124,6 +136,29 @@ def startupTests(i2c, gpio):
                 s['connected'] = True
             else:
                 s['connected'] = False
+
+def update_gnss_time():
+    global config
+    feed_wdt()
+    updated_NTP = False
+    # this can lead to wdt intervention, a reboot is ok
+    while not updated_NTP:
+        feed_wdt()
+        logger.info('Reading GNSS datetime')
+        try:
+            gnssNow = sensors['neo6m']['object'].datetime()
+            if gnssNow[0] == 2000:
+                logger.info('Failed GNSS time acquisition. Retrying time update in 1 second')
+                sleep_ms_feeded(1000)
+                continue
+            rtc.datetime(gnssNow)
+            return True
+        except OverflowError as error:
+            logger.error(error)
+        except Exception as exception:
+            logger.warning(exception)
+            logger.info('Error. Retrying time update in 1 second')
+            sleep_ms_feeded(1000)
 
 def wakeup():
     global config, use_aux_sensors
@@ -148,6 +183,8 @@ def wakeup():
         ### reinitialize UART if needed
         if sensors['pms5003']['connected']:
             uart = UART(0,baudrate=9600, tx=Pin(config.pms5003['serial_tx']), rx=Pin(config.pms5003['serial_rx']))
+        if sensors['neo6m']['connected']:
+            uart = UART(0,baudrate=9600, tx=Pin(config.neo6m['serial_tx']), rx=Pin(config.neo6m['serial_rx']))
         if sensors['pms5003_ch2']['connected']:
             uart_ch2 = UART(1,baudrate=9600, tx=Pin(config.pms5003_ch2['serial_tx']), rx=Pin(config.pms5003_ch2['serial_rx']))
 
@@ -167,6 +204,8 @@ def measure(time_DTF):
     measures['station'] = config.station['station']
     measures['datetime'] = time_DTF
     measures['internal temperature'], measures['battery charge percentage'], measures['vsys voltage'], measures['battery is charging'] = battery_values
+    if config.station['rover']:
+        sensors['neo6m']['object'].add_measure_to(measures)
     # averaging n measures from sensors with 1Hz frequency
     if config.sensors['enable_sensors']:
         rtc_now = time()
