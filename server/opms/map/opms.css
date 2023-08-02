@@ -21,6 +21,10 @@ html, body, #opmsMap {
     max-height: 100%;
 }
 
+.opms-legend {
+    font-size: 0.65rem;
+}
+
 .marker1 {
     fill-opacity: 0.7;
     fill: #ff5ca8;

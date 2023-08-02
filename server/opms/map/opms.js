@@ -4,9 +4,10 @@ const map_center = [44.6798, 8.0362];
 // the script should display dates with the browser's time offset.
 var opmsMap;
 var stations = [];
+var border;
 const jca=jscrudapi(api_url,{headers:{'X-API-Key':'RnglFqDTBsVIw6s9-ezOyM685EctG-Qr36dSeJPB96E'}});
 let pm25Layer, temperatureLayer, calPm25Layer;
-
+const boundingRect = L.latLngBounds(L.latLng(44.5891776729647873,7.9663661572344484), L.latLng(44.7402273405686657,8.1506052020368323));
 
 let pm25Gradient = {
     0: "#e5effe",
@@ -69,19 +70,17 @@ let mapOptions = {
     };
 
 let pm25Options = {
-        opacity: 0.5,
+        tileSize: L.point(256, 256),
+        opacity: 0.65,
+        //bounds LatLngBounds
         maxZoom: mapOptions.maxZoom,
         minZoom: mapOptions.minZoom,
-        cellSize: 5,
-        exp: 2,
+        //maxNativeZoom, minNativeZoom
+        className: 'pm25layer',
         gradient: pm25Gradient,
-        dataType: 2,
-        station_range: 10,
-        minVal: 0.0,
-        maxVal: 150.0
+        cellSize: 16,
+        bounds: boundingRect
 };
-
-//pm25IDWLayer = new L.idwLayer(airboxPoints, pm25IDWOptions);
 
 function initMap() {
     opmsMap = L.map('opmsMap', mapOptions).setView(map_center, 14);
@@ -101,6 +100,11 @@ function initMap() {
           unit: "μg/m³"
         }).addTo(opmsMap);
     };
+    
+    pm25Layer = new L.opmsLayer(pm25Options).addTo(opmsMap);
+    border = L.geoJSON(bacinoCherasca.features).addTo(opmsMap);
+    border.setStyle({fillOpacity: 0});
+    opmsMap.fitBounds(boundingRect);
 };
 
 function averagePM25(chart) {
@@ -339,7 +343,6 @@ function colorizeMarker(statn) {
     let htlst = [...statn.marker._icon.firstChild.children];
     let colorIndex = 2 * Math.round(statn.latest["pm2.5"] / 2);
     colorIndex = Math.min(Math.max(colorIndex, 0), 82);
-    console.log(colorIndex);
     let color = pm25Gradient[colorIndex]; 
     htlst.forEach((item) => {
         if (item.classList.value === "marker1") { 

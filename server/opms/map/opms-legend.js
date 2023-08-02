@@ -32,7 +32,7 @@ L.Control.opmsLegend = L.Control.extend({
   },
 
   onAdd: function(map) {
-    let container = L.DomUtil.create('div', 'idw-legend leaflet-control-layers'),
+    let container = L.DomUtil.create('div', 'opms-legend leaflet-control-layers'),
       gradesLabels = '',
       gradientsLength = this.gradients.length;
     let numLength = 0;
