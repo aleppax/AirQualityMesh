@@ -83,6 +83,16 @@ mqttlogger = {
     'pass' : None,
     'QOS' : 0, # default QOS is 0 and can be changed to 1
 }
+neo6m = {
+    'name' : 'NEO-6M GPS Module',
+    'is_sensor' : True,
+    'is_auxiliary' : False,
+    'driver' : 'neo6m',
+    'cls' : 'NEO6M',
+    'init_arguments' : {},
+    'serial_tx' : 'GP16',
+    'serial_rx' : 'GP17',
+}
 picosngcja5 = {
     'name' : 'Laser Type PM Sensor SN-GCJA5',
     'is_sensor' : True,
