@@ -11,6 +11,8 @@ It can work both as a stationary or a roving unit, logging datetime, position an
 
 ![data visualization](./online_data-map.png "online charto of data from a single station")
 
+![station configuration](./config_server.jpeg "on board configuration webserver")
+
 ## Supported sensors 
 
 |sensor| description | physical dimensions| max connected sensors |
