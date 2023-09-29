@@ -56,9 +56,17 @@ datalogger = {
     'apikey' : '',
     # use your REST server. prefer unsecure http
     # to avoid crashes due to limitations of the implementation.
+    'opensensemap_enable' : False,
+    'opensensemap_token' : '',
+    'opensensemap_API_URL' : 'https://api.opensensemap.org/boxes/',
+    'senseBox_ID' : '',
+    'temperature_ID' : '',
+    'humidity_ID' : '',
+    'pm2.5_ID' : '',
 }
 filelogger = {
     'filename' : '/logs/measures.txt',
+    'opensensemap_filename' : '/logs/osm-measures.txt'
 }
 logger = {
     'logfile' : 'system.log',
@@ -164,6 +172,7 @@ station = {
     'longitude' : 0.0,
     'rover' : False, # single configuration switch to enable neo6m receiver on pins 16,17 ans GPS localization before each measurement. Requires a NEO-6M GPS module
     'rover_status_channel' : 'GPIO22' # choose between 'GPIO22', and nothing else for now
+    'rover_sensor_height_above_ground' : 1 # meters
 }
 wlan = {
     'SSID_0' : 'xxx',
