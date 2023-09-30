@@ -263,6 +263,7 @@ def serve_captive_portal():
         logger.info(request.body)
         measurements_per_day = int(request.form.get('measures-per-day'))
         URL = request.form.get('datalogger-url')
+        apikey = request.form.get('datalogger-apikey')
         data_submission_interval = int(request.form.get('data_submission_interval'))*60
         data_submission_just_in_time = True if request.form.get('data_submission_just_in_time') is 'on' else False
         data_submission_when_charging = True if request.form.get('data_submission_when_charging') is 'on' else False
@@ -273,6 +274,8 @@ def serve_captive_portal():
             config.set('cron','measurements_per_day', measurements_per_day)
         if URL is not config.datalogger['URL']:
             config.set('datalogger','URL', URL)
+        if apikey is not config.datalogger['apikey']:
+            config.set('datalogger','apikey', apikey)
         if data_submission_interval is not config.cron['data_submission_interval']:
             config.set('cron','data_submission_interval', data_submission_interval)
         if data_submission_just_in_time is not config.cron['data_submission_just_in_time']:
@@ -292,11 +295,51 @@ def serve_captive_portal():
         return html_form.format(
             cfg_cron_measurements_per_day = str(config.cron['measurements_per_day']),
             cfg_datalogger_URL = config.datalogger['URL'],
+            cfg_datalogger_apikey = config.datalogger['apikey'],
             cfg_cron_data_submission_interval = int(config.cron['data_submission_interval']/60),
             cfg_cron_data_submission_just_in_time = 'checked' if config.cron['data_submission_just_in_time'] else '',
             cfg_cron_data_submission_when_charging = 'checked' if config.cron['data_submission_when_charging'] else '',
             average_measurements = config.sensors['average_particle_measurements'],
             average_interval_ms = int(config.sensors['average_measurement_interval_ms']/1000))
+
+    @app.post('/opensensemap')
+    def save_opensensemap_settings(request):
+        logger.info(request.body)
+        opensensemap_enable = True if request.form.get('opensensemap_enable') is 'on' else False
+        opensensemap_url = request.form.get('opensensemap-url')
+        opensensemap_token = request.form.get('opensensemap_token')
+        senseBox_ID = request.form.get('senseBox_ID')
+        temperature_ID = request.form.get('temperature_ID')
+        humidity_ID = request.form.get('humidity_ID')
+        pm25_ID = request.form.get('pm25_ID')
+        if opensensemap_enable is not config.datalogger['opensensemap_enable']:
+            config.set('datalogger','opensensemap_enable', opensensemap_enable)
+        if opensensemap_url is not config.datalogger['opensensemap_API_URL']:
+            config.set('datalogger','opensensemap_API_URL', opensensemap_url)
+        if opensensemap_token is not config.datalogger['opensensemap_token']:
+            config.set('datalogger','opensensemap_token', opensensemap_token)
+        if senseBox_ID is not config.datalogger['senseBox_ID']:
+            config.set('datalogger','senseBox_ID', senseBox_ID)
+        if temperature_ID is not config.datalogger['temperature_ID']:
+            config.set('datalogger','temperature_ID', temperature_ID)
+        if humidity_ID is not config.datalogger['humidity_ID']:
+            config.set('datalogger','humidity_ID', humidity_ID)
+        if pm25_ID is not config.datalogger['pm2.5_ID']:
+            config.set('datalogger','pm2.5_ID', pm25_ID)
+
+    @app.get('/opensensemap')
+    def load_opensensemap(request):
+        html_portal = open('/html/portal-opensensemap.html')
+        html_form = html_portal.read()
+        html_portal.close()
+        return html_form.format(
+            opensensemap_enable = 'checked' if config.datalogger['opensensemap_enable'] else '',
+            opensensemap_url = config.datalogger['opensensemap_API_URL'],
+            opensensemap_token = config.datalogger['opensensemap_token'],
+            senseBox_ID = config.datalogger['senseBox_ID'],
+            temperature_ID = config.datalogger['temperature_ID'],
+            humidity_ID = config.datalogger['humidity_ID'],
+            pm25_ID = config.datalogger['pm2.5_ID'])
 
     @app.post('/syslogger')
     def save_syslogger_settings(request):

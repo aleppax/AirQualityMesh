@@ -57,8 +57,8 @@ datalogger = {
     # use your REST server. prefer unsecure http
     # to avoid crashes due to limitations of the implementation.
     'opensensemap_enable' : False,
-    'opensensemap_token' : '',
     'opensensemap_API_URL' : 'https://api.opensensemap.org/boxes/',
+    'opensensemap_token' : '',
     'senseBox_ID' : '',
     'temperature_ID' : '',
     'humidity_ID' : '',

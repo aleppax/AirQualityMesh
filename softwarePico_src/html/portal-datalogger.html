@@ -37,6 +37,7 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     <a href="/status" class="navbtn" id="status">status</a>
     <a href="/network" class="navbtn" id="network">network</a>
     <a href="/datalogger" class="navbtn active" id="datalogger">datalogger</a>
+    <a href="/opensensemap" class="navbtn" id="opensensemap">opensensemap</a>
     <a href="/syslogger" class="navbtn" id="syslogger">syslogger</a>
     <a href="/mqtt" class="navbtn" id="MQTT">MQTT</a>
     <a href="/advanced" class="navbtn" id="advanced">advanced</a>
@@ -60,6 +61,11 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
     <div class="cat form-group basic">
         <label for="datalogger-url">API server URL</label>
         <input class="form-control datalogger-url" name="datalogger-url" id="datalogger-url" type="url" value="{cfg_datalogger_URL}">
+    </div>
+    <h2 class="cat basic translate" id="Dake">Datalogger API key</h2>
+    <div class="cat form-group basic">
+        <label for="datalogger-url">API server key</label>
+        <input class="form-control datalogger-apikey" name="datalogger-apikey" id="datalogger-apikey" type="text" value="{cfg_datalogger_apikey}">
     </div>
     <h2 class="cat network power translate" id="Dsin">Data submission interval</h2>
     <div class="cat form-group network power">
@@ -114,6 +120,7 @@ const translations = {{
     'Lang': 'Language',
     'Meas': 'Measurement interval',
     'Data': 'Datalogger server',
+    'Dake': 'Datalogger API key',
     'Dsin': 'Data submission interval',
     'Dsjt': 'Data submission just in time',
     'Dday': 'Data submission when charging',
@@ -126,6 +133,7 @@ const translations = {{
     'Lang': 'Lingua',
     'Meas': 'Intervallo di misurazione',
     'Data': 'Server di raccolta dei dati',
+    'Dake': 'Chiave API del server',
     'Dsin': 'Intervallo di invio dei dati',
     'Dsjt': 'Invio immediato dei dati',
     'Dday': 'Invio con batteria carica',
