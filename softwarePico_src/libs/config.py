@@ -171,8 +171,8 @@ station = {
     'latitude' : 0.0,
     'longitude' : 0.0,
     'rover' : False, # single configuration switch to enable neo6m receiver on pins 16,17 ans GPS localization before each measurement. Requires a NEO-6M GPS module
-    'rover_status_channel' : 'GPIO22' # choose between 'GPIO22', and nothing else for now
-    'rover_sensor_height_above_ground' : 1 # meters
+    'rover_status_channel' : 'GPIO22', # choose between 'GPIO22', and nothing else for now
+    'rover_sensor_height_above_ground' : 1, # meters
 }
 wlan = {
     'SSID_0' : 'xxx',
@@ -304,13 +304,15 @@ def initialize_board():
     return i2c, gpio
 
 def flash_led(mode):
-    if board['ledpin'] != None:
-        modes = {
-            'ok' : [1],
-            'error' : [0.5,0.5,0.5],
-        }
-        for s in modes[mode]:
-            board['ledpin'].on()
-            sleep(s)
-            board['ledpin'].off()
-            sleep(0.2)
+    if 'ledpin' in board:
+        if board['ledpin'] != None:
+            modes = {
+                'ok' : [1],
+                'error' : [0.5,0.5,0.5],
+            }
+            for s in modes[mode]:
+                board['ledpin'].on()
+                sleep(s)
+                board['ledpin'].off()
+                sleep(0.2)
+    

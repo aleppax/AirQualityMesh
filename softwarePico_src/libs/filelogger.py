@@ -39,7 +39,7 @@ def read():
         return csvdata_opms, csvdata_opensensemap
     return csvdata_opms, []
 
-def read_measures(fname,queue_lines):
+def read_measures(fname):
     if file_exists(fname):
         csvdata = []
         lines = []

@@ -55,6 +55,7 @@ def send_opensensemap_data(d):
     if type(d) is type(gauges):
         d = '[\n' + format_json_opensensemap(d) + '\n]'
     msg = None
+    print(d)
     attempts = 2
     while attempts > 0:
         attempts -= 1
@@ -62,7 +63,7 @@ def send_opensensemap_data(d):
             start_request_time = ticks_ms()
             # hope there will be a better way than disabling WDT
             pause_wdt()
-            durl = config.datalogger['opensensemap_API_URL'] + config.datalogger['senseBox_ID'] + '/'
+            durl = config.datalogger['opensensemap_API_URL'] + config.datalogger['senseBox_ID'] + '/data'
             resp = requests.post(durl, headers={'Authorization': config.datalogger['opensensemap_token'],'content-type': 'application/json'}, data=d, timeout=config.board['WDT_seconds']-3)
             msg = resp.text
             resp.close()
@@ -70,7 +71,7 @@ def send_opensensemap_data(d):
             feed_wdt()
             request_time = 'Opensensemap POST request time: ' + str(ticks_diff(ticks_ms(),start_request_time)) + ' ms'
             logger.info(request_time)
-            if msg == "Measurements saved in box":
+            if msg == '"Measurements saved in box"':
                 logger.info(msg)
                 return True
             else:
@@ -111,13 +112,13 @@ def send_data_list(measures_list):
 
 def format_json_opensensemap(data_dict):
     if config.station['rover']:
-        jsdata = f'{"sensor":"{config.datalogger["temperature_ID"]}", "value":"{data_dict["temperature"]}", "createdAt": "{data_dict["datetime"]}", "location": [{data_dict["longitude"]},{data_dict["latitude"]},{config.station["rover_sensor_height_above_ground"]}]},\n'
-        jsdata += f'{"sensor":"{config.datalogger["humidity_ID"]}", "value":"{data_dict["humidity"]}", "createdAt": "{data_dict["datetime"]}", "location": [{data_dict["longitude"]},{data_dict["latitude"]},{config.station["rover_sensor_height_above_ground"]}]},\n'
-        jsdata += f'{"sensor":"{config.datalogger["pm2.5_ID"]}", "value":"{data_dict["pm2.5"]}", "createdAt": "{data_dict["datetime"]}", "location": [{data_dict["longitude"]},{data_dict["latitude"]},{config.station["rover_sensor_height_above_ground"]}]}'
+        jsdata = f'{{"sensor":"{config.datalogger["temperature_ID"]}", "value":"{data_dict["temperature"]}", "createdAt": "{data_dict["datetime"]}", "location": [{data_dict["longitude"]},{data_dict["latitude"]},{config.station["rover_sensor_height_above_ground"]}]}},\n'
+        jsdata += f'{{"sensor":"{config.datalogger["humidity_ID"]}", "value":"{data_dict["humidity"]}", "createdAt": "{data_dict["datetime"]}", "location": [{data_dict["longitude"]},{data_dict["latitude"]},{config.station["rover_sensor_height_above_ground"]}]}},\n'
+        jsdata += f'{{"sensor":"{config.datalogger["pm2.5_ID"]}", "value":"{data_dict["pm2.5"]}", "createdAt": "{data_dict["datetime"]}", "location": [{data_dict["longitude"]},{data_dict["latitude"]},{config.station["rover_sensor_height_above_ground"]}]}}'
     else:
-        jsdata = f'{"sensor":"{config.datalogger["temperature_ID"]}", "value":"{data_dict["temperature"]}", "createdAt": "{data_dict["datetime"]}"},\n'
-        jsdata += f'{"sensor":"{config.datalogger["humidity_ID"]}", "value":"{data_dict["humidity"]}", "createdAt": "{data_dict["datetime"]}"},\n'
-        jsdata += f'{"sensor":"{config.datalogger["pm2.5_ID"]}", "value":"{data_dict["pm2.5"]}", "createdAt": "{data_dict["datetime"]}"}'
+        jsdata = f'{{"sensor":"{config.datalogger["temperature_ID"]}", "value":"{data_dict["temperature"]}", "createdAt": "{data_dict["datetime"]}"}},\n'
+        jsdata += f'{{"sensor":"{config.datalogger["humidity_ID"]}", "value":"{data_dict["humidity"]}", "createdAt": "{data_dict["datetime"]}"}},\n'
+        jsdata += f'{{"sensor":"{config.datalogger["pm2.5_ID"]}", "value":"{data_dict["pm2.5"]}", "createdAt": "{data_dict["datetime"]}"}}'
     return jsdata
     
 def send_opensensemap_data_list(measures_list):
@@ -128,7 +129,7 @@ def send_opensensemap_data_list(measures_list):
         fill_gauges_dict(di)
         json_payload += format_json_opensensemap(gauges)
         json_payload += ',\n'
-    json_payload = json_payload[:-3] + '\n]'
+    json_payload = json_payload[:-2] + '\n]'
     dl_results = send_opensensemap_data(json_payload)
     return dl_results
 
