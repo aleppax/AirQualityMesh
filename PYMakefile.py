@@ -12,15 +12,15 @@ parser.add_argument('--syncfiles', help='sync static files', action="store_true"
 parser.add_argument('--verbose', help='will show extended output', action="store_true")
 args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
-exclude_files = ['main.py', 'config.py','__init__.py']
+exclude_files = ['main.py','config.py','__init__.py']
 mpy_cross = '../micropython/mpy-cross/build/mpy-cross'
 
 def compile_bytecode():
     print('compiling to bytecode...')
     for fpath,fnames in vers.all_files.items():
         for fname in fnames:
-            if (fname not in exclude_files) and (fname.split('.')[1] == 'py'):
-                infile = './softwarePico_src' + fpath + fname
+            if (fname not in exclude_files) and (fname.split('.')[1] == 'mpy'):
+                infile = './softwarePico_src' + fpath + fname.split('.')[0] + '.py'
                 outfile = './softwarePico_dist' + fpath + fname.split('.')[0] + '.mpy'
                 print('compiling ' + infile)
                 comd = mpy_cross + ' ' + infile + ' -o ' + outfile
@@ -40,14 +40,16 @@ def syncfiles():
     print('syncing static files...')
     for fpath,fnames in vers.all_files.items():
         for fname in fnames:
-            if (fname not in exclude_files) and (fname.split('.')[1] != 'py'):
+            if (fname not in exclude_files) and (fname.split('.')[1] != 'mpy'):
                 infile = './softwarePico_src' + fpath + fname
                 outfile = './softwarePico_dist' + fpath + fname
                 print('copying ' + infile)
                 comd = 'cp ' + infile + ' ' + outfile
                 if args.verbose:
                     print(comd)
-                os.popen(comd)     
+                os.popen(comd)
+    print('copying ./softwarePico_src/version.py')
+    os.popen('cp ./softwarePico_src/version.py ./softwarePico_dist/version.py')
 
 
 if args.bytecode:

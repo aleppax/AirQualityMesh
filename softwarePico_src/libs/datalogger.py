@@ -2,11 +2,15 @@ from libs import logger, config, wlan
 from libs.cron import feed_wdt, pause_wdt, restart_wdt
 import urequests as requests
 import json
+import gc
 from time import ticks_ms, ticks_diff
 from libs.sensors import measures
 gauges = measures.copy()
+gc.enable()
 
 def send_data(d):
+    gc.collect()
+    gc.mem_free()
     feed_wdt()
     if type(d) is type(gauges):
         d = '[' + json.dumps(d) + ']'
@@ -48,14 +52,19 @@ def send_data(d):
                 resp.close()
             except NameError:
                 pass
+#            try:
+#                del resp
+#            except KeyError:
+#                pass
     return False
 
 def send_opensensemap_data(d):
+    gc.collect()
+    gc.mem_free()
     feed_wdt()
     if type(d) is type(gauges):
         d = '[\n' + format_json_opensensemap(d) + '\n]'
     msg = None
-    print(d)
     attempts = 2
     while attempts > 0:
         attempts -= 1
@@ -79,7 +88,7 @@ def send_opensensemap_data(d):
                 logger.warning(log_message)
         except (Exception,OSError) as exceptz:
             logger.warning(exceptz)
-            logger.warning('post request failed.')
+            logger.warning('Opensensemap post request failed.')
             # here we could try to restore network connection before proceding
             wlan.turn_off()
             wlan.connect()
@@ -88,6 +97,10 @@ def send_opensensemap_data(d):
                 resp.close()
             except NameError:
                 pass
+#            try:
+#                del resp
+#            except KeyError:
+#                pass
     return False
 
 def fill_gauges_dict(values):
