@@ -45,7 +45,7 @@ def read_measures(fname):
         lines = []
         try:
             with open(fname, 'r') as fr:
-                count = 10
+                count = config.filelogger['measurements_per_sending']
                 for line in fr:
                     count -= 1
                     if count < 0:

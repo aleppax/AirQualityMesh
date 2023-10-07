@@ -66,7 +66,8 @@ datalogger = {
 }
 filelogger = {
     'filename' : '/logs/measures.txt',
-    'opensensemap_filename' : '/logs/osm-measures.txt'
+    'opensensemap_filename' : '/logs/osm-measures.txt',
+    'measurements_per_sending' : 8,
 }
 logger = {
     'logfile' : 'system.log',
