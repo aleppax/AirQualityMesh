@@ -49,13 +49,10 @@ def send_data(d):
             wlan.connect()
         finally:
             try:
+                restart_wdt()
                 resp.close()
             except NameError:
                 pass
-#            try:
-#                del resp
-#            except KeyError:
-#                pass
     return False
 
 def send_opensensemap_data(d):
@@ -94,13 +91,10 @@ def send_opensensemap_data(d):
             wlan.connect()
         finally:
             try:
+                restart_wdt()
                 resp.close()
             except NameError:
                 pass
-#            try:
-#                del resp
-#            except KeyError:
-#                pass
     return False
 
 def fill_gauges_dict(values):
