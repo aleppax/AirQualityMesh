@@ -7,6 +7,10 @@ from time import ticks_ms, ticks_diff
 from libs.sensors import measures
 gauges = measures.copy()
 gc.enable()
+opensensemap_enable = False
+
+if config.datalogger['opensensemap_enable']:
+    opensensemap_enable = True
 
 def send_data(d):
     gc.collect()

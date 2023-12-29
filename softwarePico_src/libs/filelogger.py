@@ -4,20 +4,20 @@ from libs.cron import feed_wdt
 
 lines_opms_queue = []
 lines_opensensemap_queue = []
-written_opms_queue = False
-written_opensensemap_queue = False
 
-def write(m):
-    global written_opms_queue, written_opensensemap_queue
-    written_opms_queue, written_opensensemap_queue = False, False
+def write(m,filename):
+    written = False
     logger.info("Saving locally to data queue.")
     feed_wdt()
-    # write to files, one for each data server.
-    written_opms_queue = write_measures(m,config.filelogger['filename'])
-    if config.datalogger['opensensemap_enable']:
-        written_opensensemap_queue = write_measures(m,config.filelogger['opensensemap_filename'])
-        return (written_opms_queue, written_opensensemap_queue)
-    return (written_opms_queue, True)
+    # write to file
+    written = write_measures(m,filename)
+    return written
+    
+def write_opms(m):
+    return write(m,config.filelogger['filename'])
+    
+def write_opensensemap(m):
+    return write(m,config.filelogger['opensensemap_filename'])
     
 def write_measures(csv_measures,fname):
     # convert to csv, doesn't check the order or number of items
@@ -29,15 +29,12 @@ def write_measures(csv_measures,fname):
     except Exception:
         logger.error("Could not write file: " + fname)
         return False
-    
-def read():
-    feed_wdt()
-    # retrieve all sets of measures in a list
-    csvdata_opms = read_measures(config.filelogger['filename'])
-    if config.datalogger['opensensemap_enable']:
-        csvdata_opensensemap = read_measures(config.filelogger['opensensemap_filename'])
-        return csvdata_opms, csvdata_opensensemap
-    return csvdata_opms, []
+
+def read_opms():
+    return read_measures(config.filelogger['filename'])
+
+def read_opensensemap():
+    return read_measures(config.filelogger['opensensemap_filename'])
 
 def read_measures(fname):
     if file_exists(fname):

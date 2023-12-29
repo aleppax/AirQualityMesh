@@ -1,0 +1,3 @@
+since micropython version 1.21.0 there's no need to patch the firmware,
+therefore we suggest to use the latest official release.
+the new releases have many interesting new features.
