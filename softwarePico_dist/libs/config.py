@@ -251,10 +251,10 @@ def set(dictname, key, value, do_reload=True):
 def _reload():
     del sys.modules['libs.config']
     # if config is imported by other modules, delete it recursively
-    # for mo in sys.modules:
-        # if 'config' in dir(sys.modules[mo]):
-            # del sys.modules[mo].__dict__['config']
-            # sys.modules[mo].__dict__['config'] = __import__('libs.config').config
+    for mo in sys.modules:
+        if 'config' in dir(sys.modules[mo]):
+            del sys.modules[mo].__dict__['config']
+            sys.modules[mo].__dict__['config'] = __import__('libs.config').config
     gc.collect()
     sys.modules['libs.config'] = __import__('libs.config').config
 
