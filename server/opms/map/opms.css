@@ -52,4 +52,5 @@ html, body, #opmsMap {
 .idw-legend {
     height: 90vh;
     overflow: scroll;
+    max-height: 800px;
 }
