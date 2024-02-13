@@ -47,7 +47,7 @@ cron = {
     # 'sensor_preheating_s' do not change, suggested by the manufacturers' datasheets
     'last_update_check' : 0,
     'current_version' : 64,
-    'repository' : 'https://raw.githubusercontent.com/aleppax/outdoorPMstation/updates/concept/softwarePico_dist',
+    'repository' : 'https://raw.githubusercontent.com/aleppax/AirQualityMesh/updates/concept/softwarePico_dist',
     #'repository' : 'http://192.168.0.88:8000', # example of local server
     'use_wdt' : True,
 }
