@@ -24,6 +24,7 @@ board = {
     'I2C_SCL' : 9,
     'I2C_freq' : 100000,
     'WDT_seconds' : 8,
+    'led_pin' : 22,  ## choose one between [22,26,27]
 }
 cron = {
     'NTP_server' : 'it.pool.ntp.org',
@@ -52,11 +53,21 @@ cron = {
 }
 datalogger = {
     'URL' : 'http://example.org/opms/api.php/records/',
+    'apikey' : '',
     # use your REST server. prefer unsecure http
     # to avoid crashes due to limitations of the implementation.
+    'opensensemap_enable' : False,
+    'opensensemap_API_URL' : 'https://api.opensensemap.org/boxes/',
+    'opensensemap_token' : '',
+    'senseBox_ID' : '',
+    'temperature_ID' : '',
+    'humidity_ID' : '',
+    'pm2.5_ID' : '',
 }
 filelogger = {
     'filename' : '/logs/measures.txt',
+    'opensensemap_filename' : '/logs/osm-measures.txt',
+    'measurements_per_sending' : 8,
 }
 logger = {
     'logfile' : 'system.log',
@@ -160,6 +171,9 @@ station = {
     'station' : None, # unique at least server wise.
     'latitude' : 0.0,
     'longitude' : 0.0,
+    'rover' : False, # single configuration switch to enable neo6m receiver on pins 16,17 ans GPS localization before each measurement. Requires a NEO-6M GPS module
+    'rover_status_channel' : 'GPIO22', # choose between 'GPIO22', and nothing else for now
+    'rover_sensor_height_above_ground' : 1, # meters
 }
 wlan = {
     'SSID_0' : 'xxx',
@@ -283,6 +297,23 @@ def initialize_board():
         gpio['GP'+str(pin)].off()
     for pin in board['GPIO_in']:
         gpio['GP'+str(pin)] = machine.Pin(pin, machine.Pin.IN, machine.Pin.PULL_DOWN)
-    
+    if board['led_pin'] in [1,22,26,27]:
+        board['ledpin'] = machine.Pin(board['led_pin'], machine.Pin.OUT)
+        flash_led('ok')
+    else:
+        board.ledpin = None
     return i2c, gpio
 
+def flash_led(mode):
+    if 'ledpin' in board:
+        if board['ledpin'] != None:
+            modes = {
+                'ok' : [1],
+                'error' : [0.5,0.5,0.5],
+            }
+            for s in modes[mode]:
+                board['ledpin'].on()
+                sleep(s)
+                board['ledpin'].off()
+                sleep(0.2)
+    

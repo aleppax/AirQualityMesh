@@ -9,7 +9,6 @@
 body{{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#555}}
 #co01{{color:#04aa6d}}
 #co01{{padding-left:20px}}
-#eyes,#eyes2{{display:inline;}}
 #battery{{background-color: #d6ffd5;border-radius:6px;padding:16px;}}
 br, label{{margin-bottom:5px;}}
 mark{{background-color:#ace1ac}}
@@ -34,11 +33,11 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
 <body>
 <div class="topnav" id="navbar">
     <h1 id="co01" class="translate">Station configuration</h1>
-    <a href="/basic" class="navbtn active" id="basic">basic</a>
+    <a href="/basic" class="navbtn" id="basic">basic</a>
     <a href="/status" class="navbtn" id="status">status</a>
     <a href="/network" class="navbtn" id="network">network</a>
     <a href="/datalogger" class="navbtn" id="datalogger">datalogger</a>
-    <a href="/opensensemap" class="navbtn" id="opensensemap">opensensemap</a>
+    <a href="/opensensemap" class="navbtn active" id="opensensemap">opensensemap</a>
     <a href="/syslogger" class="navbtn" id="syslogger">syslogger</a>
     <a href="/mqtt" class="navbtn" id="MQTT">MQTT</a>
     <a href="/advanced" class="navbtn" id="advanced">advanced</a>
@@ -52,73 +51,47 @@ button{{display:inline-block;padding:6px 12px;margin:20px;font-size:16px;text-al
 </div>
 <div class="well">
 <form class="rendered-form" id="rendered-form" action="" method="post">
-    <h2 class="cat basic translate" id="WiFi">WiFi credentials</h2>
-    <div class="cat form-group basic">
-        <label for="cfg_wlan_SSID_0">SSID used to connect to the internet</label>
-        <input type="text" class="form-control" name="cfg_wlan_SSID_0" value="{cfg_wlan_SSID_0}" maxlength="24" id="cfg_wlan_SSID_0" title="enter the SSID of the network to which you want to connect the station" required="required" aria-required="true">
+    <h2 class="cat translate" id="Osen">Enable OpenSenseMap data submission</h2>
+    <div class="cat form-group advanced">
+        <label for="opensensemap_enable">if active, it enables the submission of measurements to <mark>OpensenseMap.org</mark>. <br> Opensensemap is a free service aggregating sensor data from all over the world. It requires registration.</label>
+        <input class="form-control opensensemap_enable" name="opensensemap_enable" id="opensensemap_enable" type="checkbox" {opensensemap_enable}>
     </div>
-    <div class="cat form-group basic">
-        <label for="cfg_wlan_PASSW_0">Password</label><p id="eyes"> 🧐 </p><input type="checkbox" id="show_password">
-        <input type="password" class="form-control" name="cfg_wlan_PASSW_0" value="{cfg_wlan_PASSW_0}" maxlength="16" id="cfg_wlan_PASSW_0" required="required" aria-required="true">
+    <h2 class="cat translate" id="Osms">OpenSenseMap server</h2>
+    <div class="cat form-group">
+        <label for="opensensemap-url">API server URL</label>
+        <input class="form-control opensensemap-url" name="opensensemap-url" id="opensensemap-url" type="url" value="{opensensemap_url}">
     </div>
-    <br>
-    <div class="cat form-group basic">
-        <label for="cfg_wlan_SSID_AP">Access Point SSID, used to connect to this configuration page.</label>
-        <input type="text" class="form-control" name="cfg_wlan_SSID_AP" value="{cfg_wlan_SSID_AP}" maxlength="24" id="cfg_wlan_SSID_AP" title="enter the SSID of the network to which you want to connect the station" required="required" aria-required="true">
+    <h2 class="cat translate" id="Osmt">OpenSenseMap token</h2>
+    <div class="cat form-group">
+        <label for="opensensemap_token">API token</label>
+        <input class="form-control opensensemap_token" name="opensensemap_token" id="opensensemap_token" type="text" value="{opensensemap_token}">
     </div>
-    <div class="cat form-group basic">
-        <label for="cfg_wlan_PASSW_AP">AP Password</label><p id="eyes2"> 🧐 </p><input type="checkbox" id="show_password2">
-        <input type="password" class="form-control" name="cfg_wlan_PASSW_AP" value="{cfg_wlan_PASSW_AP}" maxlength="16" id="cfg_wlan_PASSW_AP" required="required" aria-required="true">
+    <h2 class="cat translate" id="Osmb">senseBox ID</h2>
+    <div class="cat form-group">
+        <label for="senseBox_ID">OpenSenseMap senseBox ID</label>
+        <input class="form-control senseBox_ID" name="senseBox_ID" id="senseBox_ID" type="text" value="{senseBox_ID}">
     </div>
-    <h2 class="cat basic translate" id="Geol">Geolocation</h2>
-    <div class="cat form-group basic">
-        <label for="text-latitude" id="mess_geolocation">Configure the location of where the device will be installed.</label>
+    <h2 class="cat translate" id="Osmc">Temperature sensor ID</h2>
+    <div class="cat form-group">
+        <label for="temperature_ID">Temperature sensor ID</label>
+        <input class="form-control temperature_ID" name="temperature_ID" id="temperature_ID" type="text" value="{temperature_ID}">
     </div>
-    <div class="cat form-group basic">
-        <label for="text-latitude">Latitude</label>
-        <input type="latitude" class="form-control" name="text-latitude" value="{cfg_station_latitude}" maxlength="16" id="text-latitude" required="required" aria-required="true">
+    <h2 class="cat translate" id="Osmd">Humidity sensor ID</h2>
+    <div class="cat form-group">
+        <label for="humidity_ID">Humidity sensor ID</label>
+        <input class="form-control humidity_ID" name="humidity_ID" id="humidity_ID" type="text" value="{humidity_ID}">
     </div>
-    <div class="cat form-group basic">
-        <label for="text-longitude">Longitude</label>
-        <input type="longitude" class="form-control" name="text-longitude" value="{cfg_station_longitude}" maxlength="16" id="text-longitude" required="required" aria-required="true">
+    <h2 class="cat translate" id="Osme">Particulate matter sensor ID</h2>
+    <div class="cat form-group">
+        <label for="pm25_ID">PM sensor ID</label>
+        <input class="form-control pm25_ID" name="pm25_ID" id="pm25_ID" type="text" value="{pm25_ID}">
     </div>
-    <h2 class="cat basic power translate" id="Meas">Measurement interval</h2>
-    <div class="cat form-group basic power">
-        <label for="measures-per-day">Measurement interval: <span id="minterval"></span> minutes</label><br>
-        <label for="measures-per-day">Measures per day: <span id="mpday"></span></label>
-        <div class="slider-container"><input class="slider" id="measures-per-day" name="measures-per-day" type="range" min="2" max="720" step="2" value="{cfg_cron_measurements_per_day}"></div>
-    </div>
-    <h2 class="cat basic translate" id="Data">Datalogger server</h2>
-    <div class="cat form-group basic">
-        <label for="datalogger-url">API server URL</label>
-        <input class="form-control datalogger-url" name="datalogger-url" id="datalogger-url" type="url" value="{cfg_datalogger_URL}">
-    </div>
-    <div class="cat form-group basic network power logger advanced">
-        <button name="opms" class="translate" value="submit" id="Submit">Submit</button>
+    <div class="cat form-group">
+        <button class="translate" value="submit" id="Submit">Submit</button>
     </div>
 </form>
 </div>
 <script>
-
-function addPasswordHider(icon, button, input) {{
-    let pw_button = document.getElementById(button);
-    let pw_input = document.getElementById(input);
-    let pw_icon = document.getElementById(icon);
-    pw_button.addEventListener("click", () => {{
-      document.documentElement.classList.toggle(button);
-      if (pw_input.getAttribute("type") === "password") {{
-        pw_input.setAttribute("type", "text");
-        pw_icon.textContent = " 🤐 "
-      }} else {{
-        pw_input.setAttribute("type", "password");
-        pw_icon.textContent = " 🧐 "
-      }}
-    }});
-}};
-
-addPasswordHider("eyes", "show_password", "cfg_wlan_PASSW_0")
-addPasswordHider("eyes2", "show_password2", "cfg_wlan_PASSW_AP")
-
 function dropNav() {{
   var x = document.getElementById("navbar");
   if (x.className === "topnav") {{
@@ -126,34 +99,31 @@ function dropNav() {{
   }} else {{
     x.className = "topnav";
   }}
-}}
-
-const slider_mpday = document.getElementById("measures-per-day");
-const mpday = document.getElementById("mpday");
-const minterval = document.getElementById("minterval");
-function onSlideMpday() {{
-    mpday.textContent = slider_mpday.value;
-    minterval.textContent = (60*24/slider_mpday.value).toFixed(3);
-}}
-slider_mpday.addEventListener('input', onSlideMpday, false);
+}};
 
 const translations = {{
   'English': {{
     'co01': 'Station configuration',
     'Lang': 'Language',
-    'WiFi': 'WiFi credentials',
-    'Geol': 'Geolocation',
-    'Meas': 'Measurement interval',
-    'Data': 'Datalogger server',
+    'Osen': 'Enable OpenSenseMap data submission',
+    'Osms': 'OpenSenseMap server',
+    'Osmt': 'OpenSenseMap token',
+    'Osmb': 'senseBox ID',
+    'Osmc': 'Temperature sensor ID',
+    'Osmd': 'Humidity sensor ID',
+    'Osme': 'Particulate matter sensor ID',
     'Submit': 'Submit'
   }},
   'Italian': {{
     'co01': 'Configurazione della stazione',
     'Lang': 'Lingua',
-    'WiFi': 'Credenziali WiFi',
-    'Geol': 'Geolocalizzazione',
-    'Meas': 'Intervallo di misurazione',
-    'Data': 'Server di raccolta dei dati',
+    'Osen': 'Abilita l\'invio di dati a OpenSenseMap',
+    'Osms': 'Server di OpenSenseMap',
+    'Osmt': 'API Token di OpenSenseMap',
+    'Osmb': 'ID del senseBox',
+    'Osmc': 'ID del sensore di temperatura',
+    'Osmd': 'ID del sensore di umidità',
+    'Osme': 'ID del sensore di polveri sottili',
     'Submit': 'Salva'
   }}
 }};
@@ -171,13 +141,12 @@ lang_select.addEventListener("change",function(e) {{
 var submt = document.getElementById("Submit");
 function myConfirmation() {{
     return 'Are you sure you want to leave?';
-}}
+}};
 window.onbeforeunload = myConfirmation;
 
 document.getElementById("rendered-form").addEventListener("submit", function() {{
     window.onbeforeunload = null;
 }});
-
 window.addEventListener("load", (event) => {{
   onSlideMpday();
 }});

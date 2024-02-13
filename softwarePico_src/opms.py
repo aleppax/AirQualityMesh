@@ -52,7 +52,10 @@ def updates_rover():
         reset()
 
 def send_values():
-    done = filelogger.write(sensors.measures) # current measures sent or saved somewhere
+    opms_logged = filelogger.write_opms(sensors.measures) # current measures immediately saved to file
+    # if using opensensemap, write current measures also to specific file queue
+    if datalogger.opensensemap_enable:
+        opensensemap_logged = filelogger.write_opensensemap(sensors.measures)
     if cron.check_data_schedule(sensors.battery_values[2],sensors.leadacid.min_charging_voltage):
         # connect to wifi only if sending data is scheduled
         if wlan.connect():
@@ -60,24 +63,38 @@ def send_values():
             attempts = datalogger.attempts()
             while attempts > 0:
                 attempts -= 1
-                file_lines = filelogger.read()
-                if len(file_lines) == 0:
-                    break
-                if datalogger.send_data_list(file_lines):
-                    filelogger.write_remaining_data()
-            #current data submission to servers
-            if not done:
-                done = datalogger.send_data(sensors.measures)
-            if done:
+                opms_file_lines = filelogger.read_opms()
+                if len(opms_file_lines) != 0:
+                    if datalogger.send_data_list(opms_file_lines):
+                        filelogger.write_remaining_opms_data()
+                if datalogger.opensensemap_enable:
+                    opensensemap_file_lines = filelogger.read_opensensemap()
+                    if len(opensensemap_file_lines) != 0:
+                        if datalogger.send_opensensemap_data_list(opensensemap_file_lines):
+                            filelogger.write_remaining_opensensemap_data()
+            #if errors occurred, try to submit current data to remote servers
+            if not opms_logged:
+                opms_logged = datalogger.send_data(sensors.measures)
+            if datalogger.opensensemap_enable:
+                if not opensensemap_logged:
+                    opensensemap_logged = datalogger.send_opensensemap_data(sensors.measures)
+            if opms_logged:
                 cron.update_last_data_sent()
                 mqttlogger.send_data(sensors.measures)
             else:
-                done = filelogger.write(sensors.measures)  
+                opms_logged = filelogger.write_measures(sensors.measures,config.filelogger['filename'])
         wlan.turn_off()
-    if not done:
-        done = filelogger.write(sensors.measures)
-    if not done:
-        logger.error('current measures cannot be saved.')
+    # retry writing to file
+    if not opms_logged:
+        opms_logged = filelogger.write_measures(sensors.measures,config.filelogger['filename'])
+    if datalogger.opensensemap_enable:
+        if not opensensemap_logged:
+            opensensemap_logged = filelogger.write_measures(sensors.measures,config.filelogger['opensensemap_filename'])
+    if not opms_logged:
+        logger.error('current measures cannot be saved or sent to OPMS server.')
+    if datalogger.opensensemap_enable:
+        if not opensensemap_logged:
+            logger.error('current measures cannot be saved or sent to OpenSenseMap API server.')
 
 
 if cron.is_rover():
