@@ -1,6 +1,6 @@
 
 
-# outdoor particulate matter <img alt="opms logo" src="./marker_opms.svg" width="20%"/> station
+# outdoor air quality <img alt="opms logo" src="./marker_opms.svg" width="20%"/> station
 
 current development status: [Proof of Concept.](roadmap.md)
 
@@ -10,6 +10,8 @@ It can work both as a stationary or a roving unit, logging datetime, position an
 ![mainboard rendering](./casing/pictures/picture_sensors_installed.jpg "an external photo of the installed system")
 
 ![data visualization](./online_data-map.png "online charto of data from a single station")
+
+![station configuration](./config_server.jpeg "on board configuration webserver")
 
 ## Supported sensors 
 
