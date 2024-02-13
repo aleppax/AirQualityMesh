@@ -93,14 +93,10 @@ function initMap() {
     opmsMap.on("moveend", loadStations);
     opmsMap.on("click", chartToBackground);
     
-    if(L.Browser.mobile) {
-        
-    } else {
-        pm25Legend = new L.control.opmsLegend(pm25Gradient, {
+    pm25Legend = new L.control.opmsLegend(pm25Gradient, {
           position: 'bottomright',
           unit: "μg/m³"
-        }).addTo(opmsMap);
-    };
+    }).addTo(opmsMap);
 };
 
 function averagePM25(chart) {

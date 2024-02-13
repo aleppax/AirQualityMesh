@@ -48,3 +48,8 @@ html, body, #opmsMap {
 
 #opmsChart {
 }
+
+.idw-legend {
+    height: 90vh;
+    overflow: scroll;
+}
