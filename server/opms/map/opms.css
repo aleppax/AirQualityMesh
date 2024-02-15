@@ -54,3 +54,9 @@ html, body, #opmsMap {
     overflow: scroll;
     max-height: 800px;
 }
+
+#oneMoreDay {
+    position: absolute;
+    left: 25px;
+    cursor: w-resize;
+}
