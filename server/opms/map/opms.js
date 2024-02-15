@@ -1,11 +1,11 @@
-const api_url = "http://domain.org/opms/api/api.php";
+const api_url = "http://vallecherasca.org/opms/api/api.php";
 const map_center = [44.6798, 8.0362];
 // data from server is referred to UTC time, 
 // the script should display dates with the browser's time offset.
 var opmsMap;
 var stations = [];
 var activeStation = 0
-const jca=jscrudapi(api_url,{headers:{'X-API-Key':''}});
+const jca=jscrudapi(api_url,{headers:{'X-API-Key':'RnglFqDTBsVIw6s9-ezOyM685EctG-Qr36dSeJPB96E'}});
 let pm25Layer, temperatureLayer, calPm25Layer;
 
 
@@ -339,18 +339,16 @@ function loadMoreDays(station_id,days=1) {
 
 function loadLatestDayRecords(station_id,days=1) {
     let station = stations.filter(station => station.id == station_id)[0];
-    if (!station.hasOwnProperty('latestDay')) {
-        station.days = 1
-        downloadRecords(station_id,1,0).then((response) => {
-            station.latestDay = response.records
-            var oc = Chart.getChart('opmsChart')
-            let [dataSets,labels] = formatDataset(station)
-            oc.data.datasets = dataSets
-            oc.data.labels = labels
-            hideSomeChartSets(oc)
-            oc.update();
-        })
-    }
+    station.days = 1
+    downloadRecords(station_id,1,0).then((response) => {
+        station.latestDay = response.records
+        var oc = Chart.getChart('opmsChart')
+        let [dataSets,labels] = formatDataset(station)
+        oc.data.datasets = dataSets
+        oc.data.labels = labels
+        hideSomeChartSets(oc)
+        oc.update();
+    })
 }
 
 function plotStationData(sts) {
