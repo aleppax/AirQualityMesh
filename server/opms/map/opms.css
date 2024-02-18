@@ -48,3 +48,15 @@ html, body, #opmsMap {
 
 #opmsChart {
 }
+
+.idw-legend {
+    height: 90vh;
+    overflow: scroll;
+    max-height: 800px;
+}
+
+#oneMoreDay {
+    position: absolute;
+    left: 25px;
+    cursor: w-resize;
+}

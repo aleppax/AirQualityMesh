@@ -1,9 +1,10 @@
-const api_url = "http://opms.lettori.org/api/api.php";
+const api_url = "http://vallecherasca.org/opms/api/api.php";
 const map_center = [44.6798, 8.0362];
 // data from server is referred to UTC time, 
 // the script should display dates with the browser's time offset.
 var opmsMap;
 var stations = [];
+var activeStation = 0
 const jca=jscrudapi(api_url,{headers:{'X-API-Key':'RnglFqDTBsVIw6s9-ezOyM685EctG-Qr36dSeJPB96E'}});
 let pm25Layer, temperatureLayer, calPm25Layer;
 
@@ -93,14 +94,10 @@ function initMap() {
     opmsMap.on("moveend", loadStations);
     opmsMap.on("click", chartToBackground);
     
-    if(L.Browser.mobile) {
-        
-    } else {
-        pm25Legend = new L.control.opmsLegend(pm25Gradient, {
+    pm25Legend = new L.control.opmsLegend(pm25Gradient, {
           position: 'bottomright',
           unit: "μg/m³"
-        }).addTo(opmsMap);
-    };
+    }).addTo(opmsMap);
 };
 
 function averagePM25(chart) {
@@ -185,12 +182,17 @@ function initChart() {
                     maxpm25,dailyAverage
                 }
             }
-        }    
+        }
     },
     };
     new Chart(document.getElementById('opmsChart'),
     config
     );
+    let oneMoreButton = document.getElementById('oneMoreDay')
+    oneMoreButton.addEventListener("click", function() {
+        console.log('one more')
+        loadMoreDays(activeStation,1)
+    });
 }
 
 const OPMSlegendClickHandler = function(e, legendItem, legend) {
@@ -225,20 +227,18 @@ async function loadLatestRecord(station) {
     return station;
 }
 
-async function loadLatestDayRecords(station_id) {
-    let station = stations.filter(station => station.id == station_id)[0];
-    if (!station.hasOwnProperty('latestDay')) {
-        let yesterdayness = new Date(new Date(station.latest.datetime).getTime() - 1000*3600*24).toISOString().split('.')[0] + 'Z'
-        let ltst = await jca.list('measurements', {filter:[`station,eq,${station_id}`,`datetime,gt,${yesterdayness}`], order:'datetime,asc'});
-        station.latestDay = await ltst.records;
-    }
+function concatDatasets (ds1, ds2) {
+  
+}
+
+function formatDataset (station) {
     let label = station.latestDay.map(row => row.datetime);
-    let data = [];
+    let dataSets = [];
     if (station["pm capable ch2"]) {
-        data.push({
+        dataSets.push({
         label: 'aux PM1.0 ug/m³',
         data: station.latestDay.map(function (row) {if (row["pm1.0_ch2"] != 0) {
-                return row["pm1.0_ch2"];
+                return Math.min(Math.max(row["pm1.0_ch2"], 0), 200);
             } else {
                 return null;
             }}),
@@ -247,7 +247,7 @@ async function loadLatestDayRecords(station_id) {
       },{
         label: 'aux PM2.5 ug/m³',
         data: station.latestDay.map(function (row) {if (row["pm2.5_ch2"] != 0) {
-                return row["pm2.5_ch2"];
+                return Math.min(Math.max(row["pm2.5_ch2"], 0), 200);
             } else {
                 return null;
             }}),
@@ -256,16 +256,16 @@ async function loadLatestDayRecords(station_id) {
       })
     };
     if (station["pm capable ch1"]) {
-        data.push({
+        dataSets.push({
         label: 'PM1.0 ug/m³',
-        data: station.latestDay.map(row => row["pm1.0"]),
+        data: station.latestDay.map(row => Math.min(Math.max(row["pm1.0"], 0), 200)),
         borderWidth: 1,
         fill: {
             target : 'origin',
         }
       },{
         label: 'PM2.5 ug/m³',
-        data: station.latestDay.map(row => row["pm2.5"]),
+        data: station.latestDay.map(row => Math.min(Math.max(row["pm2.5"], 0), 200)),
         borderWidth: 1,
         fill: {
             target : 'origin',
@@ -273,7 +273,7 @@ async function loadLatestDayRecords(station_id) {
       })
     };
     if (station["temperature capable"]) {
-        data.push({
+        dataSets.push({
         label: 'temperature '  + station["temperature units"],
         data: station.latestDay.map(row => row["temperature"]),
         borderWidth: 1,
@@ -283,7 +283,7 @@ async function loadLatestDayRecords(station_id) {
       })
     };
     if (station["humidity capable"]) {
-        data.push({
+        dataSets.push({
         label: 'humidity '  + station["humidity units"],
         data: station.latestDay.map(row => row["humidity"]),
         borderWidth: 1,
@@ -292,7 +292,7 @@ async function loadLatestDayRecords(station_id) {
         }
       })
     };
-    data.push({
+    dataSets.push({
         label: 'vsys voltage V',
         data: station.latestDay.map(row => row["vsys voltage"]),
         borderWidth: 1,
@@ -300,20 +300,55 @@ async function loadLatestDayRecords(station_id) {
             target : 'origin',
         }
     });
-    var oc = Chart.getChart('opmsChart');
-    oc.data.labels = label;
-    oc.data.datasets = data;
+    return [dataSets,label]
+}
+
+function hideSomeChartSets (chart) {
     indexes_of_datasets_to_hide = [];
-    oc.data.datasets.forEach(function (val, indx) {
+    chart.data.datasets.forEach(function (val, indx) {
         if (!(["PM2.5 ug/m³","aux PM2.5 ug/m³"].includes(val.label))) {
             indexes_of_datasets_to_hide.push(indx);
             }
         })
     for (const i of indexes_of_datasets_to_hide) {
-    oc.getDatasetMeta(i).hidden=true;
+    chart.getDatasetMeta(i).hidden=true;
     };
-    oc.update();
-    return;
+}
+
+async function downloadRecords (station_id,fromDayAgo,toDayAgo) {
+    let station = stations.filter(station => station.id == station_id)[0];
+    let todayness = new Date(new Date(station.latest.datetime).getTime() - 1000*3600*24*toDayAgo).toISOString().split('.')[0] + 'Z'
+    let fromdayness = new Date(new Date(station.latest.datetime).getTime() - 1000*3600*24*fromDayAgo).toISOString().split('.')[0] + 'Z'
+    let ltst = await jca.list('measurements', {filter:[`station,eq,${station_id}`,`datetime,bt,${fromdayness},${todayness}`], order:'datetime,asc'});
+    return ltst;
+}
+
+function loadMoreDays(station_id,days=1) {
+    let station = stations.filter(station => station.id == station_id)[0];
+    station.days += days
+    downloadRecords(station_id,station.days,station.days-days).then((response) => {
+        station.latestDay = response.records.concat(station.latestDay)
+        const oc = Chart.getChart('opmsChart')
+        let [dataSets,labels] = formatDataset(station)
+        oc.data.datasets = dataSets
+        oc.data.labels = labels
+        hideSomeChartSets(oc)
+        oc.update();
+    })
+}
+
+function loadLatestDayRecords(station_id,days=1) {
+    let station = stations.filter(station => station.id == station_id)[0];
+    station.days = 1
+    downloadRecords(station_id,1,0).then((response) => {
+        station.latestDay = response.records
+        var oc = Chart.getChart('opmsChart')
+        let [dataSets,labels] = formatDataset(station)
+        oc.data.datasets = dataSets
+        oc.data.labels = labels
+        hideSomeChartSets(oc)
+        oc.update();
+    })
 }
 
 function plotStationData(sts) {
@@ -327,7 +362,9 @@ function plotStationData(sts) {
             mkx = L.marker(L.latLng(stx.latitude, stx.longitude), {icon:svgIcon}).addTo(opmsMap);
             let mkx_content = `<div class="leaflet-control-layers-base" station="${stx.id}"> <table> <tr> <td>station ID: </td><td>${stx.id}</td></tr><tr> <td>Name: </td><td>${stx.name}</td></tr><tr> <td>purpose: </td><td>${stx['station purpose']}</td></tr><tr> <td>Location: </td><td>Lat. ${stx.latitude} - Lon. ${stx.longitude}</td></tr><tr> <td>altitude msl: </td><td>${stx['altitude msl']}</td></tr><tr> <td>Height above ground: </td><td>${stx['height above ground']}cm</td></tr><tr> <td><input type="checkbox" name="PM channel 1" onclick="return false;" ${(stx['pm capable ch1']==1) ? 'checked' : ''}/> PM channel 1</td><td><input type="checkbox" name="PM channel 2" onclick="return false;" ${(stx['pm capable ch2']==1) ? 'checked' : ''}/> PM channel 2</td></tr><tr> <td><input type="checkbox" name="sound pressure" onclick="return false;" ${(stx['sound pressure capable']==1) ? 'checked' : ''}/> sound pressure</td><td><input type="checkbox" name="barometric pressure" onclick="return false;" ${(stx['barometric pressure capable']==1) ? 'checked' : ''}/> barometric pressure</td></tr><tr> <td><input type="checkbox" name="temperature" onclick="return false;" ${(stx['temperature capable']==1) ? 'checked' : ''}/> temperature</td><td><input type="checkbox" name="wind direction" onclick="return false;" ${(stx['wind direction capable']==1) ? 'checked' : ''}/> wind direction</td></tr><tr> <td><input type="checkbox" name="wind speed" onclick="return false;" ${(stx['wind speed capable']==1) ? 'checked' : ''}/> wind speed</td><td><input type="checkbox" name="humidity" onclick="return false;" ${(stx['humidity capable']==1) ? 'checked' : ''}/> humidity</td></tr><tr> <td><input type="checkbox" name="vehicle count" onclick="return false;" ${(stx['vehicle count capable']==1) ? 'checked' : ''}/> vehicle count</td><td><img class="chartIcon" src="chartIcon.jpg" alt="last day chart" onclick="chartToForeground()"/></td></tr></table> </div><div> <a id="idw-display-close-button" class="leaflet-popup-close-button" href="#close">×</a> </div>`;
             mkx.bindPopup(mkx_content,{offset : L.point(3, -32)});
-            opmsMap.on("popupopen",function(e) {loadLatestDayRecords(e.popup._contentNode.firstChild.attributes['station'].value);});
+            opmsMap.on("popupopen",function(e) {
+              activeStation = e.popup._contentNode.firstChild.attributes['station'].value
+              loadLatestDayRecords(activeStation);});
             stx.marker = mkx;
             loadLatestRecord(stx).then(colorizeMarker);
             stations.push(stx);
@@ -339,7 +376,6 @@ function colorizeMarker(statn) {
     let htlst = [...statn.marker._icon.firstChild.children];
     let colorIndex = 2 * Math.round(statn.latest["pm2.5"] / 2);
     colorIndex = Math.min(Math.max(colorIndex, 0), 82);
-    console.log(colorIndex);
     let color = pm25Gradient[colorIndex]; 
     htlst.forEach((item) => {
         if (item.classList.value === "marker1") { 
