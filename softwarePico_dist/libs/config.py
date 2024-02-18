@@ -152,6 +152,7 @@ sensors = {
     'average_measurement_interval_ms' : 1000,
     'enable_sensors' : True,
     'aux_measure_s' : 3600, # 1 hour
+    'recirculation_fan_power_pin' : 'GP2',
 }
 sps30 = {
     'name' : 'PM Sensor SPS30',

@@ -36,10 +36,11 @@ measures = OrderedDict([
     ('longitude',0)
 ])
 battery_values = ()
+recirculation_fan_gpio = 0
 
 def init(i2c, gpio):
     feed_wdt()
-    global sensors, latest_aux_measure, use_aux_sensors
+    global sensors, latest_aux_measure, use_aux_sensors, recirculation_fan_gpio
     if config.sensors['enable_sensors']:
         latest_aux_measure = time()
         use_aux_sensors = False
@@ -79,6 +80,7 @@ def init(i2c, gpio):
         if sensors['bmp280']['connected']: 
             sensors['bmp280']['object'].oversample(3)
         #
+        recirculation_fan_gpio = gpio[config.sensors['recirculation_fan_power_pin']]
         for pin in gpio:
             gpio[pin].off()
         power_i2c_devices(False,'off')
@@ -101,6 +103,8 @@ def power_i2c_devices(only_aux_devices=True, action='on'):
                     getattr(v['pwr_pin'],action)()
             else:
                 getattr(v['pwr_pin'],action)()
+    # here we enable the recirculation fan
+    getattr(recirculation_fan_gpio,action)()
     sleep_ms(200)
 
 def startupTests(i2c, gpio):
@@ -204,6 +208,7 @@ def measure(time_DTF):
     global measures, latest_aux_measure
     feed_wdt()
     reset_measures()
+    recirculation_fan_gpio.off()
     measures['station'] = config.station['station']
     measures['datetime'] = time_DTF
     measures['internal temperature'], measures['battery charge percentage'], measures['vsys voltage'], measures['battery is charging'] = battery_values

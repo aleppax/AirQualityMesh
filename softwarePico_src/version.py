@@ -1,9 +1,9 @@
-version = 66
+version = 67
 folders = ['/', '/libs', '/html', '/logs']
 #updates or new files. this file is manually updated and can only add or modify files or add folders
 updated_files = {
-    '/'     : ['opms.mpy'],
-    '/libs/' : ['config.py','datalogger.mpy','filelogger.mpy'],
+    '/'     : [],
+    '/libs/' : ['config.py','sensors.mpy'],
     '/logs/' : [],
     '/html/' : [], 
 }
